@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "testee src/test.html --browsers firefox --reporter Spec",
-    "start": "can-serve --port 8087",
+    "start": "can-serve --port 8080",
     "develop": "can-serve --develop --port 8087",
     "document": "documentjs",
     "build": "node build"
