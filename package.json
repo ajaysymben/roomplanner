@@ -10,8 +10,8 @@
   },
   "scripts": {
     "test": "testee src/test.html --browsers firefox --reporter Spec",
-    "start": "can-serve --port 8080",
-    "develop": "can-serve --develop --port 8087",
+    "start": "NODE_ENV=production node api/",
+    "develop": "node api/ --develop",
     "document": "documentjs",
     "build": "node build"
   },
@@ -32,10 +32,13 @@
       "documentjs",
       "testee",
       "donejs-deploy",
-      "generator-donejs"
+      "generator-donejs",
+      "mysql",
+      "body-parser"
     ]
   },
   "dependencies": {
+    "body-parser": "^1.14.1",
     "can": "^2.3.0-beta.5",
     "can-connect": "^0.3.1",
     "can-ssr": "^0.9.2",
@@ -44,6 +47,7 @@
     "done-css": "^1.1.11",
     "generator-donejs": "^0.3.2",
     "jquery": "^2.1.4",
+    "mysql": "^2.9.0",
     "steal": "^0.12.0-pre.9"
   },
   "devDependencies": {
