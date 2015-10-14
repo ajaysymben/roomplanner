@@ -1,1 +1,1 @@
-web: donejs start
+web: node api/
