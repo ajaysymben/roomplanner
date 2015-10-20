@@ -11,9 +11,11 @@ server({
     app.use( bodyParser.urlencoded({ extended: true }) );
     app.use( bodyParser.json() );
 
+    // app.get( '/initdbtables', api.createDatabaseTables );
     app.get( '/rooms', api.getRooms );
     app.post( '/rooms', api.saveRoom );
     app.get( '/items', api.getItems );
+    app.post( '/email', api.sendEmail );
 
     if ( process.argv.indexOf( "--develop" ) !== -1 ) {
       //is dev mode so do live reload

@@ -10,6 +10,9 @@
 
     <h1>{{message}}</h1>
 
+    <can-import from="svg-roomplanner/isvg/" />
+    <interactive-svg {height}="roomHeight" {width}="roomWidth" {is-running-in-browser}="isRunningInBrowser"></interactive-svg>
+
     {{asset "inline-cache"}}
 
     {{#switch env.NODE_ENV}}

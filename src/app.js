@@ -13,7 +13,15 @@ const AppViewModel = AppMap.extend({
       value: 'svg-roomplanner',
       serialize: false
     }
-  }
+  },
+
+  isRunningInBrowser: !( typeof process === "object" && {}.toString.call(process) === "[object process]" ),
+  //isRunningInNode: typeof process === "object" && {}.toString.call(process) === "[object process]",
+  //isRunningInNode2: typeof module !== 'undefined' && module.exports,
+
+  //dimensions in inches
+  roomHeight: 120,
+  roomWidth: 96
 });
 
 export default AppViewModel;
