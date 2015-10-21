@@ -31,30 +31,25 @@ export const ViewModel = Map.extend({
 		var heightFromMaxWidth = maxWidth / this.width * this.height;
 		var widthFromMaxHeight = maxHeight * this.width / this.height;
 
-		var useHeight = 0;
-		var useWidth = 0;
+		var bgSize = 0;
+		// bgSize has to be an integer in Chrome and FF to correctly display the grid (gradient), IE and
+		// Safari worked correctly without that constraint, but had to math it this way for consistency.
 
 		if ( heightFromMaxWidth <= maxHeight ) {
-			useHeight = heightFromMaxWidth;
-			useWidth = maxWidth;
-			this.scalar = heightFromMaxWidth / this.height;
+			bgSize = ~~( ( heightFromMaxWidth / this.height ) * this.gridLinesEvery );
 		} else if ( widthFromMaxHeight <= maxWidth ) {
-			useHeight = maxHeight;
-			useWidth = widthFromMaxHeight
-			this.scalar = widthFromMaxHeight / this.width;
+			bgSize = ~~( ( widthFromMaxHeight / this.width ) * this.gridLinesEvery );
 		}
 
+		this.scalar = bgSize / this.gridLinesEvery;
+
 		$isvg.css({
-			height: useHeight + "px",
-			width: useWidth + "px"
+			height: this.scalar * this.height + "px",
+			width: this.scalar * this.width + "px"
 		});
 
-		var bgSize = this.scalar * this.gridLinesEvery;
 		bgSize = bgSize + "px";
 		bgSize = bgSize + " " + bgSize;
-
-		// var bgSize = 100 * this.scalar * this.gridLinesEvery / useWidth + "% ";
-		// bgSize = bgSize + ( 100 * this.scalar * this.gridLinesEvery / useHeight ) + "%";
 
 		$isvg.find( "svg" ).css({
 			"background-size": bgSize
