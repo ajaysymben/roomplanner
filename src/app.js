@@ -20,8 +20,8 @@ const AppViewModel = AppMap.extend({
   //isRunningInNode2: typeof module !== 'undefined' && module.exports,
 
   //dimensions in inches
-  roomHeight: 120,
-  roomWidth: 96
+  roomHeight: 24 * 12,
+  roomWidth: 30 * 12
 });
 
 export default AppViewModel;
