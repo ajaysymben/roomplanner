@@ -19,9 +19,23 @@ const AppViewModel = AppMap.extend({
   //isRunningInNode: typeof process === "object" && {}.toString.call(process) === "[object process]",
   //isRunningInNode2: typeof module !== 'undefined' && module.exports,
 
-  //dimensions in inches
-  roomHeight: 24 * 12,
-  roomWidth: 30 * 12
+  isvgConfig: {
+    isRunningInBrowser: !( typeof process === "object" && {}.toString.call(process) === "[object process]" ),
+
+    //SVG's viewBox points ( sort of like pixels ) per 1 unit ( inch or whatever )
+    viewBoxPointsPerUnit: 10,
+
+    //grid lines every x units
+    gridLinesEvery: 12,
+
+    //dimensions in inches
+    height: 24 * 12,
+    width: 30 * 12,
+
+    //specify what element parts in the svg can be interacted with
+    iQueryString: "> g"
+  }
+
 });
 
 export default AppViewModel;

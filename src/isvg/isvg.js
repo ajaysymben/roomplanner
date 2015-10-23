@@ -6,10 +6,21 @@ import template from './isvg.stache!';
 
 export const ViewModel = Map.extend({
 	/*
-		Expects properties passed in through one-way parent -> child binding:
-			height
-			width
-			isRunningInBrowser
+		Expects config passed in through one-way parent -> child binding with attributes:
+	    "isRunningInBrowser" true if not ssr, must be true to fully work,
+
+	    //SVG's viewBox points ( sort of like pixels ) per 1 unit ( inch or whatever )
+	    "viewBoxPointsPerUnit" default: 10
+
+	    //grid lines every x units
+	    "gridLinesEvery" default: 12
+
+	    //dimensions in units ( inches, cm, or whatever )
+	    "height"
+	    "width"
+
+	    //interactive items query string; specifies what svg parts can be interacted with
+	    "iQueryString" default: "> *"
 	*/
 	define: {
 		message: {
@@ -19,12 +30,6 @@ export const ViewModel = Map.extend({
 
 	//scalar * units = px at current size
 	scalar: 1, //maxDimensionSize == dimensionSize ( 120 px = 120 units )
-
-	//grid lines every x units
-	gridLinesEvery: 12,
-
-	//SVG's viewBox points ( sort of like pixels ) per 1 unit ( inch or whatever )
-	viewBoxPointsPerUnit: 10,
 
 	getElementInfo: function ( svgPart ) {
 		var bboxInfo = svgPart.getBBox();
@@ -75,6 +80,19 @@ export const ViewModel = Map.extend({
 		transform += "scale( " + svgPartInfo.scaleX + " " + svgPartInfo.scaleY + " )";
 
 		svgPart.setAttribute( "transform", transform );
+	},
+
+	scalePartTo: function ( svgPart, scaleX, scaleY, svgPartInfo ) {
+		if ( typeof scaleY !== "number" ) {
+			svgPartInfo = scaleY;
+			scaleY = scaleX;
+		}
+		if ( !svgPartInfo ) svgPartInfo = this.getElementInfo( svgPart );
+
+		svgPartInfo.scaleX = scaleX;
+		svgPartInfo.scaleY = scaleY;
+
+		this.setTransform( svgPart, svgPartInfo );
 	},
 
 	rotatePartTo: function ( svgPart, angle, svgPartInfo ) {
@@ -131,7 +149,7 @@ export const ViewModel = Map.extend({
 		bgSize = bgSize + "px";
 		bgSize = bgSize + " " + bgSize;
 
-		$isvg.find( "svg" ).css({
+		this.attr( "$svg" ).css({
 			"background-size": bgSize
 		});
 	}
@@ -142,23 +160,78 @@ export default Component.extend({
 	viewModel: ViewModel,
 	template,
 	events: {
+		"init": function () {
+			var vm = this.viewModel;
+			if ( !vm ) return;
+
+			var config = vm.config;
+
+			vm.attr( "isRunningInBrowser", !!( config && config.isRunningInBrowser ) );
+
+			//SVG's viewBox points ( sort of like pixels ) per 1 unit ( inch, cm, or whatever )
+			vm.attr( "viewBoxPointsPerUnit", config && config.viewBoxPointsPerUnit || 10 );
+
+			//grid lines every x units
+			if ( config && config.gridLinesEvery === 0 ) {
+				vm.attr( "showGrid", false );
+			} else {
+				vm.attr( "showGrid", true );
+			}
+			vm.attr( "gridLinesEvery", config && config.gridLinesEvery || 12 );
+
+			//dimensions in "units" ( inches )
+			vm.attr( "width", config && config.width || 30 * 12 );
+			vm.attr( "height", config && config.height || 24 * 12 );
+
+			//interactive items query string
+			vm.attr( "iQueryString", config && config.iQueryString || "> *" );
+		},
+
 		"inserted": function () {
 			var vm = this.viewModel;
 			if ( !vm || !vm.isRunningInBrowser ) return;
 
+			vm.attr( "$svg", this.element.find( "svg" ) );
+
 			vm.setScaleSizes( this.element );
 
+			var svgEl = vm.attr( "$svg" )[ 0 ];
+			if ( vm.attr( "showGrid" ) ) {
+				svgEl.setAttribute( "class", "showGrid" );
+			} else {
+				svgEl.setAttribute( "class", "" );
+			}
+
 			//The viewBox only needs to be set once. Using vanilla setAttribute because "viewBox" is case sensitive.
-			this.element.find( "svg" )[ 0 ].setAttribute(
+			svgEl.setAttribute(
 				"viewBox",
-				"0 0 " + vm.width * vm.viewBoxPointsPerUnit + " " + vm.height * vm.viewBoxPointsPerUnit
+				"0 0 "
+					+ vm.attr( "width" ) * vm.attr( "viewBoxPointsPerUnit" )
+					+ " "
+					+ vm.attr( "height" ) * vm.attr( "viewBoxPointsPerUnit" )
 			);
 
-			var x = vm.getElementInfo( this.element.find( "svg > g" )[ 0 ] );
-			vm.moveCenterOfPartTo( this.element.find( "svg > g" )[ 0 ], 6 * 12, 3 * 12, x );
-			//console.log( x );
-			vm.rotatePartTo( this.element.find( "svg > g" )[ 0 ], 180, x );
+
+
+			var $isvgParts = vm.attr( "$svg" ).find( vm.attr( "iQueryString" ) );
+			var info = vm.getElementInfo( $isvgParts[ 0 ] );
+			vm.moveCenterOfPartTo( $isvgParts[ 0 ], 6 * 12, 3 * 12, info );
+			vm.rotatePartTo( $isvgParts[ 0 ], 305, info );
+
+			info = vm.getElementInfo( $isvgParts[ 1 ] );
+			vm.moveCenterOfPartTo( $isvgParts[ 1 ], 15 * 12, 12 * 12, info );
+			vm.rotatePartTo( $isvgParts[ 1 ], 0, info );
+			vm.scalePartTo( $isvgParts[ 1 ], 4, info );
+
+			info = vm.getElementInfo( $isvgParts[ 2 ] );
+			vm.movePartTo( $isvgParts[ 2 ], 14 * 12 + 6, 19 * 12 + 6, info );
+			vm.rotatePartTo( $isvgParts[ 2 ], -180, info );
+
+			info = vm.getElementInfo( $isvgParts[ 3 ] );
+			vm.movePartTo( $isvgParts[ 3 ], 23 * 12, 5 * 12, info );
+			vm.rotatePartTo( $isvgParts[ 3 ], 45, info );
 		},
+
 		"{window} resize": function () {
 			var vm = this.viewModel;
 			if ( !vm || !vm.isRunningInBrowser ) return;
