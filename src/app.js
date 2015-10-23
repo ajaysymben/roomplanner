@@ -23,14 +23,14 @@ const AppViewModel = AppMap.extend({
     isRunningInBrowser: !( typeof process === "object" && {}.toString.call(process) === "[object process]" ),
 
     //SVG's viewBox points ( sort of like pixels ) per 1 unit ( inch or whatever )
-    viewBoxPointsPerUnit: 10,
+    scalarUnitsToViewBoxPoints: 10,
 
     //grid lines every x units
     gridLinesEvery: 12,
 
     //dimensions in inches
-    height: 24 * 12,
     width: 30 * 12,
+    height: 24 * 12,
 
     //specify what element parts in the svg can be interacted with
     iQueryString: "> g"
