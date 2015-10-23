@@ -29,10 +29,10 @@ export const ViewModel = Map.extend({
 	},
 
 	//scalarUnitsToPx * units = px at current size
-	scalarUnitsToPx: 1, //set on inserted and on window resize via this.setScaleSizes()
+	scalarUnitsToPx: 1, //set on inserted and on window resize via this.setUnitScaleSizes()
 
 	//scalarPxToViewBoxPoints * px at current size = viewBoxPoints
-	scalarPxToViewBoxPoints: 10, //set on inserted and on window resize via this.setScaleSizes()
+	scalarPxToViewBoxPoints: 10, //set on inserted and on window resize via this.setUnitScaleSizes()
 
 	//scalarUnitsToViewBoxPoints * units = viewBoxPoints. Not effected from window resize.
 	scalarUnitsToViewBoxPoints: 10, //set during init event from config
@@ -46,6 +46,11 @@ export const ViewModel = Map.extend({
 
 		svgPartInfo.pxWidth = svgPartInfo.unitsWidth * this.scalarUnitsToPx;
 		svgPartInfo.pxHeight = svgPartInfo.unitsHeight * this.scalarUnitsToPx;
+
+		svgPartInfo.viewBoxPointsOffsetX = svgPartInfo.x * svgPartInfo.scaleX;
+		svgPartInfo.viewBoxPointsOffsetY = svgPartInfo.y * svgPartInfo.scaleY;
+		svgPartInfo.viewBoxPointsCenterOffsetX = svgPartInfo.viewBoxPointsWidth / 2 + svgPartInfo.viewBoxPointsOffsetX;
+		svgPartInfo.viewBoxPointsCenterOffsetY = svgPartInfo.viewBoxPointsHeight / 2 + svgPartInfo.viewBoxPointsOffsetY;
 	},
 
 	getPartInfo: function ( svgPart ) {
@@ -88,12 +93,12 @@ export const ViewModel = Map.extend({
 		return info;
 	},
 
-	setTransform: function ( svgPart, svgPartInfo ) {
-		var transform = "rotate( " + svgPartInfo.rotation + " ";
-		transform += ( svgPartInfo.translateX + svgPartInfo.viewBoxPointsWidth / 2 ) + " ";
-		transform += ( svgPartInfo.translateY + svgPartInfo.viewBoxPointsHeight / 2 ) + " ) ";
-		transform += "translate( " + svgPartInfo.translateX + " " + svgPartInfo.translateY + " ) ";
-		transform += "scale( " + svgPartInfo.scaleX + " " + svgPartInfo.scaleY + " )";
+	setTransform: function ( svgPart, info ) {
+		var transform = "rotate( " + info.rotation + " ";
+		transform += ( info.translateX + info.viewBoxPointsCenterOffsetX ) + " ";
+		transform += ( info.translateY + info.viewBoxPointsCenterOffsetY ) + " ) ";
+		transform += "translate( " + info.translateX + " " + info.translateY + " ) ";
+		transform += "scale( " + info.scaleX + " " + info.scaleY + " )";
 
 		svgPart.setAttribute( "transform", transform );
 	},
@@ -102,15 +107,15 @@ export const ViewModel = Map.extend({
 	// svgPart, scaleX, scaleY, svgPartInfo
 	// or
 	// svgPart, scale, svgPartInfo
-	scalePartTo: function ( svgPart, scaleX, scaleY, svgPartInfo ) {
+	scalePartFromCenterTo: function ( svgPart, scaleX, scaleY, svgPartInfo ) {
 		if ( typeof scaleY !== "number" ) {
 			svgPartInfo = scaleY;
 			scaleY = scaleX;
 		}
 		if ( !svgPartInfo ) svgPartInfo = this.getPartInfo( svgPart );
 
-		var centerUnitX = ( svgPartInfo.translateX + svgPartInfo.viewBoxPointsWidth / 2 ) / this.scalarUnitsToViewBoxPoints;
-		var centerUnitY = ( svgPartInfo.translateY + svgPartInfo.viewBoxPointsHeight / 2 ) / this.scalarUnitsToViewBoxPoints;
+		var centerUnitX = ( svgPartInfo.translateX + svgPartInfo.viewBoxPointsCenterOffsetX ) / this.scalarUnitsToViewBoxPoints;
+		var centerUnitY = ( svgPartInfo.translateY + svgPartInfo.viewBoxPointsCenterOffsetY ) / this.scalarUnitsToViewBoxPoints;
 
 		svgPartInfo.scaleX = scaleX;
 		svgPartInfo.scaleY = scaleY;
@@ -121,7 +126,7 @@ export const ViewModel = Map.extend({
 		this.moveCenterOfPartTo( svgPart, centerUnitX, centerUnitY, svgPartInfo );
 	},
 
-	rotatePartTo: function ( svgPart, angle, svgPartInfo ) {
+	rotatePartAboutCenterTo: function ( svgPart, angle, svgPartInfo ) {
 		if ( !svgPartInfo ) svgPartInfo = this.getPartInfo( svgPart );
 
 		svgPartInfo.rotation = angle;
@@ -132,8 +137,8 @@ export const ViewModel = Map.extend({
 	movePartTo: function ( svgPart, unitX, unitY, svgPartInfo ) {
 		if ( !svgPartInfo ) svgPartInfo = this.getPartInfo( svgPart );
 
-		svgPartInfo.translateX = unitX * this.scalarUnitsToViewBoxPoints;
-		svgPartInfo.translateY = unitY * this.scalarUnitsToViewBoxPoints;
+		svgPartInfo.translateX = unitX * this.scalarUnitsToViewBoxPoints - svgPartInfo.viewBoxPointsOffsetX;
+		svgPartInfo.translateY = unitY * this.scalarUnitsToViewBoxPoints - svgPartInfo.viewBoxPointsOffsetY;
 
 		this.setTransform( svgPart, svgPartInfo );
 	},
@@ -141,13 +146,13 @@ export const ViewModel = Map.extend({
 	moveCenterOfPartTo: function ( svgPart, unitX, unitY, svgPartInfo ) {
 		if ( !svgPartInfo ) svgPartInfo = this.getPartInfo( svgPart );
 
-		svgPartInfo.translateX = unitX * this.scalarUnitsToViewBoxPoints - svgPartInfo.viewBoxPointsWidth / 2;
-		svgPartInfo.translateY = unitY * this.scalarUnitsToViewBoxPoints - svgPartInfo.viewBoxPointsHeight / 2;
+		svgPartInfo.translateX = unitX * this.scalarUnitsToViewBoxPoints - svgPartInfo.viewBoxPointsCenterOffsetX;
+		svgPartInfo.translateY = unitY * this.scalarUnitsToViewBoxPoints - svgPartInfo.viewBoxPointsCenterOffsetY;
 
 		this.setTransform( svgPart, svgPartInfo );
 	},
 
-	setScaleSizes: function ( $isvg ) {
+	setUnitScaleSizes: function ( $isvg ) {
 		var margin = 20;
 		var maxWidth = $isvg.parent().width() - margin - margin;
 		var maxHeight = $isvg.parent().height() - margin - margin;
@@ -221,7 +226,7 @@ export default Component.extend({
 
 			vm.attr( "$svg", this.element.find( "svg" ) );
 
-			vm.setScaleSizes( this.element );
+			vm.setUnitScaleSizes( this.element );
 
 			var svgEl = vm.attr( "$svg" )[ 0 ];
 			if ( vm.attr( "showGrid" ) ) {
@@ -244,23 +249,23 @@ export default Component.extend({
 			var $isvgParts = vm.attr( "$svg" ).find( vm.attr( "iQueryString" ) );
 			var info = vm.getPartInfo( $isvgParts[ 0 ] );
 			vm.moveCenterOfPartTo( $isvgParts[ 0 ], 6 * 12, 3 * 12, info );
-			vm.rotatePartTo( $isvgParts[ 0 ], 305, info );
+			vm.rotatePartAboutCenterTo( $isvgParts[ 0 ], 305, info );
 			console.log( info );
 
 			info = vm.getPartInfo( $isvgParts[ 1 ] );
+			vm.scalePartFromCenterTo( $isvgParts[ 1 ], 4, info );
 			vm.moveCenterOfPartTo( $isvgParts[ 1 ], 15 * 12, 12 * 12, info );
-			vm.rotatePartTo( $isvgParts[ 1 ], 0, info );
-			vm.scalePartTo( $isvgParts[ 1 ], 4, info );
+			vm.rotatePartAboutCenterTo( $isvgParts[ 1 ], 0, info );
 			console.log( info );
 
 			info = vm.getPartInfo( $isvgParts[ 2 ] );
 			vm.movePartTo( $isvgParts[ 2 ], 14 * 12 + 6, 19 * 12 + 6, info );
-			vm.rotatePartTo( $isvgParts[ 2 ], -180, info );
+			vm.rotatePartAboutCenterTo( $isvgParts[ 2 ], -180, info );
 			console.log( info );
 
 			info = vm.getPartInfo( $isvgParts[ 3 ] );
 			vm.movePartTo( $isvgParts[ 3 ], 23 * 12, 5 * 12, info );
-			vm.rotatePartTo( $isvgParts[ 3 ], 45, info );
+			vm.rotatePartAboutCenterTo( $isvgParts[ 3 ], 45, info );
 			console.log( info );
 		},
 
@@ -268,7 +273,7 @@ export default Component.extend({
 			var vm = this.viewModel;
 			if ( !vm || !vm.isRunningInBrowser ) return;
 
-			vm.setScaleSizes( this.element );
+			vm.setUnitScaleSizes( this.element );
 		}
 	}
 });
