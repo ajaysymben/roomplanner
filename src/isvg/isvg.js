@@ -26,7 +26,7 @@ export const ViewModel = Map.extend({
 	    "width"
 
 	    //interactive items query string; specifies what svg parts can be interacted with
-	    "iQueryString" default: "> g > *"
+	    "iQueryString" default with layers: "> g > *", default without layers: "> *"
 	*/
 	define: {
 		message: {
@@ -186,6 +186,15 @@ export const ViewModel = Map.extend({
 		return this.attr( "$svg" ).find( "> g" ).eq( i );
 	},
 
+	cloneInnerElements: function ( destinationNode, sourceNode ) {
+		//TODO: scope all rules in any <style> tags... (random id)
+		$( sourceNode ).children().clone().appendTo( destinationNode );
+	},
+
+	moveInnerElements: function ( destinationNode, sourceNode ) {
+		$( sourceNode ).children().appendTo( destinationNode );
+	},
+
 	// options: ( pos and dimensions are based on Units )
 	// layer
 	// centerXPos, centerYPos //if not specified, newSVGEl is aligned to top-left corner
@@ -205,8 +214,10 @@ export const ViewModel = Map.extend({
 
 		var svgEl = this.attr( "$svg" )[ 0 ];
 		var g = document.createElementNS( "http://www.w3.org/2000/svg", "g" );
-		g.innerHTML = $( newSVGEl ).html();
-		//TODO: scope all rules in any <style> tags... (random id)
+
+		this.cloneInnerElements( g, newSVGEl );
+
+		this.getLayer( layer ).append( g );
 
 		var info = this.getPartInfo( g );
 
@@ -229,8 +240,6 @@ export const ViewModel = Map.extend({
 		} else {
 			this.moveCenterOfPartTo( g, centerXPos || 0, centerYPos || 0, info );
 		}
-
-		this.getLayer( layer ).append( g );
 	},
 
 	setUnitScaleSizes: function ( $isvg ) {
@@ -300,7 +309,11 @@ export default Component.extend({
 			vm.attr( "height", config.height || 24 * 12 );
 
 			//interactive items query string
-			vm.attr( "iQueryString", config.iQueryString || "> g > *" );
+			if ( vm.attr( "layers" ) ) {
+				vm.attr( "iQueryString", config.iQueryString || "> g > *" );
+			} else {
+				vm.attr( "iQueryString", config.iQueryString || "> *" );
+			}
 		},
 
 		"inserted": function () {
@@ -313,7 +326,7 @@ export default Component.extend({
 			var svgEl = document.createElementNS( "http://www.w3.org/2000/svg", "svg" );
 
 			if ( config.svg ) {
-				svgEl.innerHTML = $( config.svg ).html();
+				this.cloneInnerElements( svgEl, config.svg );
 
 				layerCount = $( svgEl ).find( "> g" ).length;
 				var hasLayers = layerCount === $( svgEl ).find( "> *" ).length;
@@ -324,8 +337,7 @@ export default Component.extend({
 				} else if ( layers && !hasLayers ) {
 					//doesn't have layers but needs them, so anything already needs to go to a layer
 					var layer0 = document.createElementNS( "http://www.w3.org/2000/svg", "g" );
-					layer0.innerHTML = svgEl.innerHTML;
-					svgEl.innerHTML = "";
+					this.moveInnerElements( layer0, svgEl );
 					svgEl.appendChild( layer0 );
 
 					layerCount = 1;
