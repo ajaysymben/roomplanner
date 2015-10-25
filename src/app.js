@@ -22,6 +22,8 @@ const AppViewModel = AppMap.extend({
   isvgConfig: {
     isRunningInBrowser: !( typeof process === "object" && {}.toString.call(process) === "[object process]" ),
 
+    layers: 5,
+
     //SVG's viewBox points ( sort of like pixels ) per 1 unit ( inch or whatever )
     scalarUnitsToViewBoxPoints: 10,
 
@@ -33,7 +35,7 @@ const AppViewModel = AppMap.extend({
     height: 24 * 12,
 
     //specify what element parts in the svg can be interacted with
-    iQueryString: "> g"
+    iQueryString: "> g > g"
   }
 
 });
