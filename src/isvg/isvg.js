@@ -19,7 +19,7 @@ export const ViewModel = Map.extend({
 	    "scalarUnitsToViewBoxPoints" default: 10
 
 	    //grid lines every x units
-	    "gridLinesEvery" default: 12
+	    "gridLinesEvery" default is 1 but it only shows a grid if the value is > 1
 
 	    //dimensions in units ( inches, cm, or whatever )
 	    "height"
@@ -28,11 +28,6 @@ export const ViewModel = Map.extend({
 	    //interactive items query string; specifies what svg parts can be interacted with
 	    "iQueryString" default with layers: "> g > *", default without layers: "> *"
 	*/
-	define: {
-		message: {
-			value: 'This is the interactive-svg component'
-		}
-	},
 
 	//scalarUnitsToPx * units = px at current size
 	scalarUnitsToPx: 1, //set on inserted and on window resize via this.setUnitScaleSizes()
@@ -47,11 +42,11 @@ export const ViewModel = Map.extend({
 		svgPartInfo.viewBoxPointsWidth = svgPartInfo.partOriginalWidth * svgPartInfo.scaleX;
 		svgPartInfo.viewBoxPointsHeight = svgPartInfo.partOriginalHeight * svgPartInfo.scaleY;
 
-		svgPartInfo.unitsWidth = svgPartInfo.viewBoxPointsWidth / this.scalarUnitsToViewBoxPoints;
-		svgPartInfo.unitsHeight = svgPartInfo.viewBoxPointsHeight / this.scalarUnitsToViewBoxPoints;
+		svgPartInfo.unitsWidth = svgPartInfo.viewBoxPointsWidth / this.attr( "scalarUnitsToViewBoxPoints" );
+		svgPartInfo.unitsHeight = svgPartInfo.viewBoxPointsHeight / this.attr( "scalarUnitsToViewBoxPoints" );
 
-		svgPartInfo.pxWidth = svgPartInfo.unitsWidth * this.scalarUnitsToPx;
-		svgPartInfo.pxHeight = svgPartInfo.unitsHeight * this.scalarUnitsToPx;
+		svgPartInfo.pxWidth = svgPartInfo.unitsWidth * this.attr( "scalarUnitsToPx" );
+		svgPartInfo.pxHeight = svgPartInfo.unitsHeight * this.attr( "scalarUnitsToPx" );
 
 		svgPartInfo.viewBoxPointsOffsetX = svgPartInfo.x * svgPartInfo.scaleX;
 		svgPartInfo.viewBoxPointsOffsetY = svgPartInfo.y * svgPartInfo.scaleY;
@@ -60,6 +55,7 @@ export const ViewModel = Map.extend({
 	},
 
 	getPartInfo: function ( svgPart ) {
+		svgPart = $( svgPart )[ 0 ];
 		var bboxInfo = svgPart.getBBox();
 
 		var info = {
@@ -119,8 +115,8 @@ export const ViewModel = Map.extend({
 		}
 		if ( !svgPartInfo ) svgPartInfo = this.getPartInfo( svgPart );
 
-		var centerUnitX = ( svgPartInfo.translateX + svgPartInfo.viewBoxPointsCenterOffsetX ) / this.scalarUnitsToViewBoxPoints;
-		var centerUnitY = ( svgPartInfo.translateY + svgPartInfo.viewBoxPointsCenterOffsetY ) / this.scalarUnitsToViewBoxPoints;
+		var centerUnitX = ( svgPartInfo.translateX + svgPartInfo.viewBoxPointsCenterOffsetX ) / this.attr( "scalarUnitsToViewBoxPoints" );
+		var centerUnitY = ( svgPartInfo.translateY + svgPartInfo.viewBoxPointsCenterOffsetY ) / this.attr( "scalarUnitsToViewBoxPoints" );
 
 		svgPartInfo.scaleX = scaleX;
 		svgPartInfo.scaleY = scaleY;
@@ -138,8 +134,8 @@ export const ViewModel = Map.extend({
 		}
 		if ( !svgPartInfo ) svgPartInfo = this.getPartInfo( svgPart );
 
-		var scaleX = xUnits * this.scalarUnitsToViewBoxPoints / svgPartInfo.partOriginalWidth;
-		var scaleY = yUnits * this.scalarUnitsToViewBoxPoints / svgPartInfo.partOriginalHeight;
+		var scaleX = xUnits * this.attr( "scalarUnitsToViewBoxPoints" ) / svgPartInfo.partOriginalWidth;
+		var scaleY = yUnits * this.attr( "scalarUnitsToViewBoxPoints" ) / svgPartInfo.partOriginalHeight;
 
 		this.scalePartFromCenterTo( svgPart, scaleX, scaleY, svgPartInfo );
 	},
@@ -155,8 +151,8 @@ export const ViewModel = Map.extend({
 	movePartTo: function ( svgPart, unitX, unitY, svgPartInfo ) {
 		if ( !svgPartInfo ) svgPartInfo = this.getPartInfo( svgPart );
 
-		svgPartInfo.translateX = unitX * this.scalarUnitsToViewBoxPoints - svgPartInfo.viewBoxPointsOffsetX;
-		svgPartInfo.translateY = unitY * this.scalarUnitsToViewBoxPoints - svgPartInfo.viewBoxPointsOffsetY;
+		svgPartInfo.translateX = unitX * this.attr( "scalarUnitsToViewBoxPoints" ) - svgPartInfo.viewBoxPointsOffsetX;
+		svgPartInfo.translateY = unitY * this.attr( "scalarUnitsToViewBoxPoints" ) - svgPartInfo.viewBoxPointsOffsetY;
 
 		this.setTransform( svgPart, svgPartInfo );
 	},
@@ -164,8 +160,8 @@ export const ViewModel = Map.extend({
 	moveCenterOfPartTo: function ( svgPart, unitX, unitY, svgPartInfo ) {
 		if ( !svgPartInfo ) svgPartInfo = this.getPartInfo( svgPart );
 
-		svgPartInfo.translateX = unitX * this.scalarUnitsToViewBoxPoints - svgPartInfo.viewBoxPointsCenterOffsetX;
-		svgPartInfo.translateY = unitY * this.scalarUnitsToViewBoxPoints - svgPartInfo.viewBoxPointsCenterOffsetY;
+		svgPartInfo.translateX = unitX * this.attr( "scalarUnitsToViewBoxPoints" ) - svgPartInfo.viewBoxPointsCenterOffsetX;
+		svgPartInfo.translateY = unitY * this.attr( "scalarUnitsToViewBoxPoints" ) - svgPartInfo.viewBoxPointsCenterOffsetY;
 
 		this.setTransform( svgPart, svgPartInfo );
 	},
@@ -174,16 +170,16 @@ export const ViewModel = Map.extend({
 		if ( !this.attr( "layers" ) ) {
 			return this.attr( "$svg" );
 		}
-
-		var layers = this.attr( "$svg" ).find( "> g" ).length;
-		if ( layers < i ) {
-			this.attr( "layers", i );
-			while ( layers < i ) {
-				svgEl.appendChild( document.createElementNS( "http://www.w3.org/2000/svg", "g" ) );
+		var $svg = this.attr( "$svg" );
+		var layers = $svg.find( "> g" ).length;
+		if ( layers <= i ) {
+			this.attr( "layers", i + 1 );
+			while ( layers <= i ) {
+				$svg.append( document.createElementNS( "http://www.w3.org/2000/svg", "g" ) );
 				layers++;
 			}
 		}
-		return this.attr( "$svg" ).find( "> g" ).eq( i );
+		return $svg.find( "> g" ).eq( i );
 	},
 
 	cloneInnerElements: function ( destinationNode, sourceNode ) {
@@ -222,20 +218,24 @@ export const ViewModel = Map.extend({
 		var info = this.getPartInfo( g );
 
 		if ( typeof forceWidth === "number" && forceWidth ) {
-			useScaleX = forceWidth * this.scalarUnitsToViewBoxPoints / info.partOriginalWidth;
+			useScaleX = forceWidth * this.attr( "scalarUnitsToViewBoxPoints" ) / info.partOriginalWidth;
 			if ( typeof forceHeight === "number" && forceHeight ) {
-				useScaleY = forceHeight * this.scalarUnitsToViewBoxPoints / info.partOriginalHeight;
+				useScaleY = forceHeight * this.attr( "scalarUnitsToViewBoxPoints" ) / info.partOriginalHeight;
 			} else {
 				useScaleY = useScaleX;
 			}
 		} else if ( typeof forceHeight === "number" && forceHeight ) {
-			useScaleY = forceHeight * this.scalarUnitsToViewBoxPoints / info.partOriginalHeight;
+			useScaleY = forceHeight * this.attr( "scalarUnitsToViewBoxPoints" ) / info.partOriginalHeight;
+			useScaleX = useScaleY;
+		}
+
+		if ( useScaleY && !useScaleX ) {
 			useScaleX = useScaleY;
 		}
 
 		this.scalePartFromCenterTo( g, useScaleX || 1, useScaleY || useScaleX || 1, info );
 
-		if ( typeof centerXPos === "undefined" ) {
+		if ( typeof centerXPos === "undefined" && typeof centerYPos === "undefined" ) {
 			this.movePartTo( g, 0, 0, info );
 		} else {
 			this.moveCenterOfPartTo( g, centerXPos || 0, centerYPos || 0, info );
@@ -247,26 +247,26 @@ export const ViewModel = Map.extend({
 		var maxWidth = $isvg.parent().width() - margin - margin;
 		var maxHeight = $isvg.parent().height() - margin - margin;
 
-		var heightFromMaxWidth = maxWidth / this.width * this.height;
-		var widthFromMaxHeight = maxHeight * this.width / this.height;
+		var heightFromMaxWidth = maxWidth / this.attr( "width" ) * this.attr( "height" );
+		var widthFromMaxHeight = maxHeight * this.attr( "width" ) / this.attr( "height" );
 
 		var bgSize = 0;
 		// bgSize has to be an integer in Chrome and FF to correctly display the grid (gradient), IE and
 		// Safari worked correctly without that constraint, but had to math it this way for consistency.
 
 		if ( heightFromMaxWidth <= maxHeight ) {
-			bgSize = ~~( ( heightFromMaxWidth / this.height ) * this.gridLinesEvery );
+			bgSize = ~~( ( heightFromMaxWidth / this.attr( "height" ) ) * this.attr( "gridLinesEvery" ) );
 		} else if ( widthFromMaxHeight <= maxWidth ) {
-			bgSize = ~~( ( widthFromMaxHeight / this.width ) * this.gridLinesEvery );
+			bgSize = ~~( ( widthFromMaxHeight / this.attr( "width" ) ) * this.attr( "gridLinesEvery" ) );
 		}
 
 		//scalarUnitsToPx = px / units; scalarUnitsToPx * units = px
-		this.scalarUnitsToPx = bgSize / this.gridLinesEvery;
-		this.scalarPxToViewBoxPoints = this.scalarUnitsToViewBoxPoints / this.scalarUnitsToPx;
+		this.attr( "scalarUnitsToPx", bgSize / this.attr( "gridLinesEvery" ) );
+		this.attr( "scalarPxToViewBoxPoints", this.attr( "scalarUnitsToViewBoxPoints" ) / this.attr( "scalarUnitsToPx" ) );
 
 		$isvg.css({
-			height: this.scalarUnitsToPx * this.height + "px",
-			width: this.scalarUnitsToPx * this.width + "px"
+			width: this.attr( "scalarUnitsToPx" ) * this.attr( "width" ) + "px",
+			height: this.attr( "scalarUnitsToPx" ) * this.attr( "height" ) + "px"
 		});
 
 		bgSize = bgSize + "px";
@@ -289,7 +289,11 @@ export default Component.extend({
 
 			var config = vm.config || {};
 
-			vm.attr( "isRunningInBrowser", !!( config.isRunningInBrowser ) );
+			if ( typeof config.isRunningInBrowser === "undefined" ) {
+				vm.attr( "isRunningInBrowser", !( typeof process === "object" && {}.toString.call(process) === "[object process]" ) );
+			} else {
+				vm.attr( "isRunningInBrowser", !!( config.isRunningInBrowser ) );
+			}
 
 			vm.attr( "layers", config.layers || 0 );
 
@@ -297,12 +301,13 @@ export default Component.extend({
 			vm.attr( "scalarUnitsToViewBoxPoints", config.scalarUnitsToViewBoxPoints || 10 );
 
 			//grid lines every x units
-			if ( config.gridLinesEvery === 0 ) {
+			if ( !config.gridLinesEvery || config.gridLinesEvery <= 1 ) {
 				vm.attr( "showGrid", false );
+				config.gridLinesEvery = 1;
 			} else {
 				vm.attr( "showGrid", true );
 			}
-			vm.attr( "gridLinesEvery", config.gridLinesEvery || 12 );
+			vm.attr( "gridLinesEvery", config.gridLinesEvery || 1 );
 
 			//dimensions in "units" ( inches )
 			vm.attr( "width", config.width || 30 * 12 );
@@ -369,35 +374,6 @@ export default Component.extend({
 					+ " "
 					+ vm.attr( "height" ) * vm.attr( "scalarUnitsToViewBoxPoints" )
 			);
-
-
-			var testSvg = $( "#testSvg" );
-			vm.addFromSVGAsGroup( testSvg );
-			vm.addFromSVGAsGroup( testSvg, { layer: 4 } );
-			vm.addFromSVGAsGroup( testSvg );
-			vm.addFromSVGAsGroup( testSvg );
-			vm.addFromSVGAsGroup( testSvg );
-			var $isvgParts = vm.attr( "$svg" ).find( vm.attr( "iQueryString" ) );
-			var info = vm.getPartInfo( $isvgParts[ 0 ] );
-			vm.moveCenterOfPartTo( $isvgParts[ 0 ], 6 * 12, 3 * 12, info );
-			vm.rotatePartAboutCenterTo( $isvgParts[ 0 ], 305, info );
-			console.log( info );
-
-			info = vm.getPartInfo( $isvgParts[ 4 ] );
-			vm.scalePartFromCenterTo( $isvgParts[ 4 ], 4, info );
-			vm.moveCenterOfPartTo( $isvgParts[ 4 ], 15 * 12, 12 * 12, info );
-			vm.rotatePartAboutCenterTo( $isvgParts[ 4 ], 0, info );
-			console.log( info );
-
-			info = vm.getPartInfo( $isvgParts[ 2 ] );
-			vm.movePartTo( $isvgParts[ 2 ], 14 * 12 + 6, 19 * 12 + 6, info );
-			vm.rotatePartAboutCenterTo( $isvgParts[ 2 ], -180, info );
-			console.log( info );
-
-			info = vm.getPartInfo( $isvgParts[ 3 ] );
-			vm.movePartTo( $isvgParts[ 3 ], 23 * 12, 5 * 12, info );
-			vm.rotatePartAboutCenterTo( $isvgParts[ 3 ], 45, info );
-			console.log( info );
 		},
 
 		"{window} resize": function () {
