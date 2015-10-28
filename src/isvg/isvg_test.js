@@ -283,10 +283,10 @@ QUnit.test( "addFromSVGAsGroup & getPartInfo works - forceWidth, forceHeight uni
   ok( ~~( info.partOriginalHeight ) === 118, "info.partOriginalHeight is correct [ " + info.partOriginalHeight + " ]" );
   ok( ~~( info.x ) === 4, "info.x is correct [ " + info.x + " ]" );
   ok( ~~( info.y ) === 23, "info.y is correct [ " + info.y + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetX ) === Math.round( info.x * 2 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetY ) === Math.round( info.y * 2 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
-  ok( Math.round( info.viewBoxPointsWidth ) === Math.round( info.partOriginalWidth * 2 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
-  ok( Math.round( info.viewBoxPointsHeight ) === Math.round( info.partOriginalHeight * 2 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
+  ok( ( info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( info.x * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
+  ok( ( info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( info.y * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
+  ok( ( info.viewBoxPointsWidth ).toFixed( 3 ) === ( info.partOriginalWidth * 2 ).toFixed( 3 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
+  ok( ( info.viewBoxPointsHeight ).toFixed( 3 ) === ( info.partOriginalHeight * 2 ).toFixed( 3 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
   ok( ~~( info.unitsWidth ) === 30, "info.unitsWidth is correct [ " + info.unitsWidth + " ]" );
   ok( ~~( info.unitsHeight ) === 23, "info.unitsHeight is correct [ " + info.unitsHeight + " ]" );
   ok( ~~( info.pxWidth ) === 61, "info.pxWidth is correct [ " + info.pxWidth + " ]" );
@@ -316,10 +316,10 @@ QUnit.test( "addFromSVGAsGroup & getPartInfo works - forceWidth, forceHeight non
   ok( ~~( info.partOriginalHeight ) === 118, "info.partOriginalHeight is correct [ " + info.partOriginalHeight + " ]" );
   ok( ~~( info.x ) === 4, "info.x is correct [ " + info.x + " ]" );
   ok( ~~( info.y ) === 23, "info.y is correct [ " + info.y + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetX ) === Math.round( info.x * 2 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetY ) === Math.round( info.y / 2 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
-  ok( Math.round( info.viewBoxPointsWidth ) === Math.round( info.partOriginalWidth * 2 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
-  ok( Math.round( info.viewBoxPointsHeight ) === Math.round( info.partOriginalHeight / 2 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
+  ok( ( info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( info.x * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
+  ok( ( info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( info.y / 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
+  ok( ( info.viewBoxPointsWidth ).toFixed( 3 ) === ( info.partOriginalWidth * 2 ).toFixed( 3 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
+  ok( ( info.viewBoxPointsHeight ).toFixed( 3 ) === ( info.partOriginalHeight / 2 ).toFixed( 3 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
   ok( ~~( info.unitsWidth ) === 30, "info.unitsWidth is correct [ " + info.unitsWidth + " ]" );
   ok( ~~( info.unitsHeight ) === 5, "info.unitsHeight is correct [ " + info.unitsHeight + " ]" );
   ok( ~~( info.pxWidth ) === 61, "info.pxWidth is correct [ " + info.pxWidth + " ]" );
@@ -349,10 +349,10 @@ QUnit.test( "addFromSVGAsGroup & getPartInfo works - forceWidth only so uniform 
   ok( ~~( info.partOriginalHeight ) === 118, "info.partOriginalHeight is correct [ " + info.partOriginalHeight + " ]" );
   ok( ~~( info.x ) === 4, "info.x is correct [ " + info.x + " ]" );
   ok( ~~( info.y ) === 23, "info.y is correct [ " + info.y + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetX ) === Math.round( info.x * 2 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetY ) === Math.round( info.y * 2 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
-  ok( Math.round( info.viewBoxPointsWidth ) === Math.round( info.partOriginalWidth * 2 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
-  ok( Math.round( info.viewBoxPointsHeight ) === Math.round( info.partOriginalHeight * 2 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
+  ok( ( info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( info.x * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
+  ok( ( info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( info.y * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
+  ok( ( info.viewBoxPointsWidth ).toFixed( 3 ) === ( info.partOriginalWidth * 2 ).toFixed( 3 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
+  ok( ( info.viewBoxPointsHeight ).toFixed( 3 ) === ( info.partOriginalHeight * 2 ).toFixed( 3 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
   ok( ~~( info.unitsWidth ) === 30, "info.unitsWidth is correct [ " + info.unitsWidth + " ]" );
   ok( ~~( info.unitsHeight ) === 23, "info.unitsHeight is correct [ " + info.unitsHeight + " ]" );
   ok( ~~( info.pxWidth ) === 61, "info.pxWidth is correct [ " + info.pxWidth + " ]" );
@@ -382,10 +382,10 @@ QUnit.test( "addFromSVGAsGroup & getPartInfo works - forceHeight only so uniform
   ok( ~~( info.partOriginalHeight ) === 118, "info.partOriginalHeight is correct [ " + info.partOriginalHeight + " ]" );
   ok( ~~( info.x ) === 4, "info.x is correct [ " + info.x + " ]" );
   ok( ~~( info.y ) === 23, "info.y is correct [ " + info.y + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetX ) === Math.round( info.x * 2 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetY ) === Math.round( info.y * 2 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
-  ok( Math.round( info.viewBoxPointsWidth ) === Math.round( info.partOriginalWidth * 2 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
-  ok( Math.round( info.viewBoxPointsHeight ) === Math.round( info.partOriginalHeight * 2 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
+  ok( ( info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( info.x * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
+  ok( ( info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( info.y * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
+  ok( ( info.viewBoxPointsWidth ).toFixed( 3 ) === ( info.partOriginalWidth * 2 ).toFixed( 3 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
+  ok( ( info.viewBoxPointsHeight ).toFixed( 3 ) === ( info.partOriginalHeight * 2 ).toFixed( 3 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
   ok( ~~( info.unitsWidth ) === 30, "info.unitsWidth is correct [ " + info.unitsWidth + " ]" );
   ok( ~~( info.unitsHeight ) === 23, "info.unitsHeight is correct [ " + info.unitsHeight + " ]" );
   ok( ~~( info.pxWidth ) === 61, "info.pxWidth is correct [ " + info.pxWidth + " ]" );
@@ -415,10 +415,10 @@ QUnit.test( "addFromSVGAsGroup & getPartInfo works - useScale", function ( asser
   ok( ~~( info.partOriginalHeight ) === 118, "info.partOriginalHeight is correct [ " + info.partOriginalHeight + " ]" );
   ok( ~~( info.x ) === 4, "info.x is correct [ " + info.x + " ]" );
   ok( ~~( info.y ) === 23, "info.y is correct [ " + info.y + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetX ) === Math.round( info.x * 2 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetY ) === Math.round( info.y * 2 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
-  ok( Math.round( info.viewBoxPointsWidth ) === Math.round( info.partOriginalWidth * 2 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
-  ok( Math.round( info.viewBoxPointsHeight ) === Math.round( info.partOriginalHeight * 2 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
+  ok( ( info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( info.x * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
+  ok( ( info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( info.y * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
+  ok( ( info.viewBoxPointsWidth ).toFixed( 3 ) === ( info.partOriginalWidth * 2 ).toFixed( 3 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
+  ok( ( info.viewBoxPointsHeight ).toFixed( 3 ) === ( info.partOriginalHeight * 2 ).toFixed( 3 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
   ok( ~~( info.unitsWidth ) === 30, "info.unitsWidth is correct [ " + info.unitsWidth + " ]" );
   ok( ~~( info.unitsHeight ) === 23, "info.unitsHeight is correct [ " + info.unitsHeight + " ]" );
   ok( ~~( info.pxWidth ) === 61, "info.pxWidth is correct [ " + info.pxWidth + " ]" );
@@ -448,10 +448,10 @@ QUnit.test( "addFromSVGAsGroup & getPartInfo works - useScaleX only so is unifor
   ok( ~~( info.partOriginalHeight ) === 118, "info.partOriginalHeight is correct [ " + info.partOriginalHeight + " ]" );
   ok( ~~( info.x ) === 4, "info.x is correct [ " + info.x + " ]" );
   ok( ~~( info.y ) === 23, "info.y is correct [ " + info.y + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetX ) === Math.round( info.x * 2 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetY ) === Math.round( info.y * 2 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
-  ok( Math.round( info.viewBoxPointsWidth ) === Math.round( info.partOriginalWidth * 2 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
-  ok( Math.round( info.viewBoxPointsHeight ) === Math.round( info.partOriginalHeight * 2 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
+  ok( ( info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( info.x * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
+  ok( ( info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( info.y * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
+  ok( ( info.viewBoxPointsWidth ).toFixed( 3 ) === ( info.partOriginalWidth * 2 ).toFixed( 3 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
+  ok( ( info.viewBoxPointsHeight ).toFixed( 3 ) === ( info.partOriginalHeight * 2 ).toFixed( 3 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
   ok( ~~( info.unitsWidth ) === 30, "info.unitsWidth is correct [ " + info.unitsWidth + " ]" );
   ok( ~~( info.unitsHeight ) === 23, "info.unitsHeight is correct [ " + info.unitsHeight + " ]" );
   ok( ~~( info.pxWidth ) === 61, "info.pxWidth is correct [ " + info.pxWidth + " ]" );
@@ -482,10 +482,10 @@ QUnit.test( "addFromSVGAsGroup & getPartInfo works - useScaleY only so is unifor
   ok( ~~( info.partOriginalHeight ) === 118, "info.partOriginalHeight is correct [ " + info.partOriginalHeight + " ]" );
   ok( ~~( info.x ) === 4, "info.x is correct [ " + info.x + " ]" );
   ok( ~~( info.y ) === 23, "info.y is correct [ " + info.y + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetX ) === Math.round( info.x * 2 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetY ) === Math.round( info.y * 2 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
-  ok( Math.round( info.viewBoxPointsWidth ) === Math.round( info.partOriginalWidth * 2 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
-  ok( Math.round( info.viewBoxPointsHeight ) === Math.round( info.partOriginalHeight * 2 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
+  ok( ( info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( info.x * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
+  ok( ( info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( info.y * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
+  ok( ( info.viewBoxPointsWidth ).toFixed( 3 ) === ( info.partOriginalWidth * 2 ).toFixed( 3 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
+  ok( ( info.viewBoxPointsHeight ).toFixed( 3 ) === ( info.partOriginalHeight * 2 ).toFixed( 3 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
   ok( ~~( info.unitsWidth ) === 30, "info.unitsWidth is correct [ " + info.unitsWidth + " ]" );
   ok( ~~( info.unitsHeight ) === 23, "info.unitsHeight is correct [ " + info.unitsHeight + " ]" );
   ok( ~~( info.pxWidth ) === 61, "info.pxWidth is correct [ " + info.pxWidth + " ]" );
@@ -515,10 +515,10 @@ QUnit.test( "addFromSVGAsGroup & getPartInfo works - useScaleX, useScaleY non un
   ok( ~~( info.partOriginalHeight ) === 118, "info.partOriginalHeight is correct [ " + info.partOriginalHeight + " ]" );
   ok( ~~( info.x ) === 4, "info.x is correct [ " + info.x + " ]" );
   ok( ~~( info.y ) === 23, "info.y is correct [ " + info.y + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetX ) === Math.round( info.x * 2 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
-  ok( Math.round( info.viewBoxPointsOffsetY ) === Math.round( info.y / 2 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
-  ok( Math.round( info.viewBoxPointsWidth ) === Math.round( info.partOriginalWidth * 2 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
-  ok( Math.round( info.viewBoxPointsHeight ) === Math.round( info.partOriginalHeight / 2 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
+  ok( ( info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( info.x * 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
+  ok( ( info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( info.y / 2 ).toFixed( 3 ), "info.viewBoxPointsOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
+  ok( ( info.viewBoxPointsWidth ).toFixed( 3 ) === ( info.partOriginalWidth * 2 ).toFixed( 3 ), "info.viewBoxPointsWidth is correct [ " + info.viewBoxPointsWidth + " ]" );
+  ok( ( info.viewBoxPointsHeight ).toFixed( 3 ) === ( info.partOriginalHeight / 2 ).toFixed( 3 ), "info.viewBoxPointsHeight is correct [ " + info.viewBoxPointsHeight + " ]" );
   ok( ~~( info.unitsWidth ) === 30, "info.unitsWidth is correct [ " + info.unitsWidth + " ]" );
   ok( ~~( info.unitsHeight ) === 5, "info.unitsHeight is correct [ " + info.unitsHeight + " ]" );
   ok( ~~( info.pxWidth ) === 61, "info.pxWidth is correct [ " + info.pxWidth + " ]" );
@@ -589,8 +589,6 @@ QUnit.test( "scalePartFromCenterTo works - scale", function ( assert ) {
   ok( ( info.translateY + info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( tYVBPOldPos - oldHeightVBP / 2 ).toFixed( 3 ), "info.translateY is correct [ " + info.translateY + " ]" );
   ok( ( info.translateX + info.viewBoxPointsCenterOffsetX ).toFixed( 3 ) === centerXVBPOldPos.toFixed( 3 ), "Center point X did not change [ " + centerXVBPOldPos + " ]" );
   ok( ( info.translateY + info.viewBoxPointsCenterOffsetY ).toFixed( 3 ) === centerYVBPOldPos.toFixed( 3 ), "Center point Y did not change [ " + centerYVBPOldPos + " ]" );
-
-  isvgVM.scalePartFromCenterTo( $part, 0.5, 1.5, info );
 });
 
 QUnit.test( "scalePartFromCenterTo works - scaleX and scaleY", function ( assert ) {
@@ -618,6 +616,105 @@ QUnit.test( "scalePartFromCenterTo works - scaleX and scaleY", function ( assert
 
   isvgVM.scalePartFromCenterTo( $part, 0.5, 1.5, info );
 
+  ok( ( info.translateX + info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( tXVBPOldPos + oldWidthVBP / 4 ).toFixed( 3 ), "info.translateX is correct [ " + info.translateX + " ]" );
+  ok( ( info.translateY + info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( tYVBPOldPos - oldHeightVBP / 4 ).toFixed( 3 ), "info.translateY is correct [ " + info.translateY + " ]" );
+  ok( ( info.translateX + info.viewBoxPointsCenterOffsetX ).toFixed( 3 ) === centerXVBPOldPos.toFixed( 3 ), "Center point X did not change [ " + centerXVBPOldPos + " ]" );
+  ok( ( info.translateY + info.viewBoxPointsCenterOffsetY ).toFixed( 3 ) === centerYVBPOldPos.toFixed( 3 ), "Center point Y did not change [ " + centerYVBPOldPos + " ]" );
+});
+
+QUnit.test( "sizePartFromCenterTo works - xUnits, 0 ( uniform aspect ratio based on width change )", function ( assert ) {
+  var isvgVM = initAndRender.call( assert.test, {
+    width: 150,
+    height: 200,
+    scalarUnitsToViewBoxPoints: 10
+  });
+
+  var $svg = isvgVM.attr( "$svg" );
+
+  isvgVM.addFromSVGAsGroup( $testSvg, { centerXPos: 75, centerYPos: 100 } );
+
+  var $part = $svg.find( isvgVM.attr( "iQueryString" ) );
+  var info = isvgVM.getPartInfo( $part );
+
+  var tXVBPOldPos = info.translateX + info.viewBoxPointsOffsetX;
+  var tYVBPOldPos = info.translateY + info.viewBoxPointsOffsetY;
+
+  var oldWidthVBP = info.viewBoxPointsWidth;
+  var oldHeightVBP = info.viewBoxPointsHeight;
+
+  var centerXVBPOldPos = info.translateX + info.viewBoxPointsCenterOffsetX;
+  var centerYVBPOldPos = info.translateY + info.viewBoxPointsCenterOffsetY;
+
+  isvgVM.sizePartFromCenterTo( $part, info.unitsWidth * 2, 0, info );
+
+  ok( info.scaleX.toFixed( 1 ) === "2.0", "scaleX is correct" );
+  ok( info.scaleY.toFixed( 1 ) === "2.0", "scaleY is correct" );
+  ok( ( info.translateX + info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( tXVBPOldPos - oldWidthVBP / 2 ).toFixed( 3 ), "info.translateX is correct [ " + info.translateX + " ]" );
+  ok( ( info.translateY + info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( tYVBPOldPos - oldHeightVBP / 2 ).toFixed( 3 ), "info.translateY is correct [ " + info.translateY + " ]" );
+  ok( ( info.translateX + info.viewBoxPointsCenterOffsetX ).toFixed( 3 ) === centerXVBPOldPos.toFixed( 3 ), "Center point X did not change [ " + centerXVBPOldPos + " ]" );
+  ok( ( info.translateY + info.viewBoxPointsCenterOffsetY ).toFixed( 3 ) === centerYVBPOldPos.toFixed( 3 ), "Center point Y did not change [ " + centerYVBPOldPos + " ]" );
+});
+
+QUnit.test( "sizePartFromCenterTo works - 0, yUnits ( uniform aspect ratio based on height change )", function ( assert ) {
+  var isvgVM = initAndRender.call( assert.test, {
+    width: 150,
+    height: 200,
+    scalarUnitsToViewBoxPoints: 10
+  });
+
+  var $svg = isvgVM.attr( "$svg" );
+
+  isvgVM.addFromSVGAsGroup( $testSvg, { centerXPos: 75, centerYPos: 100 } );
+
+  var $part = $svg.find( isvgVM.attr( "iQueryString" ) );
+  var info = isvgVM.getPartInfo( $part );
+
+  var tXVBPOldPos = info.translateX + info.viewBoxPointsOffsetX;
+  var tYVBPOldPos = info.translateY + info.viewBoxPointsOffsetY;
+
+  var oldWidthVBP = info.viewBoxPointsWidth;
+  var oldHeightVBP = info.viewBoxPointsHeight;
+
+  var centerXVBPOldPos = info.translateX + info.viewBoxPointsCenterOffsetX;
+  var centerYVBPOldPos = info.translateY + info.viewBoxPointsCenterOffsetY;
+
+  isvgVM.sizePartFromCenterTo( $part, 0, info.unitsHeight * 2, info );
+
+  ok( info.scaleX.toFixed( 1 ) === "2.0", "scaleX is correct" );
+  ok( info.scaleY.toFixed( 1 ) === "2.0", "scaleY is correct" );
+  ok( ( info.translateX + info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( tXVBPOldPos - oldWidthVBP / 2 ).toFixed( 3 ), "info.translateX is correct [ " + info.translateX + " ]" );
+  ok( ( info.translateY + info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( tYVBPOldPos - oldHeightVBP / 2 ).toFixed( 3 ), "info.translateY is correct [ " + info.translateY + " ]" );
+  ok( ( info.translateX + info.viewBoxPointsCenterOffsetX ).toFixed( 3 ) === centerXVBPOldPos.toFixed( 3 ), "Center point X did not change [ " + centerXVBPOldPos + " ]" );
+  ok( ( info.translateY + info.viewBoxPointsCenterOffsetY ).toFixed( 3 ) === centerYVBPOldPos.toFixed( 3 ), "Center point Y did not change [ " + centerYVBPOldPos + " ]" );
+});
+
+QUnit.test( "sizePartFromCenterTo works - xUnits and yUnits", function ( assert ) {
+  var isvgVM = initAndRender.call( assert.test, {
+    width: 150,
+    height: 200,
+    scalarUnitsToViewBoxPoints: 10
+  });
+
+  var $svg = isvgVM.attr( "$svg" );
+
+  isvgVM.addFromSVGAsGroup( $testSvg, { centerXPos: 75, centerYPos: 100 } );
+
+  var $part = $svg.find( isvgVM.attr( "iQueryString" ) );
+  var info = isvgVM.getPartInfo( $part );
+
+  var tXVBPOldPos = info.translateX + info.viewBoxPointsOffsetX;
+  var tYVBPOldPos = info.translateY + info.viewBoxPointsOffsetY;
+
+  var oldWidthVBP = info.viewBoxPointsWidth;
+  var oldHeightVBP = info.viewBoxPointsHeight;
+
+  var centerXVBPOldPos = info.translateX + info.viewBoxPointsCenterOffsetX;
+  var centerYVBPOldPos = info.translateY + info.viewBoxPointsCenterOffsetY;
+
+  isvgVM.sizePartFromCenterTo( $part, info.unitsWidth * 0.5, info.unitsHeight * 1.5, info );
+
+  ok( info.scaleX.toFixed( 1 ) === "0.5", "scaleX is correct" );
+  ok( info.scaleY.toFixed( 1 ) === "1.5", "scaleY is correct" );
   ok( ( info.translateX + info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( tXVBPOldPos + oldWidthVBP / 4 ).toFixed( 3 ), "info.translateX is correct [ " + info.translateX + " ]" );
   ok( ( info.translateY + info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( tYVBPOldPos - oldHeightVBP / 4 ).toFixed( 3 ), "info.translateY is correct [ " + info.translateY + " ]" );
   ok( ( info.translateX + info.viewBoxPointsCenterOffsetX ).toFixed( 3 ) === centerXVBPOldPos.toFixed( 3 ), "Center point X did not change [ " + centerXVBPOldPos + " ]" );
