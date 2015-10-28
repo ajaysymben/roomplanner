@@ -543,19 +543,83 @@ QUnit.test( "rotatePartAboutCenterTo works", function ( assert ) {
   isvgVM.rotatePartAboutCenterTo( $part, 45 );
 
   var info = isvgVM.getPartInfo( $part );
-  var tXUShouldBe = ( 75 - info.unitsWidth / 2 ) * isvgVM.scalarUnitsToViewBoxPoints - info.viewBoxPointsOffsetX;
-  var tYUShouldBe = ( 100 - info.unitsHeight / 2 ) * isvgVM.scalarUnitsToViewBoxPoints - info.viewBoxPointsOffsetY;
+  var tXVBPShouldBe = ( 75 - info.unitsWidth / 2 ) * isvgVM.scalarUnitsToViewBoxPoints - info.viewBoxPointsOffsetX;
+  var tYVBPShouldBe = ( 100 - info.unitsHeight / 2 ) * isvgVM.scalarUnitsToViewBoxPoints - info.viewBoxPointsOffsetY;
   ok( info.rotation === 45, "info.rotation is correct [ " + info.rotation + " ]" );
-  ok( info.translateX.toFixed( 3 ) === tXUShouldBe.toFixed( 3 ), "info.translateX is correct [ " + info.translateX + " ]" );
-  ok( info.translateY.toFixed( 3 ) === tYUShouldBe.toFixed( 3 ), "info.translateY is correct [ " + info.translateY + " ]" );
+  ok( info.translateX.toFixed( 3 ) === tXVBPShouldBe.toFixed( 3 ), "info.translateX is correct [ " + info.translateX + " ]" );
+  ok( info.translateY.toFixed( 3 ) === tYVBPShouldBe.toFixed( 3 ), "info.translateY is correct [ " + info.translateY + " ]" );
   ok( info.viewBoxPointsCenterOffsetX === info.viewBoxPointsWidth / 2 + info.viewBoxPointsOffsetX, "info.viewBoxPointsCenterOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
   ok( info.viewBoxPointsCenterOffsetY === info.viewBoxPointsHeight / 2 + info.viewBoxPointsOffsetY, "info.viewBoxPointsCenterOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
 
   isvgVM.rotatePartAboutCenterTo( $part, 180, info );
 
   ok( info.rotation === 180, "info.rotation is correct [ " + info.rotation + " ]" );
-  ok( info.translateX.toFixed( 3 ) === tXUShouldBe.toFixed( 3 ), "info.translateX is still correct [ " + info.translateX + " ]" );
-  ok( info.translateY.toFixed( 3 ) === tYUShouldBe.toFixed( 3 ), "info.translateY is still correct [ " + info.translateY + " ]" );
+  ok( info.translateX.toFixed( 3 ) === tXVBPShouldBe.toFixed( 3 ), "info.translateX is still correct [ " + info.translateX + " ]" );
+  ok( info.translateY.toFixed( 3 ) === tYVBPShouldBe.toFixed( 3 ), "info.translateY is still correct [ " + info.translateY + " ]" );
   ok( info.viewBoxPointsCenterOffsetX === info.viewBoxPointsWidth / 2 + info.viewBoxPointsOffsetX, "info.viewBoxPointsCenterOffsetX is still correct [ " + info.viewBoxPointsOffsetX + " ]" );
   ok( info.viewBoxPointsCenterOffsetY === info.viewBoxPointsHeight / 2 + info.viewBoxPointsOffsetY, "info.viewBoxPointsCenterOffsetY is still correct [ " + info.viewBoxPointsOffsetY + " ]" );
+});
+
+QUnit.test( "scalePartFromCenterTo works - scale", function ( assert ) {
+  var isvgVM = initAndRender.call( assert.test, {
+    width: 150,
+    height: 200,
+    scalarUnitsToViewBoxPoints: 10
+  });
+
+  var $svg = isvgVM.attr( "$svg" );
+
+  isvgVM.addFromSVGAsGroup( $testSvg, { centerXPos: 75, centerYPos: 100 } );
+
+  var $part = $svg.find( isvgVM.attr( "iQueryString" ) );
+  var info = isvgVM.getPartInfo( $part );
+
+  var tXVBPOldPos = info.translateX + info.viewBoxPointsOffsetX;
+  var tYVBPOldPos = info.translateY + info.viewBoxPointsOffsetY;
+
+  var oldWidthVBP = info.viewBoxPointsWidth;
+  var oldHeightVBP = info.viewBoxPointsHeight;
+
+  var centerXVBPOldPos = info.translateX + info.viewBoxPointsCenterOffsetX;
+  var centerYVBPOldPos = info.translateY + info.viewBoxPointsCenterOffsetY;
+
+  isvgVM.scalePartFromCenterTo( $part, 2, info );
+
+  ok( ( info.translateX + info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( tXVBPOldPos - oldWidthVBP / 2 ).toFixed( 3 ), "info.translateX is correct [ " + info.translateX + " ]" );
+  ok( ( info.translateY + info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( tYVBPOldPos - oldHeightVBP / 2 ).toFixed( 3 ), "info.translateY is correct [ " + info.translateY + " ]" );
+  ok( ( info.translateX + info.viewBoxPointsCenterOffsetX ).toFixed( 3 ) === centerXVBPOldPos.toFixed( 3 ), "Center point X did not change [ " + centerXVBPOldPos + " ]" );
+  ok( ( info.translateY + info.viewBoxPointsCenterOffsetY ).toFixed( 3 ) === centerYVBPOldPos.toFixed( 3 ), "Center point Y did not change [ " + centerYVBPOldPos + " ]" );
+
+  isvgVM.scalePartFromCenterTo( $part, 0.5, 1.5, info );
+});
+
+QUnit.test( "scalePartFromCenterTo works - scaleX and scaleY", function ( assert ) {
+  var isvgVM = initAndRender.call( assert.test, {
+    width: 150,
+    height: 200,
+    scalarUnitsToViewBoxPoints: 10
+  });
+
+  var $svg = isvgVM.attr( "$svg" );
+
+  isvgVM.addFromSVGAsGroup( $testSvg, { centerXPos: 75, centerYPos: 100 } );
+
+  var $part = $svg.find( isvgVM.attr( "iQueryString" ) );
+  var info = isvgVM.getPartInfo( $part );
+
+  var tXVBPOldPos = info.translateX + info.viewBoxPointsOffsetX;
+  var tYVBPOldPos = info.translateY + info.viewBoxPointsOffsetY;
+
+  var oldWidthVBP = info.viewBoxPointsWidth;
+  var oldHeightVBP = info.viewBoxPointsHeight;
+
+  var centerXVBPOldPos = info.translateX + info.viewBoxPointsCenterOffsetX;
+  var centerYVBPOldPos = info.translateY + info.viewBoxPointsCenterOffsetY;
+
+  isvgVM.scalePartFromCenterTo( $part, 0.5, 1.5, info );
+
+  ok( ( info.translateX + info.viewBoxPointsOffsetX ).toFixed( 3 ) === ( tXVBPOldPos + oldWidthVBP / 4 ).toFixed( 3 ), "info.translateX is correct [ " + info.translateX + " ]" );
+  ok( ( info.translateY + info.viewBoxPointsOffsetY ).toFixed( 3 ) === ( tYVBPOldPos - oldHeightVBP / 4 ).toFixed( 3 ), "info.translateY is correct [ " + info.translateY + " ]" );
+  ok( ( info.translateX + info.viewBoxPointsCenterOffsetX ).toFixed( 3 ) === centerXVBPOldPos.toFixed( 3 ), "Center point X did not change [ " + centerXVBPOldPos + " ]" );
+  ok( ( info.translateY + info.viewBoxPointsCenterOffsetY ).toFixed( 3 ) === centerYVBPOldPos.toFixed( 3 ), "Center point Y did not change [ " + centerYVBPOldPos + " ]" );
 });

@@ -127,16 +127,18 @@ export const ViewModel = Map.extend({
 		this.moveCenterOfPartTo( svgPart, centerUnitX, centerUnitY, svgPartInfo );
 	},
 
+	// params:
+	// svgPart, xUnits, 0, svgPartInfo // aspect ratio is preserved
+	// svgPart, 0, yUnits, svgPartInfo // aspect ratio is preserved
+	// svgPart, xUnits, yUnits, svgPartInfo
 	sizePartFromCenterTo: function ( svgPart, xUnits, yUnits, svgPartInfo ) {
-		if ( typeof yUnits !== "number" ) {
-			svgPartInfo = yUnits;
-			yUnits = xUnits;
-		}
 		if ( !svgPartInfo ) svgPartInfo = this.getPartInfo( svgPart );
 
 		var scaleX = xUnits * this.attr( "scalarUnitsToViewBoxPoints" ) / svgPartInfo.partOriginalWidth;
-		var scaleY = yUnits * this.attr( "scalarUnitsToViewBoxPoints" ) / svgPartInfo.partOriginalHeight;
+		var scaleY = yUnits ? yUnits * this.attr( "scalarUnitsToViewBoxPoints" ) / svgPartInfo.partOriginalHeight : scaleX;
 
+		if ( !scaleX ) scaleX = scaleY;
+		
 		this.scalePartFromCenterTo( svgPart, scaleX, scaleY, svgPartInfo );
 	},
 
