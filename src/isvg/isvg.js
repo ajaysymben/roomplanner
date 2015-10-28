@@ -102,7 +102,7 @@ export const ViewModel = Map.extend({
 		transform += "translate( " + info.translateX + " " + info.translateY + " ) ";
 		transform += "scale( " + info.scaleX + " " + info.scaleY + " )";
 
-		svgPart.setAttribute( "transform", transform );
+		$( svgPart )[ 0 ].setAttribute( "transform", transform );
 	},
 
 	// params:

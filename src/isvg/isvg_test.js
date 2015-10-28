@@ -526,3 +526,36 @@ QUnit.test( "addFromSVGAsGroup & getPartInfo works - useScaleX, useScaleY non un
   ok( ~~( info.viewBoxPointsCenterOffsetX ) === 162, "info.viewBoxPointsCenterOffsetX is correct [ " + info.viewBoxPointsCenterOffsetX + " ]" );
   ok( ~~( info.viewBoxPointsCenterOffsetY ) === 41, "info.viewBoxPointsCenterOffsetY is correct [ " + info.viewBoxPointsCenterOffsetY + " ]" );
 });
+
+QUnit.test( "rotatePartAboutCenterTo works", function ( assert ) {
+  var isvgVM = initAndRender.call( assert.test, {
+    width: 150,
+    height: 200,
+    scalarUnitsToViewBoxPoints: 10
+  });
+
+  var $svg = isvgVM.attr( "$svg" );
+
+  isvgVM.addFromSVGAsGroup( $testSvg, { centerXPos: 75, centerYPos: 100 } );
+
+  var $part = $svg.find( isvgVM.attr( "iQueryString" ) );
+
+  isvgVM.rotatePartAboutCenterTo( $part, 45 );
+
+  var info = isvgVM.getPartInfo( $part );
+  var tXUShouldBe = ( 75 - info.unitsWidth / 2 ) * isvgVM.scalarUnitsToViewBoxPoints - info.viewBoxPointsOffsetX;
+  var tYUShouldBe = ( 100 - info.unitsHeight / 2 ) * isvgVM.scalarUnitsToViewBoxPoints - info.viewBoxPointsOffsetY;
+  ok( info.rotation === 45, "info.rotation is correct [ " + info.rotation + " ]" );
+  ok( info.translateX.toFixed( 3 ) === tXUShouldBe.toFixed( 3 ), "info.translateX is correct [ " + info.translateX + " ]" );
+  ok( info.translateY.toFixed( 3 ) === tYUShouldBe.toFixed( 3 ), "info.translateY is correct [ " + info.translateY + " ]" );
+  ok( info.viewBoxPointsCenterOffsetX === info.viewBoxPointsWidth / 2 + info.viewBoxPointsOffsetX, "info.viewBoxPointsCenterOffsetX is correct [ " + info.viewBoxPointsOffsetX + " ]" );
+  ok( info.viewBoxPointsCenterOffsetY === info.viewBoxPointsHeight / 2 + info.viewBoxPointsOffsetY, "info.viewBoxPointsCenterOffsetY is correct [ " + info.viewBoxPointsOffsetY + " ]" );
+
+  isvgVM.rotatePartAboutCenterTo( $part, 180, info );
+
+  ok( info.rotation === 180, "info.rotation is correct [ " + info.rotation + " ]" );
+  ok( info.translateX.toFixed( 3 ) === tXUShouldBe.toFixed( 3 ), "info.translateX is still correct [ " + info.translateX + " ]" );
+  ok( info.translateY.toFixed( 3 ) === tYUShouldBe.toFixed( 3 ), "info.translateY is still correct [ " + info.translateY + " ]" );
+  ok( info.viewBoxPointsCenterOffsetX === info.viewBoxPointsWidth / 2 + info.viewBoxPointsOffsetX, "info.viewBoxPointsCenterOffsetX is still correct [ " + info.viewBoxPointsOffsetX + " ]" );
+  ok( info.viewBoxPointsCenterOffsetY === info.viewBoxPointsHeight / 2 + info.viewBoxPointsOffsetY, "info.viewBoxPointsCenterOffsetY is still correct [ " + info.viewBoxPointsOffsetY + " ]" );
+});
