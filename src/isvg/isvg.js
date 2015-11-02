@@ -4,6 +4,39 @@ import 'can/map/define/';
 import './isvg.less!';
 import template from './isvg.stache!';
 
+/*
+		noSelection: function(elm) {
+			elm = elm || this.delegate
+			document.documentElement.onselectstart = function() {
+				// Disables selection
+				return false;
+			};
+			document.documentElement.unselectable = "on";
+			this.selectionDisabled = (this.selectionDisabled ? this.selectionDisabled.add(elm) : $(elm));
+			this.selectionDisabled.css('-moz-user-select', '-moz-none');
+		},
+
+		selection: function() {
+			if(this.selectionDisabled) {
+				document.documentElement.onselectstart = function() {};
+				document.documentElement.unselectable = "off";
+				this.selectionDisabled.css('-moz-user-select', '');
+			}
+		},
+*/
+
+// function to clear the window selection if there is one
+var clearSelection = window.getSelection ? function(){
+	window.getSelection().removeAllRanges()
+} : function(){};
+
+var supportTouch = !window._phantom && "ontouchend" in document;
+
+// Use touch events or map it to mouse events
+var startEvent = supportTouch ? "touchstart" : "mousedown";
+var stopEvent = supportTouch ? "touchend" : "mouseup";
+var moveEvent = supportTouch ? "touchmove" : "mousemove";
+
 export const ViewModel = Map.extend({
 	/*
 		Expects config passed in through one-way parent -> child binding with attributes:
@@ -481,7 +514,7 @@ export default Component.extend({
 			vm.attr( "partsDataValid", 0 );
 		},
 
-		"mousedown": function ( $isvg, ev ) {
+		[startEvent]: function ( $isvg, ev ) {
 			//ev.preventDefault();
 			var vm = this.viewModel;
 			var iQueryString = vm.attr( "iQueryString" );
@@ -489,8 +522,11 @@ export default Component.extend({
 			var $parts = $svg.find( iQueryString );
 			var selectedParts = [];
 			var scalarPxToViewBoxPoints = vm.attr( "scalarPxToViewBoxPoints" );
-			var clickViewBoxPointsX = ( ev.pageX - $isvg.offset().left ) * scalarPxToViewBoxPoints;
-			var clickViewBoxPointsY = ( ev.pageY - $isvg.offset().top ) * scalarPxToViewBoxPoints;
+			var touches = ev.originalEvent.touches;
+			var pageX = ev.pageX || touches && touches[ 0 ] && touches[ 0 ].pageX || 0;
+			var pageY = ev.pageY || touches && touches[ 0 ] && touches[ 0 ].pageY || 0;
+			var clickViewBoxPointsX = ( pageX - $isvg.offset().left ) * scalarPxToViewBoxPoints;
+			var clickViewBoxPointsY = ( pageY - $isvg.offset().top ) * scalarPxToViewBoxPoints;
 
 			var scalarUnitsToViewBoxPoints = vm.attr( "scalarUnitsToViewBoxPoints" );
 
@@ -498,7 +534,6 @@ export default Component.extend({
 				vm.attr( "partsDataValid", Date.now() );
 				vm.loadAllPartsData();
 			}
-
 			$parts.each(function () {
 				var info = vm.getPartInfo( this );
 				var topLeftX = info.translateX + info.viewBoxPointsOffsetX;
@@ -522,7 +557,7 @@ export default Component.extend({
 			}
 		},
 
-		"mousemove": function ( $isvg, ev ) {
+		[moveEvent]: function ( $isvg, ev ) {
 			ev.preventDefault();
 			var vm = this.viewModel;
 			var selectedParts = vm.attr( "selectedParts" );
@@ -530,24 +565,31 @@ export default Component.extend({
 				return;
 			}
 			var scalarUnitsToPx = vm.attr( "scalarUnitsToPx" );
-			var curUnitsX = ( ev.pageX - $isvg.offset().left ) / scalarUnitsToPx;
-			var curUnitsY = ( ev.pageY - $isvg.offset().top ) / scalarUnitsToPx;
+			var touches = ev.originalEvent.touches;
+			var pageX = ev.pageX || touches && touches[ 0 ] && touches[ 0 ].pageX || 0;
+			var pageY = ev.pageY || touches && touches[ 0 ] && touches[ 0 ].pageY || 0;
+			var curUnitsX = ( pageX - $isvg.offset().left ) / scalarUnitsToPx;
+			var curUnitsY = ( pageY - $isvg.offset().top ) / scalarUnitsToPx;
 			var lastPos = vm.attr( "mouseMoveLastPos" );
 			vm.attr( "mouseMoveLastPos", { unitsX: curUnitsX, unitsY: curUnitsY } );
 			var difUnitsX = lastPos.unitsX === -1 ? 0 : curUnitsX - lastPos.unitsX;
 			var difUnitsY = lastPos.unitsY === -1 ? 0 : curUnitsY - lastPos.unitsY;
 
-			vm.moveByUnitsDifference( selectedParts, difUnitsX, difUnitsY )
+			vm.moveByUnitsDifference( selectedParts, difUnitsX, difUnitsY );
 		},
 
-		"mouseup": function ( $isvg, ev ) {
+		["{document} " + moveEvent]: function ( $isvg, ev ) {
+			if ( supportTouch ) ev.preventDefault();
+		},
+
+		[stopEvent]: function ( $isvg, ev ) {
 			var vm = this.viewModel;
 			var selectedParts = vm.attr( "selectedParts" );
 			vm.attr( "selectedParts", null );
 			vm.attr( "mouseMoveLastPos", { unitsX: -1, unitsY: -1 } );
 		},
 
-		"{document} mouseup": function ( $isvg, ev ) {
+		["{document} " + stopEvent]: function ( $isvg, ev ) {
 			var vm = this.viewModel;
 			var selectedParts = vm.attr( "selectedParts" );
 			vm.attr( "selectedParts", null );
