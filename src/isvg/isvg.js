@@ -71,25 +71,25 @@ export const ViewModel = Map.extend({
 	//scalarUnitsToViewBoxPoints * units = viewBoxPoints. Not effected from window resize.
 	scalarUnitsToViewBoxPoints: 10, //set during init event from config
 
-	pointIsInSvgPart: function ( svgPart, xUnits, yUnits, svgPartInfo ) {
-		if ( !svgPartInfo ) svgPartInfo = this.getPartInfo( svgPart );
 
-		var geo = svgPartInfo.geo;
-		var sUtVBP = this.attr( "scalarUnitsToViewBoxPoints" );
-		var xVBP = xUnits * sUtVBP;
-		var yVBP = yUnits * sUtVBP;
+	triangleArea: function ( A, B, C ) {
+		//return ( C.x * B.y - B.x * C.y ) - ( C.x * A.y - A.x * C.y ) + ( B.x * A.y - A.x * B.y );
+		return ( ( C.x * B.y - B.x * C.y ) - ( C.x * A.y - A.x * C.y ) + ( B.x * A.y - A.x * B.y ) ) / 2;
+	},
 
-		if ( ( xVBP - geo.A.x ) * geo.bax + ( yVBP - geo.A.y ) * geo.bay < 0 ) return false;
-		if ( ( xVBP - geo.B.x ) * geo.bax + ( yVBP - geo.B.y ) * geo.bay > 0 ) return false;
-		if ( ( xVBP - geo.A.x ) * geo.cax + ( yVBP - geo.A.y ) * geo.cay < 0 ) return false;
-		if ( ( xVBP - geo.C.x ) * geo.cax + ( yVBP - geo.C.y ) * geo.cay > 0 ) return false;
+	isInsideSquare: function ( A, B, C, D, P ) {
+		if ( this.triangleArea( A, B, P ) > 0 ) return false;
+		if ( this.triangleArea( B, C, P ) > 0 ) return false;
+		if ( this.triangleArea( C, D, P ) > 0 ) return false;
+		if ( this.triangleArea( D, A, P ) > 0 ) return false;
 
-		return true
+		return true;
 	},
 
 	rotatePoint: function ( px, py, angle, cx, cy ) {
-		var s = Math.sin( angle );
-		var c = Math.cos( angle );
+		var radians = angle * Math.PI / 180;
+		var s = Math.sin( radians );
+		var c = Math.cos( radians );
 
 		px -= cx;
 		py -= cy;
@@ -100,19 +100,48 @@ export const ViewModel = Map.extend({
 		};
 	},
 
+	pointIsInSvgPart: function ( svgPart, xUnits, yUnits, svgPartInfo ) {
+		if ( !svgPartInfo ) svgPartInfo = this.getPartInfo( svgPart );
+
+		var geo = svgPartInfo.geo;
+		var sUtVBP = this.attr( "scalarUnitsToViewBoxPoints" );
+		var clickVBP = {
+			x: xUnits * sUtVBP,
+			y: yUnits * sUtVBP
+		};
+
+		return this.isInsideSquare( geo.A, geo.B, geo.C, geo.D, clickVBP )
+	},
+
+	debugDrawOutline: function ( geo ) {
+		var $svg = this.attr( "$svg" );
+		var container = document.createElementNS( "http://www.w3.org/2000/svg", "svg" );
+		container.innerHTML += '<line x1="'+ geo.A.x +'" y1="'+ geo.A.y +'" x2="'+ geo.B.x +'" y2="'+ geo.B.y +'" style="stroke:rgb(255,0,0);stroke-width:2;" />';
+		container.innerHTML += '<line x1="'+ geo.A.x +'" y1="'+ geo.A.y +'" x2="'+ geo.D.x +'" y2="'+ geo.D.y +'" style="stroke:rgb(255,0,0);stroke-width:2;" />';
+		container.innerHTML += '<line x1="'+ geo.C.x +'" y1="'+ geo.C.y +'" x2="'+ geo.B.x +'" y2="'+ geo.B.y +'" style="stroke:rgb(255,0,0);stroke-width:2;" />';
+		container.innerHTML += '<line x1="'+ geo.C.x +'" y1="'+ geo.C.y +'" x2="'+ geo.D.x +'" y2="'+ geo.D.y +'" style="stroke:rgb(255,0,0);stroke-width:2;" />';
+
+		$( container ).children().appendTo( $svg );
+	},
+
 	setGeometryInfo: function ( info ) {
+		var lx = info.translateX + info.viewBoxPointsOffsetX;
+		var rx = lx + info.viewBoxPointsWidth;
+		var ty = info.translateY + info.viewBoxPointsOffsetY;
+		var by = ty + info.viewBoxPointsHeight;
+
+		var cx = info.translateX + info.viewBoxPointsCenterOffsetX;
+		var cy = info.translateY + info.viewBoxPointsCenterOffsetY;
+
 		info.geo = {};
 		//bottom left corner
-		info.geo.A = this.rotatePoint( info.translateX + info.viewBoxPointsOffsetX, info.translateY + info.viewBoxPointsOffsetY + info.viewBoxPointsHeight, info.rotation, info.translateX + info.viewBoxPointsCenterOffsetX, info.translateY + info.viewBoxPointsCenterOffsetY + info.viewBoxPointsHeight );
+		info.geo.A = this.rotatePoint( lx, by, info.rotation, cx, cy );
 		//top left corner
-		info.geo.B = this.rotatePoint( info.translateX + info.viewBoxPointsOffsetX, info.translateY + info.viewBoxPointsOffsetY, info.rotation, info.translateX + info.viewBoxPointsCenterOffsetX, info.translateY + info.viewBoxPointsCenterOffsetY );
+		info.geo.B = this.rotatePoint( lx, ty, info.rotation, cx, cy );
 		//top right corner
-		info.geo.C = this.rotatePoint( info.translateX + info.viewBoxPointsOffsetX + info.viewBoxPointsWidth, info.translateY + info.viewBoxPointsOffsetY, info.rotation, info.translateX + info.viewBoxPointsCenterOffsetX + info.viewBoxPointsWidth, info.translateY + info.viewBoxPointsCenterOffsetY );
-		
-		info.geo.bax = info.geo.B.x - info.geo.A.x;
-		info.geo.bay = info.geo.B.y - info.geo.A.y;
-		info.geo.cax = info.geo.C.x - info.geo.A.x;
-		info.geo.cay = info.geo.C.y - info.geo.A.y;
+		info.geo.C = this.rotatePoint( rx, ty, info.rotation, cx, cy );
+		//bottom right corner
+		info.geo.D = this.rotatePoint( rx, by, info.rotation, cx, cy );
 	},
 
 	scaleUpdatedSetDimensions: function ( svgPartInfo ) {
@@ -210,6 +239,8 @@ export const ViewModel = Map.extend({
 		transform += "scale( " + info.scaleX + " " + info.scaleY + " )";
 
 		$( svgPart )[ 0 ].setAttribute( "transform", transform );
+
+		this.setGeometryInfo( info );
 	},
 
 	// params:
@@ -521,39 +552,28 @@ export default Component.extend({
 			var $svg = vm.attr( "$svg" );
 			var $parts = $svg.find( iQueryString );
 			var selectedParts = [];
-			var scalarPxToViewBoxPoints = vm.attr( "scalarPxToViewBoxPoints" );
+			var scalarUnitsToPx = vm.attr( "scalarUnitsToPx" );
 			var touches = ev.originalEvent.touches;
 			var pageX = ev.pageX || touches && touches[ 0 ] && touches[ 0 ].pageX || 0;
 			var pageY = ev.pageY || touches && touches[ 0 ] && touches[ 0 ].pageY || 0;
-			var clickViewBoxPointsX = ( pageX - $isvg.offset().left ) * scalarPxToViewBoxPoints;
-			var clickViewBoxPointsY = ( pageY - $isvg.offset().top ) * scalarPxToViewBoxPoints;
-
-			var scalarUnitsToViewBoxPoints = vm.attr( "scalarUnitsToViewBoxPoints" );
+			var clickXUnits = ( pageX - $isvg.offset().left ) / scalarUnitsToPx;
+			var clickYUnits = ( pageY - $isvg.offset().top ) / scalarUnitsToPx;
 
 			if ( !vm.attr( "partsDataValid" ) ) {
 				vm.attr( "partsDataValid", Date.now() );
 				vm.loadAllPartsData();
 			}
+
 			$parts.each(function () {
-				var info = vm.getPartInfo( this );
-				var topLeftX = info.translateX + info.viewBoxPointsOffsetX;
-				var topLeftY = info.translateY + info.viewBoxPointsOffsetY;
-
-				var clickInXRange = ( topLeftX <= clickViewBoxPointsX );
-				clickInXRange &= ( (topLeftX + info.viewBoxPointsWidth) >= clickViewBoxPointsX );
-
-				var clickInYRange = ( topLeftY <= clickViewBoxPointsY );
-				clickInYRange &= ( (topLeftY + info.viewBoxPointsHeight) >= clickViewBoxPointsY );
-				if ( clickInXRange && clickInYRange ) {
+				if ( vm.pointIsInSvgPart( this, clickXUnits, clickYUnits ) ) {
 					selectedParts.push( this );
 				}
-				//if ( vm.pointIsInSvgPart( this, clickViewBoxPointsX / scalarUnitsToViewBoxPoints, clickViewBoxPointsY / scalarUnitsToViewBoxPoints, info ) ) {
-				//	selectedParts.push( this );
-				//}
 			});
-			console.log(selectedParts.length);
+			
+			//console.log(selectedParts.length);
 			if ( selectedParts.length ) {
-				vm.attr( "selectedParts", selectedParts );
+				//vm.debugDrawOutline( vm.getPartInfo( selectedParts[ selectedParts.length - 1 ] ).geo );
+				vm.attr( "selectedParts", [ selectedParts.pop() ] );
 			}
 		},
 

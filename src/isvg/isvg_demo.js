@@ -46,7 +46,9 @@ var vm = initAndRender({
 
   //dimensions in inches
   width: 30 * 12,
-  height: 24 * 12
+  height: 24 * 12,
+
+  iQueryString: "> g"
 });
 
 var $testSvg = $( "#testSvg" );
