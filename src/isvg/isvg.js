@@ -628,7 +628,7 @@ export default Component.extend({
 			var partMoved = ( mmlp.unitsX + mmlp.unitsY ) > -2;
 
 			vm.attr( "mouseMoveLastPos", { unitsX: -1, unitsY: -1 } );
-			if ( selectedParts.length && partMoved ) {
+			if ( selectedParts && selectedParts.length && partMoved ) {
 				vm.attr( "selectedParts", null );
 				vm.attr( "infoForPartControls", null );
 			} else {
