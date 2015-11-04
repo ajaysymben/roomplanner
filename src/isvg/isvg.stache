@@ -1,0 +1,17 @@
+{{#is followMouse false}}
+	{{#is selectedParts.length 1}}
+		<div class="part-controls" style="
+			width: {{infoForPartControls.pxWidth}};
+			height: {{infoForPartControls.pxHeight}};
+			left: {{infoForPartControls.pxLeftTopX}};
+			top: {{infoForPartControls.pxLeftTopY}};
+			transform: rotate( {{infoForPartControls.rotation}}deg );
+		">
+			<div class="resizehandle top left"></div>
+			<div class="resizehandle top right"></div>
+			<div class="resizehandle bottom left"></div>
+			<div class="resizehandle bottom right"></div>
+			<div class="rotationhandle"></div>
+		</div>
+	{{/is}}
+{{/is}}

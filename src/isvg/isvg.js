@@ -125,6 +125,7 @@ export const ViewModel = Map.extend({
 	},
 
 	setGeometryInfo: function ( info ) {
+		var scalarPxToViewBoxPoints = this.attr( "scalarPxToViewBoxPoints" );
 		var lx = info.translateX + info.viewBoxPointsOffsetX;
 		var rx = lx + info.viewBoxPointsWidth;
 		var ty = info.translateY + info.viewBoxPointsOffsetY;
@@ -142,17 +143,25 @@ export const ViewModel = Map.extend({
 		info.geo.C = this.rotatePoint( rx, ty, info.rotation, cx, cy );
 		//bottom right corner
 		info.geo.D = this.rotatePoint( rx, by, info.rotation, cx, cy );
+
+		info.pxLeftTopX = lx / scalarPxToViewBoxPoints;
+		info.pxLeftTopY = ty / scalarPxToViewBoxPoints;
+		info.pxCenterX = cx / scalarPxToViewBoxPoints;
+		info.pxCenterY = cy / scalarPxToViewBoxPoints;
 	},
 
 	scaleUpdatedSetDimensions: function ( svgPartInfo ) {
+		var scalarUnitsToViewBoxPoints = this.attr( "scalarUnitsToViewBoxPoints" );
+		var scalarUnitsToPx = this.attr( "scalarUnitsToPx" );
+
 		svgPartInfo.viewBoxPointsWidth = svgPartInfo.partOriginalWidth * svgPartInfo.scaleX;
 		svgPartInfo.viewBoxPointsHeight = svgPartInfo.partOriginalHeight * svgPartInfo.scaleY;
 
-		svgPartInfo.unitsWidth = svgPartInfo.viewBoxPointsWidth / this.attr( "scalarUnitsToViewBoxPoints" );
-		svgPartInfo.unitsHeight = svgPartInfo.viewBoxPointsHeight / this.attr( "scalarUnitsToViewBoxPoints" );
+		svgPartInfo.unitsWidth = svgPartInfo.viewBoxPointsWidth / scalarUnitsToViewBoxPoints;
+		svgPartInfo.unitsHeight = svgPartInfo.viewBoxPointsHeight / scalarUnitsToViewBoxPoints;
 
-		svgPartInfo.pxWidth = svgPartInfo.unitsWidth * this.attr( "scalarUnitsToPx" );
-		svgPartInfo.pxHeight = svgPartInfo.unitsHeight * this.attr( "scalarUnitsToPx" );
+		svgPartInfo.pxWidth = svgPartInfo.unitsWidth * scalarUnitsToPx;
+		svgPartInfo.pxHeight = svgPartInfo.unitsHeight * scalarUnitsToPx;
 
 		svgPartInfo.viewBoxPointsOffsetX = svgPartInfo.x * svgPartInfo.scaleX;
 		svgPartInfo.viewBoxPointsOffsetY = svgPartInfo.y * svgPartInfo.scaleY;
@@ -230,6 +239,7 @@ export const ViewModel = Map.extend({
 		unitsX: -1,
 		unitsY: -1
 	},
+	infoForPartControls: null,
 
 	setTransform: function ( svgPart, info ) {
 		var transform = "rotate( " + info.rotation + " ";
@@ -569,11 +579,17 @@ export default Component.extend({
 					selectedParts.push( this );
 				}
 			});
-			
+
 			//console.log(selectedParts.length);
 			if ( selectedParts.length ) {
 				//vm.debugDrawOutline( vm.getPartInfo( selectedParts[ selectedParts.length - 1 ] ).geo );
 				vm.attr( "selectedParts", [ selectedParts.pop() ] );
+				vm.attr( "mouseMoveLastPos", { unitsX: -1, unitsY: -1 } );
+				vm.attr( "followMouse", true );
+				vm.attr( "infoForPartControls", vm.getPartInfo( vm.attr( "selectedParts" )[ 0 ] ) );
+			} else {
+				vm.attr( "selectedParts", null );
+				vm.attr( "infoForPartControls", null );
 			}
 		},
 
@@ -582,6 +598,9 @@ export default Component.extend({
 			var vm = this.viewModel;
 			var selectedParts = vm.attr( "selectedParts" );
 			if ( !selectedParts || !selectedParts.length ) {
+				return;
+			}
+			if ( !vm.attr( "followMouse" ) ) {
 				return;
 			}
 			var scalarUnitsToPx = vm.attr( "scalarUnitsToPx" );
@@ -605,14 +624,23 @@ export default Component.extend({
 		[stopEvent]: function ( $isvg, ev ) {
 			var vm = this.viewModel;
 			var selectedParts = vm.attr( "selectedParts" );
-			vm.attr( "selectedParts", null );
+			var mmlp = vm.attr( "mouseMoveLastPos" );
+			var partMoved = ( mmlp.unitsX + mmlp.unitsY ) > -2;
+
 			vm.attr( "mouseMoveLastPos", { unitsX: -1, unitsY: -1 } );
+			if ( selectedParts.length && partMoved ) {
+				vm.attr( "selectedParts", null );
+				vm.attr( "infoForPartControls", null );
+			} else {
+				//leave the svgPart selected
+			}
+			vm.attr( "followMouse", false );
 		},
 
 		["{document} " + stopEvent]: function ( $isvg, ev ) {
 			var vm = this.viewModel;
 			var selectedParts = vm.attr( "selectedParts" );
-			vm.attr( "selectedParts", null );
+			//vm.attr( "selectedParts", null );
 			vm.attr( "mouseMoveLastPos", { unitsX: -1, unitsY: -1 } );
 		}
 	}

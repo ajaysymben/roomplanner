@@ -52,4 +52,30 @@ interactive-svg {
 			background-size: 20px 20px; //defaults, overwritten with js to show scale
 		}
 	}
+
+	.part-controls {
+		position: absolute;
+
+		.resizehandle {
+			position: absolute;
+			width: 10px;
+			height: 10px;
+			border: 2px solid #000000;
+			cursor: pointer;
+			background-color: rgba( 255, 255, 255, 0.25 );
+			box-shadow: 0 0 4px #FFFFFF, inset 0 0 4px #FFFFFF;
+		}
+		.top {
+			top: -5px;
+		}
+		.left {
+			left: -5px;
+		}
+		.right {
+			right: -5px;
+		}
+		.bottom {
+			bottom: -5px;
+		}
+	}
 }
