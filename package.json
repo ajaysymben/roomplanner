@@ -58,5 +58,8 @@
     "steal-qunit": "^0.1.1",
     "steal-tools": "^0.12.0-pre.5",
     "testee": "^0.2.1"
+  },
+  "engines": {
+    "node": "0.12.7"
   }
 }
