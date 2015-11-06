@@ -148,6 +148,15 @@ export const ViewModel = Map.extend({
 		info.pxLeftTopY = ty / scalarPxToViewBoxPoints;
 		info.pxCenterX = cx / scalarPxToViewBoxPoints;
 		info.pxCenterY = cy / scalarPxToViewBoxPoints;
+
+		info.pxOptionsX = Math.min( info.geo.A.x, info.geo.B.x, info.geo.C.x, info.geo.D.x ) / scalarPxToViewBoxPoints;
+		if ( info.pxOptionsX < 10 ) {
+			info.pxOptionsX = Math.max( info.geo.A.x, info.geo.B.x, info.geo.C.x, info.geo.D.x ) / scalarPxToViewBoxPoints;
+		}
+		info.pxOptionsY = Math.min( info.geo.A.y, info.geo.B.y, info.geo.C.y, info.geo.D.y ) / scalarPxToViewBoxPoints - 110;
+		if ( info.pxOptionsY < 10 ) {
+			info.pxOptionsY = Math.max( info.geo.A.y, info.geo.B.y, info.geo.C.y, info.geo.D.y ) / scalarPxToViewBoxPoints + 40;
+		}
 	},
 
 	scaleUpdatedSetDimensions: function ( svgPartInfo ) {
@@ -233,13 +242,6 @@ export const ViewModel = Map.extend({
 			vm.getPartInfo( this );
 		});
 	},
-
-	selectedParts: null,
-	mouseMoveLastPos: {
-		unitsX: -1,
-		unitsY: -1
-	},
-	infoForPartControls: null,
 
 	setTransform: function ( svgPart, info ) {
 		var transform = "rotate( " + info.rotation + " ";
@@ -335,6 +337,40 @@ export const ViewModel = Map.extend({
 				info
 			);
 		});
+	},
+
+	resizeByUnitsInDirection: function ( svgPart, difUnitsX, difUnitsY, direction, info ) {
+		if ( !info ) info = this.getPartInfo( svgPart );
+
+		var newXUnits, newYUnits;
+		var newWidthUnits = info.unitsWidth + difUnitsX;
+		var newHeightUnits = info.unitsHeight + difUnitsY;
+		var scalarUnitsToViewBoxPoints = this.attr( "scalarUnitsToViewBoxPoints" );
+		var xUnits = ( info.translateX + info.viewBoxPointsOffsetX ) / scalarUnitsToViewBoxPoints;
+		var yUnits = ( info.translateY + info.viewBoxPointsOffsetY ) / scalarUnitsToViewBoxPoints;
+
+		switch ( direction.toUpperCase() ) {
+			case "LT":
+				newXUnits = xUnits - difUnitsX;
+				newYUnits = yUnits - difUnitsY;
+				break;
+			case "RT":
+				newXUnits = xUnits;
+				newYUnits = yUnits - difUnitsY;
+				break;
+			case "LB":
+				newXUnits = xUnits - difUnitsX;
+				newYUnits = yUnits;
+				break;
+			case "RB":
+				newXUnits = xUnits;
+				newYUnits = yUnits;
+				break;
+		}
+
+		this.sizePartFromCenterTo( svgPart, newWidthUnits, newHeightUnits, info );
+		this.movePartTo( svgPart, newXUnits, newYUnits, info );
+		this.attr( "infoForPartControls", info );
 	},
 
 	getLayer: function ( i ) {
@@ -446,7 +482,44 @@ export const ViewModel = Map.extend({
 		this.attr( "$svg" ).css({
 			"background-size": bgSize
 		});
-	}
+	},
+
+	// startEvent on "grid"
+	// 	moveEvent from grid ( begin multi select )
+	// 		stopEvent from grid after moveEvent ( multi select items in range )
+	// 	stopEvent from grid without moveEvent ( deselect all )
+
+	// startEvent on "selectedParts" -- already selected (or multi selected) svgPart
+	// startEvent on "newSelectedPart" -- currently unselected svgPart ( deselect others )
+	// 	moveEvent from newSelectedPart OR from selectedParts ( move parts )
+	// 		stopEvent from either after moveEvent ( no further action )
+	// 	stopEvent from either without moveEvent ( select only this one, show controls )
+
+	// startEvent on a resize handle = "resizerLT", "resizerRT", "resizerLB", "resizerRB"
+	// 	moveEvent from resizer ( scale from handle, position anchored to oposite corner )
+	//  	stopEvent from resizer after moveEvent ( no further action )
+	//	stopEvent from resizer without moveEvent ( no further action )
+
+	// startEvent on "rotator" -- rotation handle
+	// 	moveEvent from rotator ( rotate from center of item )
+	//  	stopEvent from rotator after moveEvent ( no further action )
+	//	stopEvent from rotator without moveEvent ( no further action )
+
+	// startEvent on "other" -- anything not described
+	//	moveEvent from other ( no further action )
+	//  	stopEvent from other after moveEvent ( no further action )
+	//	stopEvent from other without moveEvent ( no further action )
+	currentInteractionOn: null,
+	selectedParts: null,
+	mouseMoveInitialPos: {
+		unitsX: -1,
+		unitsY: -1
+	},
+	mouseMoveLastPos: {
+		unitsX: -1,
+		unitsY: -1
+	},
+	infoForPartControls: null
 });
 
 export default Component.extend({
@@ -557,11 +630,9 @@ export default Component.extend({
 
 		[startEvent]: function ( $isvg, ev ) {
 			//ev.preventDefault();
+			var $target = $( ev.target );
 			var vm = this.viewModel;
-			var iQueryString = vm.attr( "iQueryString" );
-			var $svg = vm.attr( "$svg" );
-			var $parts = $svg.find( iQueryString );
-			var selectedParts = [];
+			var controlsShowing = vm.attr( "infoForPartControls" );
 			var scalarUnitsToPx = vm.attr( "scalarUnitsToPx" );
 			var touches = ev.originalEvent.touches;
 			var pageX = ev.pageX || touches && touches[ 0 ] && touches[ 0 ].pageX || 0;
@@ -569,27 +640,69 @@ export default Component.extend({
 			var clickXUnits = ( pageX - $isvg.offset().left ) / scalarUnitsToPx;
 			var clickYUnits = ( pageY - $isvg.offset().top ) / scalarUnitsToPx;
 
-			if ( !vm.attr( "partsDataValid" ) ) {
-				vm.attr( "partsDataValid", Date.now() );
-				vm.loadAllPartsData();
-			}
-
-			$parts.each(function () {
-				if ( vm.pointIsInSvgPart( this, clickXUnits, clickYUnits ) ) {
-					selectedParts.push( this );
-				}
+			vm.attr( "mouseMoveInitialPos", {
+				unitsX: clickXUnits,
+				unitsY: clickYUnits
 			});
+			vm.attr( "mouseMoveLastPos", { unitsX: -1, unitsY: -1 } );
 
-			//console.log(selectedParts.length);
-			if ( selectedParts.length ) {
-				//vm.debugDrawOutline( vm.getPartInfo( selectedParts[ selectedParts.length - 1 ] ).geo );
-				vm.attr( "selectedParts", [ selectedParts.pop() ] );
-				vm.attr( "mouseMoveLastPos", { unitsX: -1, unitsY: -1 } );
-				vm.attr( "followMouse", true );
-				vm.attr( "infoForPartControls", vm.getPartInfo( vm.attr( "selectedParts" )[ 0 ] ) );
+			if ( controlsShowing && $target.is( ".resizehandle" ) ) {
+				var interactionType = "resizer";
+				interactionType += $target.is( ".left" ) ? "L" : "R";
+				interactionType += $target.is( ".top" ) ? "T" : "B";
+
+				/****** INTERACTION SET ******/
+				vm.attr( "currentInteractionOn", interactionType );
+			} else if ( controlsShowing && $target.is( ".rotationhandle" ) ) {
+				/****** INTERACTION SET ******/
+				vm.attr( "currentInteractionOn", "rotator" );
 			} else {
-				vm.attr( "selectedParts", null );
-				vm.attr( "infoForPartControls", null );
+				var iQueryString = vm.attr( "iQueryString" );
+				var $svg = vm.attr( "$svg" );
+				var $parts = $svg.find( iQueryString );
+				var selectedParts = [];
+
+				if ( !vm.attr( "partsDataValid" ) ) {
+					vm.attr( "partsDataValid", Date.now() );
+					vm.loadAllPartsData();
+				}
+
+				$parts.each(function () {
+					if ( vm.pointIsInSvgPart( this, clickXUnits, clickYUnits ) ) {
+						selectedParts.push( this );
+					}
+				});
+
+				//console.log(selectedParts.length);
+				if ( selectedParts.length ) {
+					var curPart = selectedParts.pop();
+					var prevSelected = vm.attr( "selectedParts" );
+					var indexOfAlreadySelected = ( prevSelected && prevSelected.indexOf( curPart ) ) || -1;
+
+					if ( indexOfAlreadySelected !== -1 ) {
+						/****** INTERACTION SET ******/
+						vm.attr( "currentInteractionOn", "selectedParts" );
+
+						prevSelected.splice( indexOfAlreadySelected, 1 );
+						prevSelected.unshift( curPart );
+					} else {
+						/****** INTERACTION SET ******/
+						vm.attr( "currentInteractionOn", "newSelectedPart" );
+
+						vm.attr( "selectedParts", [ curPart ] );
+						//vm.debugDrawOutline( vm.getPartInfo( curPart ).geo );
+					}
+					vm.attr( "infoForPartControls", null );
+				} else if ( $target.is( "svg" ) ) {
+					/****** INTERACTION SET ******/
+					vm.attr( "currentInteractionOn", "grid" );
+
+					vm.attr( "selectedParts", null );
+					vm.attr( "infoForPartControls", null );
+				} else {
+					/****** INTERACTION SET ******/
+					vm.attr( "currentInteractionOn", "other" );
+				}
 			}
 		},
 
@@ -597,12 +710,6 @@ export default Component.extend({
 			ev.preventDefault();
 			var vm = this.viewModel;
 			var selectedParts = vm.attr( "selectedParts" );
-			if ( !selectedParts || !selectedParts.length ) {
-				return;
-			}
-			if ( !vm.attr( "followMouse" ) ) {
-				return;
-			}
 			var scalarUnitsToPx = vm.attr( "scalarUnitsToPx" );
 			var touches = ev.originalEvent.touches;
 			var pageX = ev.pageX || touches && touches[ 0 ] && touches[ 0 ].pageX || 0;
@@ -614,7 +721,40 @@ export default Component.extend({
 			var difUnitsX = lastPos.unitsX === -1 ? 0 : curUnitsX - lastPos.unitsX;
 			var difUnitsY = lastPos.unitsY === -1 ? 0 : curUnitsY - lastPos.unitsY;
 
-			vm.moveByUnitsDifference( selectedParts, difUnitsX, difUnitsY );
+			switch ( vm.attr( "currentInteractionOn" ) ) {
+				case "grid":
+					return;
+				case "selectedParts":
+				case "newSelectedPart":
+					if ( !selectedParts || !selectedParts.length ) {
+						return;
+					}
+					vm.moveByUnitsDifference( selectedParts, difUnitsX, difUnitsY );
+					break;
+				case "resizerLT":
+					vm.resizeByUnitsInDirection( selectedParts, -difUnitsX, -difUnitsY, "LT" );
+					break;
+				case "resizerRT":
+					vm.resizeByUnitsInDirection( selectedParts, difUnitsX, -difUnitsY, "RT" );
+					break;
+				case "resizerLB":
+					vm.resizeByUnitsInDirection( selectedParts, -difUnitsX, difUnitsY, "LB" );
+					break;
+				case "resizerRB":
+					vm.resizeByUnitsInDirection( selectedParts, difUnitsX, difUnitsY, "RB" );
+					break;
+				case "rotator":
+					var info = vm.getPartInfo( selectedParts );
+					var angle = Math.atan2(
+						info.pxCenterY / scalarUnitsToPx - curUnitsY,
+						curUnitsX - info.pxCenterX / scalarUnitsToPx
+					) * 180 / Math.PI + 90;
+					vm.rotatePartAboutCenterTo( selectedParts, -1 * angle, info );
+					vm.attr( "infoForPartControls", info );
+					break;
+				default:
+					return;
+			}
 		},
 
 		["{document} " + moveEvent]: function ( $isvg, ev ) {
@@ -625,23 +765,39 @@ export default Component.extend({
 			var vm = this.viewModel;
 			var selectedParts = vm.attr( "selectedParts" );
 			var mmlp = vm.attr( "mouseMoveLastPos" );
-			var partMoved = ( mmlp.unitsX + mmlp.unitsY ) > -2;
+			var movementOccurred = ( mmlp.unitsX + mmlp.unitsY ) > -2;
 
-			vm.attr( "mouseMoveLastPos", { unitsX: -1, unitsY: -1 } );
-			if ( selectedParts && selectedParts.length && partMoved ) {
-				vm.attr( "selectedParts", null );
-				vm.attr( "infoForPartControls", null );
-			} else {
-				//leave the svgPart selected
+			switch ( vm.attr( "currentInteractionOn" ) ) {
+				case "grid":
+					vm.attr( "selectedParts", null );
+					//TODO (strech goal) if movementOccurred, select range ( ceneter of part is in rect defined by start/end pos )
+					break;
+				case "selectedParts":
+					if ( movementOccurred ) {
+						//no further action
+					} else {
+						selectedParts.splice( 1, selectedParts.length - 1 );
+						vm.attr( "infoForPartControls", vm.getPartInfo( selectedParts[ 0 ] ) );
+					}
+					break;
+				case "newSelectedPart":
+					if ( movementOccurred ) {
+						//no further action
+					} else {
+						vm.attr( "infoForPartControls", vm.getPartInfo( selectedParts[ 0 ] ) );
+					}
+					break;
+				default:
+					break;
 			}
-			vm.attr( "followMouse", false );
 		},
 
 		["{document} " + stopEvent]: function ( $isvg, ev ) {
 			var vm = this.viewModel;
-			var selectedParts = vm.attr( "selectedParts" );
-			//vm.attr( "selectedParts", null );
 			vm.attr( "mouseMoveLastPos", { unitsX: -1, unitsY: -1 } );
+
+			/****** INTERACTION SET ******/
+			vm.attr( "currentInteractionOn", null );
 		}
 	}
 });

@@ -1,17 +1,30 @@
-{{#is followMouse false}}
-	{{#is selectedParts.length 1}}
-		<div class="part-controls" style="
-			width: {{infoForPartControls.pxWidth}};
-			height: {{infoForPartControls.pxHeight}};
-			left: {{infoForPartControls.pxLeftTopX}};
-			top: {{infoForPartControls.pxLeftTopY}};
-			transform: rotate( {{infoForPartControls.rotation}}deg );
-		">
-			<div class="resizehandle top left"></div>
-			<div class="resizehandle top right"></div>
-			<div class="resizehandle bottom left"></div>
-			<div class="resizehandle bottom right"></div>
-			<div class="rotationhandle"></div>
+{{#infoForPartControls}}
+	<div class="part-controls" style="
+		width: {{infoForPartControls.pxWidth}};
+		height: {{infoForPartControls.pxHeight}};
+		left: {{infoForPartControls.pxLeftTopX}};
+		top: {{infoForPartControls.pxLeftTopY}};
+		transform: rotate( {{infoForPartControls.rotation}}deg );
+	">
+		<div class="resizehandle top left"></div>
+		<div class="resizehandle top right"></div>
+		<div class="resizehandle bottom left"></div>
+		<div class="resizehandle bottom right"></div>
+		<div class="rotationhandle icon-rotate"></div>
+	</div>
+	<div class="part-options" style="
+		left: {{infoForPartControls.pxOptionsX}};
+		top: {{infoForPartControls.pxOptionsY}};
+	">
+		<div class="part-title">Test title<div>
+		<div class="part-dimensions">
+			<input type="text" value="{{infoForPartControls.unitsWidth}}">" x
+			<input type="text" value="{{infoForPartControls.unitsHeight}}">"
 		</div>
-	{{/is}}
-{{/is}}
+		<div class="part-menu">
+			<i class="icon-lock-open"></i>
+			<i class="icon-clone"></i>
+			<i class="icon-trash-can"></i>
+		</div>
+	</div>
+{{/infoForPartControls}}
