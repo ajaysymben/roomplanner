@@ -1,4 +1,7 @@
 {{#infoForPartControls}}
+	{{#if blurShield}}
+		<div class="blur-shield"></div>
+	{{/if}}
 	<div class="part-controls" style="
 		width: {{infoForPartControls.pxWidth}};
 		height: {{infoForPartControls.pxHeight}};
@@ -18,8 +21,8 @@
 	">
 		<div class="part-title">Test title<div>
 		<div class="part-dimensions">
-			<input type="text" value="{{infoForPartControls.unitsWidth}}">" x
-			<input type="text" value="{{infoForPartControls.unitsHeight}}">"
+			<input class="width" type="text" value="{{infoForPartControls.unitsWidth}}">" x
+			<input class="height" type="text" value="{{infoForPartControls.unitsHeight}}">"
 		</div>
 		<div class="part-menu">
 			<i class="icon-lock-open"></i>

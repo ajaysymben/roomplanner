@@ -389,6 +389,21 @@ export const ViewModel = Map.extend({
 		return $svg.find( "> g" ).eq( i );
 	},
 
+	cloneSvgParts: function ( svgParts ) {
+		var $svgParts = $( svgParts );
+		var ret = [];
+		$svgParts.each(function () {
+			ret.push( $( this ).clone().appendTo( $( this ).parent() )[ 0 ] );
+		});
+		var offset = 10 / this.attr( "scalarUnitsToPx" );
+		this.moveByUnitsDifference( ret, offset, offset );
+		return ret;
+	},
+
+	deleteSvgParts: function ( svgParts ) {
+		$( svgParts ).remove();
+	},
+
 	cloneInnerElements: function ( destinationNode, sourceNode ) {
 		//TODO: scope all rules in any <style> tags... (random id)
 		$( sourceNode ).children().clone().appendTo( destinationNode );
@@ -504,6 +519,16 @@ export const ViewModel = Map.extend({
 	// 	moveEvent from rotator ( rotate from center of item )
 	//  	stopEvent from rotator after moveEvent ( no further action )
 	//	stopEvent from rotator without moveEvent ( no further action )
+
+	// startEvent on "clone" -- .icon-clone
+	// 	moveEvent from clone ( no action )
+	//  	stopEvent from clone after moveEvent ( clone item if still on .icon-clone )
+	//	stopEvent from clone without moveEvent ( clone item )
+
+	// startEvent on "delete" -- .icon-trash-can
+	// 	moveEvent from delete ( no action )
+	//  	stopEvent from delete after moveEvent ( clone item if still on .icon-clone )
+	//	stopEvent from delete without moveEvent ( clone item )
 
 	// startEvent on "other" -- anything not described
 	//	moveEvent from other ( no further action )
@@ -625,7 +650,53 @@ export default Component.extend({
 			if ( !vm || !vm.isRunningInBrowser ) return;
 
 			vm.setUnitScaleSizes( this.element );
-			vm.attr( "partsDataValid", 0 );
+			vm.attr( "partsDataValid", Date.now() );
+
+			var selectedParts = vm.attr( "selectedParts" );
+			if ( selectedParts && selectedParts.length && vm.attr( "infoForPartControls" ) ) {
+				vm.attr( "infoForPartControls", vm.getPartInfo( selectedParts[ 0 ] ) );
+			}
+		},
+
+		".part-dimensions input focus": function () {
+			this.viewModel.attr( "blurShield", true );
+		},
+
+		".part-dimensions input blur": function () {
+			this.viewModel.attr( "blurShield", false );
+		},
+
+		".part-dimensions input change": function ( $input, ev ) {
+			var vm = this.viewModel;
+			var selectedParts = vm.attr( "selectedParts" );
+			if ( !selectedParts || !selectedParts.length ) {
+				return;
+			}
+			var $width = $( ".part-dimensions input.width" );
+			var $height = $( ".part-dimensions input.height" );
+			var newWidthUnits = parseFloat( $width.val() ) || 0;
+			var newHeightUnits = parseFloat( $height.val() ) || 0;
+			var curVal = parseFloat( $input.val() ) || 0;
+			var info = vm.getPartInfo( selectedParts[ 0 ] );
+
+			if ( newWidthUnits <= 0 ) {
+				newWidthUnits = 0;
+				$width.val( "" );
+			}
+			if ( newHeightUnits <= 0 ) {
+				newHeightUnits = 0;
+				$height.val( "" );
+			}
+
+			if ( newWidthUnits + newHeightUnits === 0 ) {
+				$width.val( info.unitsWidth );
+				$height.val( info.unitsHeight );
+			} else if ( curVal ) {
+				vm.sizePartFromCenterTo( selectedParts[ 0 ], newWidthUnits, newHeightUnits, info );
+				$width.val( info.unitsWidth );
+				$height.val( info.unitsHeight );
+				vm.attr( "infoForPartControls", info );
+			}
 		},
 
 		[startEvent]: function ( $isvg, ev ) {
@@ -656,6 +727,12 @@ export default Component.extend({
 			} else if ( controlsShowing && $target.is( ".rotationhandle" ) ) {
 				/****** INTERACTION SET ******/
 				vm.attr( "currentInteractionOn", "rotator" );
+			} else if ( controlsShowing && $target.is( ".icon-clone" ) ) {
+				/****** INTERACTION SET ******/
+				vm.attr( "currentInteractionOn", "clone" );
+			} else if ( controlsShowing && $target.is( ".icon-trash-can" ) ) {
+				/****** INTERACTION SET ******/
+				vm.attr( "currentInteractionOn", "delete" );
 			} else {
 				var iQueryString = vm.attr( "iQueryString" );
 				var $svg = vm.attr( "$svg" );
@@ -785,6 +862,20 @@ export default Component.extend({
 						//no further action
 					} else {
 						vm.attr( "infoForPartControls", vm.getPartInfo( selectedParts[ 0 ] ) );
+					}
+					break;
+				case "clone":
+					if ( $( ev.target ).is( ".icon-clone" ) ) {
+						vm.attr( "selectedParts", vm.cloneSvgParts( selectedParts ) );
+						var info = vm.getPartInfo( vm.attr( "selectedParts" )[ 0 ] );
+						vm.attr( "infoForPartControls", info );
+					}
+					break;
+				case "delete":
+					if ( $( ev.target ).is( ".icon-trash-can" ) ) {
+						vm.attr( "infoForPartControls", null );
+						vm.attr( "selectedParts", null );
+						vm.deleteSvgParts( selectedParts );
 					}
 					break;
 				default:
