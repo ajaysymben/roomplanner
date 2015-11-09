@@ -645,7 +645,7 @@ export default Component.extend({
 			);
 		},
 
-		"{window} resize": function () {
+		"resize": function () {
 			var vm = this.viewModel;
 			if ( !vm || !vm.isRunningInBrowser ) return;
 
@@ -657,6 +657,18 @@ export default Component.extend({
 				vm.attr( "infoForPartControls", vm.getPartInfo( selectedParts[ 0 ] ) );
 			}
 		},
+
+		"{window} resize": ( function () {
+			var el, timeout = null;
+			var tofn = function () {
+				can.trigger( el, "resize" );
+			};
+			return function () {
+				el = this.element;
+				clearTimeout( timeout );
+				timeout = setTimeout( tofn, 100 );
+			};
+		})(),
 
 		".part-dimensions input focus": function () {
 			this.viewModel.attr( "blurShield", true );

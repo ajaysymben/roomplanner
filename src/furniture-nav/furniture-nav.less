@@ -1,0 +1,128 @@
+furniture-nav {
+	display: block;
+	width: 0px;
+	transition: width 250ms ease-out;
+	&.expanded {
+		width: 275px;
+	}
+	overflow: hidden;
+	position: absolute;
+	height: ~"calc( 100% - 50px )";
+	top: 50px;
+	left: 0px;
+	border-right: 1px solid #797979;
+
+	> * {
+		display: block;
+		padding-left: 10px;
+		padding-right: 10px;
+		position: absolute;
+		width: 100%;
+	}
+
+	.current-room {
+		background-color: #29597E;
+		color: #FFFFFF;
+		height: 50px;
+		top: 0px;
+
+		.label {
+			font-size: 11px;
+			padding-top: 6px;
+			padding-bottom: 6px;
+		}
+		.title {
+			font-size: 13px;
+			font-weight: bold;
+		}
+	}
+
+	.search-area {
+		top: 50px;
+		height: 45px;
+		line-height: 45px;
+		vertical-align: middle;
+
+		input {
+			height: 40px;
+			width: ~"calc( 100% - 40px )";
+			position: absolute;
+			right: 0px;
+			bottom: 0px;
+			font-size: 13px;
+			padding-left: 4px;
+		}
+	}
+
+	.category-dd-current {
+		background-color: #F2F2F2;
+		color: #29597E;
+		border-bottom: 1px solid #C9C9C9;
+		top: 95px;
+		height: 50px;
+		cursor: pointer;
+
+		.current-category {
+			font-size: 11px;
+			padding-top: 6px;
+			padding-bottom: 6px;
+		}
+		.current-subcategory {
+			font-size: 13px;
+			font-weight: bold;
+		}
+		.icon-chevron {
+			font-size: 8px;
+			position: absolute;
+			right: 14px;
+			top: 50%;
+			transform: translateY( -50% );
+		}
+	}
+
+	.categories {
+		top: 145px;
+		max-height: ~"calc( 100% - 145px )";
+		overflow-y: auto;
+		z-index: 2;
+		list-style: none;
+		ul {
+			list-style: none;
+		}
+
+		li {
+			display: block;
+			position: relative;
+			padding: 10px;
+			background-color: #FFFFFF;
+			color: #000000;
+			border-bottom: 1px solid #C9C9C9;
+			cursor: pointer;
+
+			.icon-chevron {
+				font-size: 8px;
+				position: absolute;
+				right: 14px;
+				top: 15px;
+			}
+
+			ul {
+				margin-top: 10px;
+				margin-right: -10px;
+			}
+
+			li {
+				border-top: 1px solid #C9C9C9;
+				border-bottom: none;
+				padding-left: 5px;
+				padding-right: 5px;
+				border-left: 5px solid #C9C9C9;
+			}
+		}
+	}
+
+	.results {
+		top: 145px;
+		height: ~"calc( 100% - 145px )";
+	}
+}

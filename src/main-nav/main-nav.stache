@@ -1,0 +1,23 @@
+<ul>
+	<li class="menu-toggle">
+		{{#if partsMenuExpanded}}
+			<i class="icon-menu-toggle"></i>
+		{{else}}
+			<i class="icon-menu-toggle is-closed"></i>
+		{{/if}}
+	</li>
+	<li>New</li>
+	<li>Open</li>
+	<li>Save</li>
+	<li>Summary</li>
+	<li>Export</li>
+</ul>
+
+<ul class="right-nav">
+	<li>Reset</li>
+	<li>Help</li>
+	<li>
+		[client logo]
+	</li>
+</ul>
+

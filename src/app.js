@@ -5,12 +5,12 @@ import 'can/route/pushstate/';
 
 const AppViewModel = AppMap.extend({
   define: {
-    message: {
-      value: 'Hello World!',
-      serialize: false
-    },
     title: {
       value: 'svg-roomplanner',
+      serialize: false
+    },
+    partsMenuExpanded: {
+      value: true,
       serialize: false
     }
   },
