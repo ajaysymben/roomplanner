@@ -3,12 +3,16 @@ interactive-svg {
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	-ms-transform: translate( -50%, -50% );
 	-webkit-transform: translate( -50%, -50% );
-	-moz-transform: translate( -50%, -50% );
-	-o-transform: translate( -50%, -50% );
 	transform: translate( -50%, -50% );
 	outline: 4px solid #000000;
+
+	&, & * {
+		box-sizing: border-box;
+		-ms-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+	}
 
 	/*
 		background-color: transparent;
@@ -66,8 +70,8 @@ interactive-svg {
 
 		.resizehandle {
 			position: absolute;
-			width: 10px;
-			height: 10px;
+			width: 14px;
+			height: 14px;
 			border: 2px solid #000000;
 			cursor: pointer;
 			background-color: rgba( 255, 255, 255, 0.25 );
@@ -92,6 +96,7 @@ interactive-svg {
 			height: 20px;
 			bottom: -25px;
 			left: 50%;
+			-webkit-transform: translateX( -50% );
 			transform: translateX( -50% );
 			cursor: pointer;
 			background-color: rgba( 255, 255, 255, 0.25 );
@@ -101,8 +106,8 @@ interactive-svg {
 
 	.part-options {
 		background-color: #000000;
-		height: 50px;
-		width: 222px;
+		height: 70px;
+		width: 242px;
 		position: absolute;
 		@padding: 10px;
 		padding: @padding;
@@ -119,7 +124,7 @@ interactive-svg {
 			left: @padding;
 
 			input {
-				width: 50px;
+				width: 58px;
 				color: #FFFFFF;
 				border-radius: 2px;
 				border: 1px solid #FFFFFF;

@@ -658,7 +658,7 @@ export default Component.extend({
 			}
 		},
 
-		"{window} resize": ( function () {
+		"{window} resize": (function () {
 			var el, timeout = null;
 			var tofn = function () {
 				can.trigger( el, "resize" );
@@ -675,6 +675,10 @@ export default Component.extend({
 		},
 
 		".part-dimensions input blur": function () {
+			this.viewModel.attr( "blurShield", false );
+		},
+
+		".blur-shield click": function () {
 			this.viewModel.attr( "blurShield", false );
 		},
 

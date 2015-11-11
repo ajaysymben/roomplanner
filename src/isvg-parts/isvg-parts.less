@@ -1,0 +1,43 @@
+interactive-svg-parts {
+	display: block;
+	overflow-y: auto;
+	max-height: 100%;
+
+	.isvg-part {
+		width: ~"calc( 50% - 3px )";
+		word-wrap: break-word;
+		border-right: 1px solid #F7F7F7;
+		border-bottom: 1px solid #F7F7F7;
+		display: inline-block;
+		overflow: hidden;
+		height: 125px;
+		text-align: center;
+		position: relative;
+		padding: 5px;
+		padding-top: 80px;
+		color: #444444;
+		font-size: 13px;
+
+		&:nth-child( 2n ) {
+			border-right: none;
+		}
+
+		svg {
+			display: block;
+			position: absolute;
+			top: 40px;
+			left: 50%;
+			max-height: 80px;
+			max-width: ~"calc( 100% - 10px )";
+			-webkit-transform: translate( -50%, -50% );
+			transform: translate( -50%, -50% );
+		}
+	}
+
+}
+
+.isvg-part-ghost {
+	display: inline-block;
+	position: absolute;
+	z-index: 10;
+}

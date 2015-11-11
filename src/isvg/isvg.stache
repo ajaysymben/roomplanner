@@ -3,10 +3,11 @@
 		<div class="blur-shield"></div>
 	{{/if}}
 	<div class="part-controls" style="
-		width: {{infoForPartControls.pxWidth}};
-		height: {{infoForPartControls.pxHeight}};
-		left: {{infoForPartControls.pxLeftTopX}};
-		top: {{infoForPartControls.pxLeftTopY}};
+		width: {{infoForPartControls.pxWidth}}px;
+		height: {{infoForPartControls.pxHeight}}px;
+		left: {{infoForPartControls.pxLeftTopX}}px;
+		top: {{infoForPartControls.pxLeftTopY}}px;
+		-webkit-transform: rotate( {{infoForPartControls.rotation}}deg );
 		transform: rotate( {{infoForPartControls.rotation}}deg );
 	">
 		<div class="resizehandle top left"></div>
@@ -16,8 +17,8 @@
 		<div class="rotationhandle icon-rotate"></div>
 	</div>
 	<div class="part-options" style="
-		left: {{infoForPartControls.pxOptionsX}};
-		top: {{infoForPartControls.pxOptionsY}};
+		left: {{infoForPartControls.pxOptionsX}}px;
+		top: {{infoForPartControls.pxOptionsY}}px;
 	">
 		<div class="part-title">Test title<div>
 		<div class="part-dimensions">

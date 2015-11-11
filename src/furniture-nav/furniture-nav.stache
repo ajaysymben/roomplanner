@@ -7,27 +7,26 @@
 	<input type="text">
 </div>
 <div class="category-dd-current">
-	<div class="current-category">Main category name</div>
-	<div class="current-subcategory">Subcategory name</div>
+	<div class="current-category">{{currentCategoryText}}</div>
+	<div class="current-subcategory">{{currentSubcategoryText}}</div>
 	<i class="icon-chevron"></i>
 </div>
 {{#if categoryMenuOpen}}
 	<ul class="categories">
-		<li>Placeholder</li>
-		<li>Placeholder</li>
-		<li class="has-subcats">
-			Placeholder
-			<i class="icon-chevron"></i>
-			<ul class="subcategories">
-				<li>Placeholder</li>
-				<li>Placeholder</li>
-				<li>Placeholder</li>
-			</ul>
-		</li>
-		<li>Placeholder</li>
-		<li>Placeholder</li>
+		{{#partsByCategory}}
+			<li class="has-subcats">
+				{{./category}}
+				<i class="icon-chevron"></i>
+				<ul class="subcategories">
+					{{#each ./subcategories}}
+						<li ($click)="subcategorySelected( ../category, ./subcategory )">{{./subcategory}}</li>
+					{{/each}}
+				</ul>
+			</li>
+		{{/partsByCategory}}
 	</ul>
 {{/if}}
 <div class="results">
-	[svg furniture here]
+    <can-import from="svg-roomplanner/isvg-parts/" />
+    <interactive-svg-parts {config}="isvgPartsConfig"></interactive-svg-parts>
 </div>

@@ -1,0 +1,6 @@
+{{#each parts}}
+	<div class="isvg-part">
+		<div ($inserted)="insertSVGPart( %element, ./url )"></div>
+		{{./itemname}}
+	</div>
+{{/each}}
