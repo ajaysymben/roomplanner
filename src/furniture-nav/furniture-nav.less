@@ -62,14 +62,20 @@ furniture-nav {
 		height: 50px;
 		cursor: pointer;
 
-		.current-category {
-			font-size: 11px;
-			padding-top: 6px;
-			padding-bottom: 6px;
-		}
 		.current-subcategory {
-			font-size: 13px;
+			padding-left: 0px;
+			padding-top: 15px;
+			font-size: 14px;
 			font-weight: bold;
+		}
+		.current-category {
+			font-size: 13px;
+			padding-top: 4px;
+
+			+ .current-subcategory {
+				padding: 5px;
+				padding-top: 3px;
+			}
 		}
 		.icon-chevron {
 			font-size: 8px;
@@ -83,13 +89,13 @@ furniture-nav {
 
 	.categories {
 		top: 145px;
-		max-height: ~"calc( 100% - 145px )";
+		height: ~"calc( 100% - 145px )";
+		background-color: rgba( 0, 0, 0, 0.05 );
 		overflow-y: auto;
 		z-index: 2;
 		list-style: none;
-		ul {
-			list-style: none;
-		}
+		padding-left: 0px;
+		padding-right: 0px;
 
 		li {
 			display: block;
@@ -99,25 +105,15 @@ furniture-nav {
 			color: #000000;
 			border-bottom: 1px solid #C9C9C9;
 			cursor: pointer;
+			font-size: 16px;
+		}
 
-			.icon-chevron {
-				font-size: 8px;
-				position: absolute;
-				right: 14px;
-				top: 15px;
-			}
+		.category {
+			color: #797979;
+			font-size: 12px;
 
-			ul {
-				margin-top: 10px;
-				margin-right: -10px;
-			}
-
-			li {
-				border-top: 1px solid #C9C9C9;
-				border-bottom: none;
+			+ .subcategory {
 				padding-left: 5px;
-				padding-right: 5px;
-				border-left: 5px solid #C9C9C9;
 			}
 		}
 	}

@@ -193,6 +193,7 @@ export const ViewModel = Map.extend({
 
 		var info = {
 			valid: partsDataValid,
+			partTitle: $svgPart.attr( "data-part-title" ),
 			rotation: 0,
 			translateX: 0,
 			translateY: 0,
@@ -433,6 +434,9 @@ export const ViewModel = Map.extend({
 		var svgEl = this.attr( "$svg" )[ 0 ];
 		var g = document.createElementNS( "http://www.w3.org/2000/svg", "g" );
 
+		//TODO: make this more generic
+		g.setAttribute( "data-part-title", options.itemname || "[no title]" );
+
 		this.cloneInnerElements( g, newSVGEl );
 
 		this.getLayer( layer ).append( g );
@@ -464,8 +468,55 @@ export const ViewModel = Map.extend({
 		}
 	},
 
+	valueInFeetAndInches: function ( value ) {
+		var ft = ~~( value / 12 );
+		var out = ft + "' ";
+		out += ( value - ft * 12 ).toFixed( 2 ).replace( /0+$/, "" ).replace( /\.$/, "" ) + '"';
+		return out;
+	},
+
+	getValueString: function ( value ) {
+		//TODO: make this return values based on a configuration property
+		//allow: VBP, px, units, units as feet and inches, custom
+		return this.valueInFeetAndInches( value );
+	},
+
+	positionMeasurementInfo: function ( fromUnitsPos, toUnitsPos ) {
+		var $svg = this.attr( "$svg" );
+		var sUtVBP = this.attr( "scalarUnitsToViewBoxPoints" );
+		var sUtPx = this.attr( "scalarUnitsToPx" );
+		var $dest = this.getLayer( this.attr( "layers" ) - 1 );
+		var line = $svg.find( ".isvg-measurement-line" )[ 0 ];
+
+		if ( !line ) {
+			line = document.createElementNS( "http://www.w3.org/2000/svg", "line" );
+			line.setAttribute( "class", "isvg-measurement-line" );
+			line.setAttribute( "style", "stroke:#CCCC00;stroke-width:8;" );
+			$dest.append( line );
+		}
+		line.setAttribute( "x1", fromUnitsPos.unitsX * sUtVBP );
+		line.setAttribute( "y1", fromUnitsPos.unitsY * sUtVBP );
+		line.setAttribute( "x2", toUnitsPos.unitsX * sUtVBP );
+		line.setAttribute( "y2", toUnitsPos.unitsY * sUtVBP );
+
+		var xDiff = ( toUnitsPos.unitsX - fromUnitsPos.unitsX );
+		var yDiff = ( toUnitsPos.unitsY - fromUnitsPos.unitsY );
+		var unitsDistance = Math.sqrt( xDiff * xDiff + yDiff * yDiff );
+
+		this.attr( "measurementInfo", {
+			pxX: ( fromUnitsPos.unitsX + toUnitsPos.unitsX ) / 2 * sUtPx,
+			pxY: ( fromUnitsPos.unitsY + toUnitsPos.unitsY ) / 2 * sUtPx,
+			value: this.getValueString( unitsDistance )
+		});
+	},
+
+	removeMeasurmentInfo: function () {
+		this.attr( "$svg" ).find( ".isvg-measurement-line" ).remove();
+		this.attr( "measurementInfo", null );
+	},
+
 	setUnitScaleSizes: function ( $isvg ) {
-		var margin = 20;
+		var margin = 40;
 		var maxWidth = $isvg.parent().width() - margin - margin;
 		var maxHeight = $isvg.parent().height() - margin - margin;
 
@@ -544,7 +595,9 @@ export const ViewModel = Map.extend({
 		unitsX: -1,
 		unitsY: -1
 	},
-	infoForPartControls: null
+	infoForPartControls: null,
+	measurmentState: false,
+	measurementInfo: null
 });
 
 export default Component.extend({
@@ -733,7 +786,13 @@ export default Component.extend({
 			});
 			vm.attr( "mouseMoveLastPos", { unitsX: -1, unitsY: -1 } );
 
-			if ( controlsShowing && $target.is( ".resizehandle" ) ) {
+			if ( $target.is( ".measurment-field" ) ) {
+				/****** INTERACTION SET ******/
+				vm.attr( "currentInteractionOn", "measure" );
+			} else if ( $target.is( ".icon-ruler" ) ) {
+				/****** INTERACTION SET ******/
+				vm.attr( "currentInteractionOn", "measureStart" );
+			} else if ( controlsShowing && $target.is( ".resizehandle" ) ) {
 				var interactionType = "resizer";
 				interactionType += $target.is( ".left" ) ? "L" : "R";
 				interactionType += $target.is( ".top" ) ? "T" : "B";
@@ -749,7 +808,7 @@ export default Component.extend({
 			} else if ( controlsShowing && $target.is( ".icon-trash-can" ) ) {
 				/****** INTERACTION SET ******/
 				vm.attr( "currentInteractionOn", "delete" );
-			} else {
+			} else if ( $target.is( "svg, svg *, .part-controls" ) ) {
 				var iQueryString = vm.attr( "iQueryString" );
 				var $svg = vm.attr( "$svg" );
 				var $parts = $svg.find( iQueryString );
@@ -796,6 +855,9 @@ export default Component.extend({
 					/****** INTERACTION SET ******/
 					vm.attr( "currentInteractionOn", "other" );
 				}
+			} else {
+				/****** INTERACTION SET ******/
+				vm.attr( "currentInteractionOn", "other" );
 			}
 		},
 
@@ -845,6 +907,9 @@ export default Component.extend({
 					vm.rotatePartAboutCenterTo( selectedParts, -1 * angle, info );
 					vm.attr( "infoForPartControls", info );
 					break;
+				case "measure":
+					vm.positionMeasurementInfo( vm.attr( "mouseMoveInitialPos" ), vm.attr( "mouseMoveLastPos" ) );
+					break;
 				default:
 					return;
 			}
@@ -862,6 +927,7 @@ export default Component.extend({
 
 			switch ( vm.attr( "currentInteractionOn" ) ) {
 				case "grid":
+					vm.attr( "infoForPartControls", null );
 					vm.attr( "selectedParts", null );
 					//TODO (strech goal) if movementOccurred, select range ( ceneter of part is in rect defined by start/end pos )
 					break;
@@ -892,6 +958,19 @@ export default Component.extend({
 						vm.attr( "infoForPartControls", null );
 						vm.attr( "selectedParts", null );
 						vm.deleteSvgParts( selectedParts );
+					}
+					break;
+				case "measureStart":
+					if ( $( ev.target ).is( ".icon-ruler" ) ) {
+						vm.attr( "infoForPartControls", null );
+						vm.attr( "selectedParts", null );
+						vm.attr( "measurmentState", !vm.attr( "measurmentState" ) );
+					}
+					break;
+				case "measure":
+					vm.removeMeasurmentInfo();
+					if ( !movementOccurred ) {
+						vm.attr( "measurmentState", false );
 					}
 					break;
 				default:

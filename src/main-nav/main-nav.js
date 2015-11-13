@@ -9,7 +9,8 @@ export const ViewModel = Map.extend({
 		message: {
 			value: 'This is the main-nav component'
 		}
-	}
+	},
+	clientLogo: "/src/flinn-logo.svg"
 });
 
 export default Component.extend({

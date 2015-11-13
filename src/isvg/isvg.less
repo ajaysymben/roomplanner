@@ -5,7 +5,7 @@ interactive-svg {
 	top: 50%;
 	-webkit-transform: translate( -50%, -50% );
 	transform: translate( -50%, -50% );
-	outline: 4px solid #000000;
+	outline: 1px solid #000000;
 
 	&, & * {
 		box-sizing: border-box;
@@ -35,6 +35,50 @@ interactive-svg {
 		background-size: 100% 100%;
 	*/
 
+	.floor-x {
+		position: absolute;
+		top: -25px;
+		left: 50%;
+		-webkit-transform: translateX( -50% );
+		transform: translateX( -50% );
+	}
+
+	.floor-y {
+		position: absolute;
+		left: -20px;
+		top: 50%;
+		-webkit-transform: translateY( -50% ) rotate( -90deg );
+		transform: translateY( 12px ) rotate( -90deg );
+		width: 0px;
+		white-space: nowrap;
+	}
+
+	.icon-ruler {
+		position: absolute;
+		top: -32px;
+		right: -32px;
+		font-size: 23px;
+		cursor: pointer;
+		border-radius: 20px;
+		width: 32px;
+		height: 32px;
+		vertical-align: middle;
+		&.measurement-state-on {
+			color: #666600;
+			text-shadow: 0 0 5px #CCCC00, 0 0 5px #CCCC00, 0 0 5px #CCCC00, 0 0 5px #CCCC00;
+		}
+	}
+
+	.measuerment-info {
+		position: absolute;
+		display: inline-block;
+		-webkit-transform: translate( -50%, -50% );
+		transform: translate( -50%, -50% );
+		border-radius: 10px;
+		padding: 3px;
+		background-color: rgba( 255, 255, 255, 0.8 );
+	}
+
 	svg {
 		width: 100%;
 		height: 100%;
@@ -57,7 +101,8 @@ interactive-svg {
 		}
 	}
 
-	.blur-shield {
+	.blur-shield,
+	.measurment-field {
 		position: absolute;
 		top: 0;
 		bottom: 0;
@@ -98,6 +143,7 @@ interactive-svg {
 			left: 50%;
 			-webkit-transform: translateX( -50% );
 			transform: translateX( -50% );
+			border-radius: 15px;
 			cursor: pointer;
 			background-color: rgba( 255, 255, 255, 0.25 );
 			box-shadow: 0 0 4px #FFFFFF, inset 0 0 4px #FFFFFF;

@@ -7,22 +7,23 @@
 	<input type="text">
 </div>
 <div class="category-dd-current">
-	<div class="current-category">{{currentCategoryText}}</div>
+	{{#if currentCategoryText}}
+		<div class="current-category">{{currentCategoryText}}</div>
+	{{/if}}
 	<div class="current-subcategory">{{currentSubcategoryText}}</div>
 	<i class="icon-chevron"></i>
 </div>
 {{#if categoryMenuOpen}}
 	<ul class="categories">
 		{{#partsByCategory}}
-			<li class="has-subcats">
-				{{./category}}
-				<i class="icon-chevron"></i>
-				<ul class="subcategories">
-					{{#each ./subcategories}}
-						<li ($click)="subcategorySelected( ../category, ./subcategory )">{{./subcategory}}</li>
-					{{/each}}
-				</ul>
-			</li>
+			{{#each ./subcategories}}
+				<li ($click)="subcategorySelected( ../category, ./subcategory )">
+					{{^is ./category ./subcategory}}
+						<div class="category">{{./category}}</div>
+					{{/is}}
+					<div class="subcategory">{{./subcategory}}</div>
+				</li>
+			{{/each}}
 		{{/partsByCategory}}
 	</ul>
 {{/if}}

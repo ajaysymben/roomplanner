@@ -20,7 +20,7 @@
 		left: {{infoForPartControls.pxOptionsX}}px;
 		top: {{infoForPartControls.pxOptionsY}}px;
 	">
-		<div class="part-title">Test title<div>
+		<div class="part-title">{{infoForPartControls.partTitle}}<div>
 		<div class="part-dimensions">
 			<input class="width" type="text" value="{{infoForPartControls.unitsWidth}}">" x
 			<input class="height" type="text" value="{{infoForPartControls.unitsHeight}}">"
@@ -32,3 +32,18 @@
 		</div>
 	</div>
 {{/infoForPartControls}}
+{{#measurmentState}}
+	<div class="measurment-field">
+		{{#measurementInfo}}
+			<div class="measuerment-info" style="
+				left: {{measurementInfo.pxX}}px;
+				top: {{measurementInfo.pxY}}px;
+			">
+				{{measurementInfo.value}}
+			</div>
+		{{/measurementInfo}}
+	</div>
+{{/measurmentState}}
+<div class="floor-x">{{getValueString( width )}}</div>
+<div class="floor-y">{{getValueString( height )}}</div>
+<i class="icon-ruler {{#if measurmentState}}measurement-state-on{{/if}}"></i>
