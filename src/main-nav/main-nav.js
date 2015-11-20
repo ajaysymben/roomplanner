@@ -10,7 +10,12 @@ export const ViewModel = Map.extend({
 			value: 'This is the main-nav component'
 		}
 	},
-	clientLogo: "/src/flinn-logo.svg"
+	clientLogo: "/src/flinn-logo.svg",
+
+	setAction: function ( newState ) {
+		console.log(newState)
+		this.attr( "menuAction", newState );
+	}
 });
 
 export default Component.extend({

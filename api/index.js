@@ -9,9 +9,12 @@ server({
   configure: function ( app ) {
 
     app.use( bodyParser.urlencoded({ extended: true }) );
-    app.use( bodyParser.json() );
+    app.use( bodyParser.json({limit: '5mb'}) );
 
     // app.get( '/initdbtables', api.createDatabaseTables );
+    // app.get( '/destroydatabase', api.dropDatabaseTables );
+    app.get( '/addclient', api.addClient );
+    app.post( '/addclient', api.doAddClient );
     app.get( '/rooms', api.getRooms );
     app.post( '/rooms', api.saveRoom );
     app.get( '/items', api.getItems );

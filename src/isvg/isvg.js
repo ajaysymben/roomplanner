@@ -470,9 +470,12 @@ export const ViewModel = Map.extend({
 
 	valueInFeetAndInches: function ( value ) {
 		var ft = ~~( value / 12 );
-		var out = ft + "' ";
-		out += ( value - ft * 12 ).toFixed( 2 ).replace( /0+$/, "" ).replace( /\.$/, "" ) + '"';
-		return out;
+		var inches = parseFloat( ( value - ft * 12 ).toFixed( 2 ).replace( /0+$/, "" ).replace( /\.$/, "" ) );
+		if ( inches >= 12 ) {
+			ft++;
+			inches = 0;
+		}
+		return ft + "' " + inches + '"';
 	},
 
 	getValueString: function ( value ) {
@@ -486,7 +489,8 @@ export const ViewModel = Map.extend({
 		var sUtVBP = this.attr( "scalarUnitsToViewBoxPoints" );
 		var sUtPx = this.attr( "scalarUnitsToPx" );
 		var $dest = this.getLayer( this.attr( "layers" ) - 1 );
-		var line = $svg.find( ".isvg-measurement-line" )[ 0 ];
+		//IE11 doesn't implement svg.getElementsByClassName, so just find it from the interactive-svg tag
+		var line = $svg.parent().find( ".isvg-measurement-line" )[ 0 ];
 
 		if ( !line ) {
 			line = document.createElementNS( "http://www.w3.org/2000/svg", "line" );
@@ -511,7 +515,7 @@ export const ViewModel = Map.extend({
 	},
 
 	removeMeasurmentInfo: function () {
-		this.attr( "$svg" ).find( ".isvg-measurement-line" ).remove();
+		this.attr( "$svg" ).parent().find( ".isvg-measurement-line" ).remove();
 		this.attr( "measurementInfo", null );
 	},
 
@@ -653,7 +657,7 @@ export default Component.extend({
 			var svgEl = document.createElementNS( "http://www.w3.org/2000/svg", "svg" );
 
 			if ( config.svg ) {
-				this.cloneInnerElements( svgEl, config.svg );
+				vm.cloneInnerElements( svgEl, config.svg );
 
 				layerCount = $( svgEl ).find( "> g" ).length;
 				var hasLayers = layerCount === $( svgEl ).find( "> *" ).length;
@@ -664,7 +668,7 @@ export default Component.extend({
 				} else if ( layers && !hasLayers ) {
 					//doesn't have layers but needs them, so anything already needs to go to a layer
 					var layer0 = document.createElementNS( "http://www.w3.org/2000/svg", "g" );
-					this.moveInnerElements( layer0, svgEl );
+					vm.moveInnerElements( layer0, svgEl );
 					svgEl.appendChild( layer0 );
 
 					layerCount = 1;

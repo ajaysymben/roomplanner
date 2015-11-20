@@ -29,7 +29,11 @@ export const ViewModel = Map.extend({
 			$.get(
 				svgUrl,
 				(function ( data ) {
-					window.xx = data;
+					if ( !data || !data.getElementsByTagName ) {
+						this.parentNode.style.display = "none";
+						console.log( "svg file missing:", svgUrl );
+						return;
+					}
 					this.appendChild( data.getElementsByTagName( "svg" )[ 0 ] );
 				}).bind( el )
 			);
@@ -139,7 +143,7 @@ export default Component.extend({
 				var options = vm.attr( "currentPartInfo" ).serialize();
 				options.centerXPos = curUnitsX;
 				options.centerYPos = curUnitsY;
-				
+
 				isvgVM.addFromSVGAsGroup( $( svgPartGhost ).find( "svg" ), options );
 			}
 

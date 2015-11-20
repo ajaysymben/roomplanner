@@ -1,6 +1,6 @@
 <div class="current-room">
 	<div class="label">Current Room:</div>
-	<div class="title">This is a Long Science Room Name</div>
+	<div class="title">{{roomname}}</div>
 </div>
 <div class="search-area">
 	<i class="icon-search"></i>

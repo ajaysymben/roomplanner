@@ -129,10 +129,10 @@ export const ViewModel = Map.extend({
 				{ url: "/src/svgs/tech_refrigerator.svg", itemname: "Refrigerator, EP", category: "Support Equipment", subcategory: "", forceWidth: 29.5, forceHeight: 23.5, unitprice: 3793.20, itemnumber: "AP7600", layer: 2 - 1 },
 				{ url: "/src/svgs/tech_smart_board.svg", itemname: "SMART Board", category: "Support Equipment", subcategory: "", forceWidth: 73, forceHeight: 1.5, unitprice: 2400, itemnumber: "AP7638", layer: 2 - 1 },
 				{ url: "/src/svgs/column.svg", itemname: "Column", category: "Structural Details", subcategory: "", forceWidth: 24, forceHeight: 24, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
-				{ url: "/src/svgs/door30L.svg", itemname: "Door30L", category: "Structural Details", subcategory: "", forceWidth: 30, forceHeight: 3, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
-				{ url: "/src/svgs/door30R.svg", itemname: "Door30R", category: "Structural Details", subcategory: "", forceWidth: 30, forceHeight: 3, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
-				{ url: "/src/svgs/door36L.svg", itemname: "Door36L", category: "Structural Details", subcategory: "", forceWidth: 36, forceHeight: 3, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
-				{ url: "/src/svgs/door36R.svg", itemname: "Door36R", category: "Structural Details", subcategory: "", forceWidth: 36, forceHeight: 3, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
+				{ url: "/src/svgs/door_30L.svg", itemname: "Door30L", category: "Structural Details", subcategory: "", forceWidth: 30, forceHeight: 3, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
+				{ url: "/src/svgs/door_30R.svg", itemname: "Door30R", category: "Structural Details", subcategory: "", forceWidth: 30, forceHeight: 3, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
+				{ url: "/src/svgs/door_36L.svg", itemname: "Door36L", category: "Structural Details", subcategory: "", forceWidth: 36, forceHeight: 3, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
+				{ url: "/src/svgs/door_36R.svg", itemname: "Door36R", category: "Structural Details", subcategory: "", forceWidth: 36, forceHeight: 3, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
 				{ url: "/src/svgs/drain.svg", itemname: "Drain", category: "Structural Details", subcategory: "", forceWidth: 6, forceHeight: 6, unitprice: 0, itemnumber: "0", layer: 1 - 1 },
 				{ url: "/src/svgs/electric.svg", itemname: "Electric", category: "Structural Details", subcategory: "", forceWidth: 4, forceHeight: 4, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
 				{ url: "/src/svgs/gas.svg", itemname: "Gas", category: "Structural Details", subcategory: "", forceWidth: 4, forceHeight: 4, unitprice: 0, itemnumber: "0", layer: 1 - 1 },
@@ -140,7 +140,7 @@ export const ViewModel = Map.extend({
 				{ url: "/src/svgs/radiator.svg", itemname: "Radiator", category: "Structural Details", subcategory: "", forceWidth: 36, forceHeight: 3, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
 				{ url: "/src/svgs/softwall.svg", itemname: "Softwall", category: "Structural Details", subcategory: "", forceWidth: 96, forceHeight: 4, unitprice: 0, itemnumber: "0", layer: 2 - 1 },
 				{ url: "/src/svgs/water.svg", itemname: "Water", category: "Structural Details", subcategory: "", forceWidth: 4, forceHeight: 4, unitprice: 0, itemnumber: "0", layer: 1 - 1 },
-				{ url: "/src/svgs/window.svg", itemname: "Window", category: "Structural Details", subcategory: "", forceWidth: 36, forceHeight: 2, unitprice: 0, itemnumber: "0", layer: 3 - 1 }
+				{ url: "/src/svgs/window_3foot.svg", itemname: "Window", category: "Structural Details", subcategory: "", forceWidth: 36, forceHeight: 2, unitprice: 0, itemnumber: "0", layer: 3 - 1 }
 			]
 		};
 
@@ -191,6 +191,9 @@ export default Component.extend({
 			var vm = this.viewModel;
 			var oldState = vm.attr( "categoryMenuOpen" );
 			vm.attr( "categoryMenuOpen", !oldState );
+		},
+		".categories click": function () {
+			this.viewModel.attr( "categoryMenuOpen", false );
 		}
 	}
 });

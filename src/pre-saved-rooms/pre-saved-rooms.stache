@@ -1,0 +1,12 @@
+<div class="title">Pre-planned Rooms:</div>
+<div class="pre-planned-room-grid">
+	{{#rooms}}
+		<div ($click)="loadRoom( %element, . )">
+			<div ($inserted)="insertSVG( %element, ./room )"></div>
+			<div class="title">
+				{{./roomname}}<br>
+				{{valueInFeetAndInches(./width)}} x {{valueInFeetAndInches(./depth)}}
+			</div>
+		</div>
+	{{/rooms}}
+</div>

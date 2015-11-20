@@ -9,15 +9,82 @@
     <can-import from="svg-roomplanner/app" export-as="viewModel" />
 
     <can-import from="svg-roomplanner/main-nav/" />
-    <main-nav {(parts-menu-expanded)}="partsMenuExpanded"></main-nav>
+    <main-nav {(parts-menu-expanded)}="partsMenuExpanded" {(menu-action)}="menuAction"></main-nav>
 
     <can-import from="svg-roomplanner/furniture-nav/" />
-    <furniture-nav class="{{#if partsMenuExpanded}}expanded{{/if}}"></furniture-nav>
+    <furniture-nav {(roomname)}="roomname" class="{{#if partsMenuExpanded}}expanded{{/if}}"></furniture-nav>
 
     <div class="planning-area">
       <can-import from="svg-roomplanner/isvg/" />
-      <interactive-svg {config}="isvgConfig"></interactive-svg>
+      {{#if isvgConfig.width}}
+        <interactive-svg {config}="isvgConfig"></interactive-svg>
+      {{/if}}
     </div>
+
+    {{#is menuAction "new"}}
+      <div class="menu-action-top">
+        Enter your desired dimensions below, or select a template from the right to get started.
+      </div>
+      <div class="menu-action-left">
+        <div>
+          <span>&nbsp;</span>
+          <span>Room Name:</span>
+          <input class="room-name" type="text">
+        </div>
+        <div>
+          <span>Width:</span>
+          <input class="width-feet" type="number">'
+          <input class="width-inches" type="number">"
+        </div>
+        <div>
+          <span>Length:</span>
+          <input class="length-feet" type="number">'
+          <input class="length-inches" type="number">"
+        </div>
+        <div class="button" ($click)="createRoom()">
+          Create Room
+        </div>
+        <div class="button secondary" ($click)="menuActionNone()">
+          Cancel
+        </div>
+      </div>
+      <div class="menu-action-right">
+        <can-import from="svg-roomplanner/pre-saved-rooms/" />
+        <pre-saved-rooms  {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
+      </div>
+    {{/is}}
+    {{#is menuAction "open"}}
+      <div class="menu-action-top">
+      </div>
+      <div class="menu-action-left">
+      </div>
+      <div class="menu-action-right">
+      </div>
+    {{/is}}
+    {{#is menuAction "save"}}
+      <div class="menu-action-top">
+        Save your roomplan!
+      </div>
+      <div class="menu-action-left">
+        <div>
+          <span>&nbsp;</span>
+          <span>Room Name:</span>
+          <input class="room-name" name="roomname" type="text" {($value)}="roomname">
+        </div>
+        <div>
+          <span>Email:</span>
+          <input class="room-email" type="text" value="preplanned">
+        </div>
+        <div class="button" ($click)="saveRoom()">
+          Save Room
+        </div>
+        <div class="button secondary" ($click)="menuActionNone()">
+          Cancel
+        </div>
+      </div>
+      <div class="menu-action-right">
+      </div>
+    {{/is}}
 
     {{asset "inline-cache"}}
 

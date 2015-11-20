@@ -6,10 +6,10 @@
 			<i class="icon-menu-toggle is-closed"></i>
 		{{/if}}
 	</li>
-	<li>New</li>
-	<li>Open</li>
-	<li>Save</li>
-	<li>Summary</li>
+	<li ($click)="setAction( 'new' )">New</li>
+	<li ($click)="setAction( 'open' )">Open</li>
+	<li ($click)="setAction( 'save' )">Save</li>
+	<li>Item Summary</li>
 	<li>Export</li>
 </ul>
 
