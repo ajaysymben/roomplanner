@@ -773,7 +773,6 @@ export default Component.extend({
 		},
 
 		[startEvent]: function ( $isvg, ev ) {
-			//ev.preventDefault();
 			var $target = $( ev.target );
 			var vm = this.viewModel;
 			var controlsShowing = vm.attr( "infoForPartControls" );
@@ -863,6 +862,7 @@ export default Component.extend({
 				/****** INTERACTION SET ******/
 				vm.attr( "currentInteractionOn", "other" );
 			}
+			if ( vm.attr( "currentInteractionOn" ) !== "other" ) ev.preventDefault();
 		},
 
 		[moveEvent]: function ( $isvg, ev ) {

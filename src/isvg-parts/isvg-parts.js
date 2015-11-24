@@ -69,11 +69,13 @@ export default Component.extend({
 		},
 
 		[".isvg-part " + startEvent]: function ( $el, ev ) {
+			ev.preventDefault();
 			var touches = ev.originalEvent.touches;
 			var pageX = ev.pageX || touches && touches[ 0 ] && touches[ 0 ].pageX || 0;
 			var pageY = ev.pageY || touches && touches[ 0 ] && touches[ 0 ].pageY || 0;
 
 			var vm = this.viewModel;
+			if ( vm.config && vm.config.onBeforeStartMove ) vm.config.onBeforeStartMove();
 			vm.attr( "currentInteractionOn", "newsvgpart" );
 			vm.attr( "$isvg", $( "interactive-svg" ) );
 
@@ -134,12 +136,11 @@ export default Component.extend({
 			if ( svgPartGhost && curISVG ) {
 				var isvgVM = $( curISVG ).viewModel();
 				var scalarUnitsToPx = isvgVM.attr( "scalarUnitsToPx" );
-				var touches = ev.originalEvent.touches;
+				var touches = ev.originalEvent.changedTouches;
 				var pageX = ev.pageX || touches && touches[ 0 ] && touches[ 0 ].pageX || 0;
 				var pageY = ev.pageY || touches && touches[ 0 ] && touches[ 0 ].pageY || 0;
 				var curUnitsX = ( pageX - $( curISVG ).offset().left ) / scalarUnitsToPx;
 				var curUnitsY = ( pageY - $( curISVG ).offset().top ) / scalarUnitsToPx;
-
 				var options = vm.attr( "currentPartInfo" ).serialize();
 				options.centerXPos = curUnitsX;
 				options.centerYPos = curUnitsY;
@@ -152,6 +153,8 @@ export default Component.extend({
 			vm.attr( "currentPartInfo", null );
 			vm.attr( "currentISVGHover", null );
 			vm.attr( "currentInteractionOn", null );
+
+			if ( vm.config && vm.config.onAfterStopMove ) vm.config.onAfterStopMove();
 		}
 	}
 });

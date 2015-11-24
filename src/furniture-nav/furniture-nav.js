@@ -185,6 +185,12 @@ export default Component.extend({
 		"init": function () {
 			var vm = this.viewModel;
 			if ( !vm ) return;
+			vm.attr( "isvgPartsConfig" ).onBeforeStartMove = function () {
+				if ( $( document.body ).width() <= 800 ) vm.attr( "partsMenuExpanded", false );
+			};
+			vm.attr( "isvgPartsConfig" ).onAfterStopMove = function () {
+				if ( $( document.body ).width() <= 800 ) vm.attr( "partsMenuExpanded", true );
+			};
 			vm.loadSVGParts();
 		},
 		".category-dd-current click": function () {

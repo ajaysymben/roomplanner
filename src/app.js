@@ -33,7 +33,7 @@ const AppViewModel = AppMap.extend({
     gridLinesEvery: 12,
 
     //dimensions in inches
-    width: 40 * 12,
+    //width: 40 * 12,
     height: 30 * 12,
 
     //specify what element parts in the svg can be interacted with

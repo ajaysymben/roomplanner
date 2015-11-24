@@ -300,6 +300,104 @@ exports.doAddClient = function ( req, res ) {
   );
 };
 
+exports.getManage = function ( req, res ) {
+  var connection = getConnection();
+
+  var getRowHTML = function ( row ) {
+    var html = "<div class='row'>";
+    html += "<div>" + row.id + " <input name='roomid' type='checkbox' value='" + row.id + "'></div>";
+    html += "<div>" + row.clientid + "</div>";
+    html += "<div>" + row.clientname + "</div>";
+    html += "<div>" + row.email + "</div>";
+    html += "<div>" + row.roomname + "</div>";
+    html += "<div>" + row.width + "</div>";
+    html += "<div>" + row.length + "</div>";
+    html += "<div>" + row.created + "</div>";
+    html += "<div>" + row.updated + "</div>";
+    return html + "</div>";
+  };
+
+  connection.query(fcs(function(){/*!
+        SELECT r.id, r.clientid, c.name AS clientname
+            , r.email, r.roomname
+            , r.width, r.depth as length
+            , r.created, r.updated
+        FROM rooms r
+          INNER JOIN clients c ON r.clientid = c.id
+      */}), function ( err, rows, fields ) {
+    if (err) throw err;
+
+    var resp = fcs(function(){/*!
+      <style type="text/css">
+        .row {
+          display: block;
+          word-wrap: no-wrap;
+          border-bottom: 1px solid #777;
+        }
+        .row > * {
+          display: inline-block;
+          width: 200px;
+          padding: 2px;
+        }
+      </style>
+      <a href="/addclient">Add client</a><br>
+      <form action="/manage" method="POST">
+
+        <div class='row'>
+          <div>id</div>
+          <div>clientid</div>
+          <div>clientname</div>
+          <div>email</div>
+          <div>roomname</div>
+          <div>width</div>
+          <div>length</div>
+          <div>created</div>
+          <div>updated</div>
+        </div>
+        @roomlist@
+        <input type="submit" value="Delete selected rooms"><br>
+      </form><br>
+      <br>
+      Current clients:<br>
+      <pre>
+    */});
+    for ( var i = 0; i < rows.length; i++ ) {
+      resp = resp.replace( "@roomlist@", getRowHTML( rows[ i ] ) + "@roomlist@" );
+    }
+    resp = resp.replace( "@roomlist@", "" );
+
+    res.send( resp );
+
+    connection.destroy();
+  });
+};
+
+exports.doManage = function ( req, res ) {
+  var roomids = req.body.roomid;
+  if ( roomids && typeof roomids.join === "function" ) {
+    roomids = roomids.join( "" );
+  }
+  roomids += "";
+  roomids = roomids.replace( /[^\d,]/g, "" ).replace( /,,|^,|,$/, "" );
+  if ( !roomids || !roomids.length ) {
+    res.send( {success: false, err: "roomids invalid" } );
+    return;
+  }
+
+  var connection = getConnection();
+
+  connection.query(
+    'DELETE FROM rooms WHERE id IN ( '+roomids+' )',
+    function ( err, result ) {
+      if (err) throw err;
+
+      res.send({ success: true, msg: result.affectedRows + " rooms deleted." });
+
+      connection.destroy();
+    }
+  );
+};
+
 exports.getRooms = function ( req, res ) {
   var validParams = true;
   validParams = parseInt( req.query.clientid ) && validParams;

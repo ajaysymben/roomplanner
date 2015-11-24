@@ -3,6 +3,7 @@
     <title>{{title}}</title>
     {{asset "css"}}
     {{asset "html5shiv"}}
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   </head>
   <body>
     <can-import from="svg-roomplanner/styles.less!" />
@@ -12,7 +13,7 @@
     <main-nav {(parts-menu-expanded)}="partsMenuExpanded" {(menu-action)}="menuAction"></main-nav>
 
     <can-import from="svg-roomplanner/furniture-nav/" />
-    <furniture-nav {(roomname)}="roomname" class="{{#if partsMenuExpanded}}expanded{{/if}}"></furniture-nav>
+    <furniture-nav {(roomname)}="roomname" class="{{#if partsMenuExpanded}}expanded{{/if}}" {(parts-menu-expanded)}="partsMenuExpanded"></furniture-nav>
 
     <div class="planning-area">
       <can-import from="svg-roomplanner/isvg/" />
@@ -50,7 +51,7 @@
       </div>
       <div class="menu-action-right">
         <can-import from="svg-roomplanner/pre-saved-rooms/" />
-        <pre-saved-rooms  {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
+        <pre-saved-rooms {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
       </div>
     {{/is}}
     {{#is menuAction "open"}}

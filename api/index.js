@@ -15,6 +15,8 @@ server({
     // app.get( '/destroydatabase', api.dropDatabaseTables );
     app.get( '/addclient', api.addClient );
     app.post( '/addclient', api.doAddClient );
+    app.get( '/manage', api.getManage );
+    app.post( '/manage', api.doManage );
     app.get( '/rooms', api.getRooms );
     app.post( '/rooms', api.saveRoom );
     app.get( '/items', api.getItems );

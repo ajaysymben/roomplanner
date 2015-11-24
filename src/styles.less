@@ -36,10 +36,12 @@ html, body {
 
 furniture-nav {
 	z-index: 2;
+	background-color: #FFFFFF;
 }
-
-furniture-nav.expanded + .planning-area {
-	width: ~"calc( 100% - 275px )"; /* furniture-nav width is 275px */
+@media(min-width: 801px) {
+	furniture-nav.expanded + .planning-area {
+		width: ~"calc( 100% - 275px )"; /* furniture-nav width is 275px */
+	}
 }
 
 .menu-action-top {

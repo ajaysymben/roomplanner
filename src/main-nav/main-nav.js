@@ -13,7 +13,7 @@ export const ViewModel = Map.extend({
 	clientLogo: "/src/flinn-logo.svg",
 
 	setAction: function ( newState ) {
-		console.log(newState)
+		//console.log(newState)
 		this.attr( "menuAction", newState );
 	}
 });
@@ -26,7 +26,7 @@ export default Component.extend({
 		".icon-menu-toggle click": function () {
 			var vm = this.viewModel;
 			var curState = vm.attr( "partsMenuExpanded" );
-			console.log( curState, "->", !curState );
+			//console.log( curState, "->", !curState );
 			vm.attr( "partsMenuExpanded", !curState );
 			setTimeout( function () {
 				var isvg = $( "interactive-svg" );

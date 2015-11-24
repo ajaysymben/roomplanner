@@ -1,15 +1,15 @@
-{{#infoForPartControls}}
+{{#if infoForPartControls}}
 	{{#if blurShield}}
 		<div class="blur-shield"></div>
 	{{/if}}
-	<div class="part-controls" style="
+	<div class="part-controls" {{#infoForPartControls}}style="
 		width: {{infoForPartControls.pxWidth}}px;
 		height: {{infoForPartControls.pxHeight}}px;
 		left: {{infoForPartControls.pxLeftTopX}}px;
 		top: {{infoForPartControls.pxLeftTopY}}px;
 		-webkit-transform: rotate( {{infoForPartControls.rotation}}deg );
 		transform: rotate( {{infoForPartControls.rotation}}deg );
-	">
+	"{{/infoForPartControls}}>
 		<div class="resizehandle top left"></div>
 		<div class="resizehandle top right"></div>
 		<div class="resizehandle bottom left"></div>
@@ -31,7 +31,7 @@
 			<i class="icon-trash-can"></i>
 		</div>
 	</div>
-{{/infoForPartControls}}
+{{/if}}
 {{#measurmentState}}
 	<div class="measurment-field">
 		{{#measurementInfo}}

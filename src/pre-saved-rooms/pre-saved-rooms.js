@@ -18,6 +18,7 @@ export const ViewModel = Roomplan.extend({}, {
     this.attr( "isvgConfig.svg", $( el ).find( "svg" ) );
     this.attr( "isvgConfig.height", roominfo.depth );
     this.attr( "isvgConfig.width", roominfo.width );
+    this.attr( "roomname", roominfo.roomname );
     this.attr( "menuAction", "none" );
   },
   insertSVG: function ( el, svgHTML ) {
