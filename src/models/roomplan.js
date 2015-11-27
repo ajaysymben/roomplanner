@@ -7,8 +7,8 @@ export const Roomplan = can.Model.extend({
 
   findAll: function ( params, success, error ) {
     return $.ajax({
-      url: "/rooms",
-      data: params,
+      url: can.sub( "/rooms?clientid={clientid}&email={email}", params, true ),
+      //data: JSON.stringify( params ),
       type: 'GET',
       dataType: 'json',
       cache: false

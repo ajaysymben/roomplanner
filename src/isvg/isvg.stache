@@ -16,21 +16,23 @@
 		<div class="resizehandle bottom right"></div>
 		<div class="rotationhandle icon-rotate"></div>
 	</div>
-	<div class="part-options" style="
-		left: {{infoForPartControls.pxOptionsX}}px;
-		top: {{infoForPartControls.pxOptionsY}}px;
-	">
-		<div class="part-title">{{infoForPartControls.partTitle}}<div>
-		<div class="part-dimensions">
-			<input class="width" type="text" value="{{infoForPartControls.unitsWidth}}">" x
-			<input class="height" type="text" value="{{infoForPartControls.unitsHeight}}">"
+	{{#infoForPartControls}}
+		<div class="part-options" style="
+			left: {{infoForPartControls.pxOptionsX}}px;
+			top: {{infoForPartControls.pxOptionsY}}px;
+		">
+			<div class="part-title">{{infoForPartControls.partTitle}}<div>
+			<div class="part-dimensions">
+				<input class="width" type="text" value="{{round2DecimalPlaces( infoForPartControls.unitsWidth )}}">" x
+				<input class="height" type="text" value="{{round2DecimalPlaces( infoForPartControls.unitsHeight )}}">"
+			</div>
+			<div class="part-menu">
+				<i class="icon-lock-open"></i>
+				<i class="icon-clone"></i>
+				<i class="icon-trash-can"></i>
+			</div>
 		</div>
-		<div class="part-menu">
-			<i class="icon-lock-open"></i>
-			<i class="icon-clone"></i>
-			<i class="icon-trash-can"></i>
-		</div>
-	</div>
+	{{/infoForPartControls}}
 {{/if}}
 {{#measurmentState}}
 	<div class="measurment-field">

@@ -114,38 +114,40 @@ interactive-svg {
 
 		.resizehandle {
 			position: absolute;
-			width: 14px;
-			height: 14px;
+			width: 22px;
+			height: 22px;
 			border: 2px solid #000000;
 			cursor: pointer;
-			background-color: rgba( 255, 255, 255, 0.25 );
-			box-shadow: 0 0 4px #FFFFFF, inset 0 0 4px #FFFFFF;
+			background-color: #FFFFFF;
+			box-shadow: 0 0 4px #FFFFFF;
 		}
 		.top {
-			top: -5px;
+			top: -20px;
 		}
 		.left {
-			left: -5px;
+			left: -20px;
 		}
 		.right {
-			right: -5px;
+			right: -20px;
 		}
 		.bottom {
-			bottom: -5px;
+			bottom: -20px;
 		}
 
 		.rotationhandle {
 			position: absolute;
-			width: 20px;
-			height: 20px;
-			bottom: -25px;
-			left: 50%;
+			font-size: 21px;
+			padding-top: 2px;
+			width: 32px;
+			height: 30px;
+			bottom: -35px;
+			left: ~"calc( 50% - 1px )";
 			-webkit-transform: translateX( -50% );
 			transform: translateX( -50% );
 			border-radius: 15px;
 			cursor: pointer;
-			background-color: rgba( 255, 255, 255, 0.25 );
-			box-shadow: 0 0 4px #FFFFFF, inset 0 0 4px #FFFFFF;
+			background-color: #FFFFFF;
+			box-shadow: 0 0 4px #FFFFFF;
 		}
 	}
 

@@ -12,8 +12,88 @@ const AppViewModel = AppMap.extend({
     partsMenuExpanded: {
       value: true,
       serialize: false
+    },
+    itemSummary: {
+      //TODO: Use DB ID instead of itemname
+      get: (function(){
+        var partsByCategory = [];
+        var itemSummary = [];
+
+        var findSummaryPartById = function ( id ) {
+          for ( var i = 0; i < itemSummary.length; i++ ) {
+            if ( itemSummary[ i ].itemname === id ) {
+              return itemSummary[ i ];
+            }
+          }
+          return null;
+        };
+
+        var findPartById = function ( id ) {
+          var c, catparts, s, subcatparts, p;
+          for ( c = 0; c < partsByCategory.length; c++ ) {
+            catparts = partsByCategory[ c ].parts;
+            for ( p = 0; p < catparts.length; p++ ) {
+              if ( catparts[ p ].itemname === id ) {
+                return catparts[ p ];
+              }
+            }
+            catparts = partsByCategory[ c ].subcategories;
+            for ( s = 0; s < catparts.length; s++ ) {
+              subcatparts = catparts[ s ].parts;
+              for ( p = 0; p < subcatparts.length; p++ ) {
+                if ( subcatparts[ p ].itemname === id ) {
+                  return subcatparts[ p ];
+                }
+              }
+            }
+          }
+          return null;
+        };
+
+        return function ( items ) {
+          partsByCategory = this.attr( "partsByCategory" );
+          itemSummary = [];
+
+          var partsInPlan = $( ".planning-area interactive-svg svg > g > g" );
+          var itemSummaryTotal = 0;
+
+          partsInPlan.each(function ( x, item ) {
+            var idFromItem = this.getAttribute( "data-part-title" );
+            var summaryEntry = findSummaryPartById( idFromItem );
+            if ( summaryEntry ) {
+              itemSummaryTotal += (parseFloat( summaryEntry.unitprice ) || 0);
+              summaryEntry.qty++;
+            } else if ( idFromItem ) {
+              var part = findPartById( idFromItem );
+
+              if ( part ) {
+                part = part.serialize();
+                part.qty = 1;
+                itemSummaryTotal += (parseFloat( part.unitprice ) || 0);
+                itemSummary.push( part );
+              }
+            }
+          });
+
+          this.attr( "itemSummaryTotal", itemSummaryTotal.toFixed( 2 ) );
+
+          return itemSummary;
+        };
+      })()
     }
   },
+
+  itemSummaryTotal: 0,
+
+  loadItemSummary: function () {
+    this.attr( "itemSummary", null );
+    this.attr( "itemSummary" );
+    this.attr( "itemSummaryTotal" );
+  },
+
+  extendedPrice: function ( qty, price ) {
+    return ( qty * price ).toFixed( 2 );
+  }, 
 
   menuAction: "new",
 
@@ -53,6 +133,7 @@ const AppViewModel = AppMap.extend({
 
     if ( length > 0 && width > 0 ) {
       this.attr( "isvgConfig.width", 0 ); //removes isvg from the dom, clearing anything there
+      this.attr( "isvgConfig.svg", null ); //makes sure no previously set svg is used as basis
 
       this.attr( "roomname", roomname );
       this.attr( "isvgConfig.height", length );

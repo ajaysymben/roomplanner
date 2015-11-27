@@ -468,9 +468,13 @@ export const ViewModel = Map.extend({
 		}
 	},
 
+	round2DecimalPlaces: function ( value ) {
+		return value.toFixed( 2 ).replace( /0+$/, "" ).replace( /\.$/, "" );
+	},
+
 	valueInFeetAndInches: function ( value ) {
 		var ft = ~~( value / 12 );
-		var inches = parseFloat( ( value - ft * 12 ).toFixed( 2 ).replace( /0+$/, "" ).replace( /\.$/, "" ) );
+		var inches = parseFloat( this.round2DecimalPlaces( value - ft * 12 ) );
 		if ( inches >= 12 ) {
 			ft++;
 			inches = 0;

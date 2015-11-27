@@ -9,7 +9,7 @@
 	<li ($click)="setAction( 'new' )">New</li>
 	<li ($click)="setAction( 'open' )">Open</li>
 	<li ($click)="setAction( 'save' )">Save</li>
-	<li>Item Summary</li>
+	<li ($click)="setAction( 'summary' )">Item Summary</li>
 	<li>Print</li>
 </ul>
 

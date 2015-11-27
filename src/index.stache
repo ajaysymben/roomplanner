@@ -13,7 +13,7 @@
     <main-nav {(parts-menu-expanded)}="partsMenuExpanded" {(menu-action)}="menuAction"></main-nav>
 
     <can-import from="svg-roomplanner/furniture-nav/" />
-    <furniture-nav {(roomname)}="roomname" class="{{#if partsMenuExpanded}}expanded{{/if}}" {(parts-menu-expanded)}="partsMenuExpanded"></furniture-nav>
+    <furniture-nav {(roomname)}="roomname" class="{{#if partsMenuExpanded}}expanded{{/if}}" {(parts-menu-expanded)}="partsMenuExpanded" {^parts-by-category}="partsByCategory"></furniture-nav>
 
     <div class="planning-area">
       <can-import from="svg-roomplanner/isvg/" />
@@ -84,6 +84,49 @@
         </div>
       </div>
       <div class="menu-action-right">
+      </div>
+    {{/is}}
+    {{#is menuAction "summary"}}
+      <div class="menu-action-top" ($inserted)="loadItemSummary()">
+        Item Summary
+      </div>
+      <div class="menu-action-left">
+        <div>&nbsp;</div>
+        <div class="button secondary" ($click)="menuActionNone()">
+          Return To Planner
+        </div>
+        <div>&nbsp;</div>
+      </div>
+      <div class="menu-action-right">
+        <div class="backdrop">
+          <table>
+            <tr>
+              <th width="20%">Item Number</th>
+              <th width="40%">Description</th>
+              <th width="10%">Quantity</th>
+              <th width="12%">Price (Each)</th>
+              <th width="18%">Extended Price</th>
+            </tr>
+            {{#each itemSummary}}
+              <tr>
+                <td>{{./itemnumber}}</td>
+                <td>{{./itemname}}</td>
+                <td>{{./qty}}</td>
+                <td>${{extendedPrice( 1, ./unitprice )}}</td>
+                <td>${{extendedPrice( ./qty, ./unitprice )}}</td>
+              </tr>
+            {{/each}}
+          </table>
+          <div class="summary-totals">
+            {{#itemSummaryTotal}}
+              <b>Total:&nbsp;&nbsp;&nbsp;${{itemSummaryTotal}}&nbsp;&nbsp;&nbsp;</b><br>
+            {{/itemSummaryTotal}}
+            <br>
+            <div class="button" ($click)="menuActionNone()">
+              Return To Planner
+            </div>
+          </div>
+        </div>
       </div>
     {{/is}}
 
