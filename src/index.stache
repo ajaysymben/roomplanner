@@ -22,6 +22,45 @@
       {{/if}}
     </div>
 
+    {{#is menuAction "gettingstarted"}}
+      <div class="menu-action-top">
+        Welcome to the Science Room Planner
+      </div>
+      <div class="menu-action-left">
+        <div class="scrollable">
+          <span>&nbsp;</span>
+          <b>Whether planning a new or remodeled science room, get started using these easy-to-follow steps!</b><br>
+          <br>
+          - To create a plan with your room dimensions select New.<br>
+          <br>
+          - To create a plan with a template room, select a room from the planning area to the right.<br>
+          <br>
+          - Next, choose a furniture category from the menu on the left.<br>
+          <br>
+          - Create your room plan using furniture from the furniture library.<br>
+          <br>
+          - Click or touch and drag furniture icons into the room.<br>
+          <br>
+          - Click or tap any of the furniture icons in the plan to open the planning tools.<br>
+          <br>
+          - Use "Help" for an overview of the planning tools available.<br>
+          <br>
+          - Click on "Item Summary" to view a list of items placed.<br>
+          <br>
+          - Save your project using your email for future review.<br>
+          <br>
+          - Print your project.<br>
+          <br>
+          - Request a safety review &amp; estimate of your project.<br>
+          <br>
+          Thank you for using the Science Room Planner.<br>
+        </div>
+      </div>
+      <div class="menu-action-right">
+        <can-import from="svg-roomplanner/pre-saved-rooms/" />
+        <pre-saved-rooms {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
+      </div>
+    {{/is}}
     {{#is menuAction "new"}}
       <div class="menu-action-top">
         Enter your desired dimensions below, or select a template from the right to get started.
@@ -56,8 +95,28 @@
     {{/is}}
     {{#is menuAction "open"}}
       <div class="menu-action-top">
+        Enter your email address to find rooms you've saved
       </div>
       <div class="menu-action-left">
+        <div>
+          <span>&nbsp;</span>
+          <span>Email:</span>
+          <input class="room-email" type="text">
+        </div>
+        <div class="button" ($click)="searchRooms()">
+          Find Saved Room(s)
+        </div>
+        {{#savedRoomsList}}
+          <div class="open-saved-room">
+            <div ($click)="loadRoomFromID( ./id )">
+              {{./title}}
+            </div>
+            <i class="icon-trash-can" ($click)="deleteRoom( ./id, ./title )"></i>
+          </div>
+        {{/savedRoomsList}}
+        <div class="button secondary" ($click)="menuActionNone()">
+          Cancel
+        </div>
       </div>
       <div class="menu-action-right">
       </div>
@@ -73,8 +132,49 @@
           <input class="room-name" name="roomname" type="text" {($value)}="roomname">
         </div>
         <div>
+          <span>Your First and Last Name:</span>
+          <input class="room-firstandlastname" type="text">
+        </div>
+        <div>
           <span>Email:</span>
           <input class="room-email" type="text" value="preplanned">
+        </div>
+        <div>
+          <span>Phone Number:</span>
+          <input class="room-phone" type="text">
+        </div>
+        <div>
+          <span>School Name:</span>
+          <input class="room-school" type="text">
+        </div>
+        <div>
+          <span>State:</span>
+          <select class="room-state">
+            <option value="il">Illinois</option>
+            <option value="ca">California</option>
+            <option value="tx">Texas</option>
+          </select>
+        </div>
+        <div>
+          <span>When will your project start construction?</span>
+          <input class="room-timeframe" type="radio" name="room-timeframe" id="room-timeframe-1" value="1">
+          <label for="room-timeframe-1">1 to 3 months</label><br>
+
+          <input class="room-timeframe" type="radio" name="room-timeframe" id="room-timeframe-3" value="3">
+          <label for="room-timeframe-3">3 to 6 months</label><br>
+
+          <input class="room-timeframe" type="radio" name="room-timeframe" id="room-timeframe-6" value="6">
+          <label for="room-timeframe-6">6 to 12 months</label><br>
+
+          <input class="room-timeframe" type="radio" name="room-timeframe" id="room-timeframe-12" value="12">
+          <label for="room-timeframe-12">More than 12 months</label><br>
+
+          <input class="room-timeframe" type="radio" name="room-timeframe" id="room-timeframe-100" value="100">
+          <label for="room-timeframe-100">Waiting for bond/funding</label>
+        </div>
+        <div>
+          <span>Comments or Questions:</span>
+          <textarea class="room-comments"></textarea>
         </div>
         <div class="button" ($click)="saveRoom()">
           Save Room
@@ -91,7 +191,10 @@
         Item Summary
       </div>
       <div class="menu-action-left">
-        <div>&nbsp;</div>
+        <div>
+          &nbsp;<br>
+          If this plan looks good, save your project. A link will be sent to your email for sharing and future review. We'll be in touch for a complete safety review of your project.
+        </div>
         <div class="button secondary" ($click)="menuActionNone()">
           Return To Planner
         </div>
@@ -99,6 +202,8 @@
       </div>
       <div class="menu-action-right">
         <div class="backdrop">
+          <b>Item Summary</b><br>
+          <br>
           <table>
             <tr>
               <th width="20%">Item Number</th>

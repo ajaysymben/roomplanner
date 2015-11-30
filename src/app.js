@@ -2,6 +2,7 @@ import AppMap from "can-ssr/app-map";
 import route from "can/route/";
 import 'can/map/define/';
 import 'can/route/pushstate/';
+import Roomplan from './models/roomplan';
 
 const AppViewModel = AppMap.extend({
   define: {
@@ -95,7 +96,7 @@ const AppViewModel = AppMap.extend({
     return ( qty * price ).toFixed( 2 );
   }, 
 
-  menuAction: "new",
+  menuAction: "gettingstarted",
 
   isRunningInBrowser: !( typeof process === "object" && {}.toString.call(process) === "[object process]" ),
   //isRunningInNode: typeof process === "object" && {}.toString.call(process) === "[object process]",
@@ -143,6 +144,7 @@ const AppViewModel = AppMap.extend({
   },
 
   saveRoom: function () {
+    //TODO move ajax stuff into roomplan model
     var postData = {
       clientid: 2, //TODO: use app's client info
       room: $( "<div/>" ).append( $( ".planning-area interactive-svg svg" ).clone() ).html(),
@@ -160,9 +162,78 @@ const AppViewModel = AppMap.extend({
       dataType: 'json',
       cache: false
     }).then( function ( resp ) {
-      //TODO: get rid of this log
-      console.log( "room saved response", resp );
+      return resp;
     });
+  },
+
+  savedRoomsList: [],
+
+  searchRooms: function () {
+    var email = $( ".room-email" ).val();
+    if ( !email ) {
+      return;
+    }
+
+    var vm = this;
+
+    //TODO use app's clientid
+    return Roomplan.findAll({
+      clientid: 2,
+      email: email
+    }).then(function ( rooms ) {
+      var i, room, updated, title, hours, minutes, ampm;
+
+      if ( !rooms || !rooms.length ) {
+        vm.attr( "savedRoomsList", [{ id:0, title: "No rooms found with the provided email address." }] );
+        return rooms;
+      }
+
+      for ( i = 0; i < rooms.length; i++ ) {
+        room = rooms[ i ];
+        updated = new Date( room.attr( "updated" ) );
+        title = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"][ updated.getMonth() ];
+        title += ". " + updated.getDate() + ", " + updated.getFullYear();
+
+        hours = updated.getHours();
+        minutes = updated.getMinutes();
+        ampm = hours >= 12 ? 'pm' : 'am';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        minutes = minutes < 10 ? '0'+minutes : minutes;
+
+        title += " " + hours + ':' + minutes + ampm + " - ";
+        title += room.attr( "roomname" );
+        room.attr( "title", title ); //"Oct. 30, 2015 10:00am - This Is A Long Science Room Name"
+      }
+
+      vm.attr( "savedRoomsList", rooms );
+    });
+  },
+
+  loadRoomFromID: function ( roomid ) {
+    var vm = this;
+    return Roomplan.findOne({
+      roomid: roomid
+    }).then(function ( roominfo ) {
+      //TODO: save if dirty first
+      vm.attr( "isvgConfig.width", 0 );
+      vm.attr( "isvgConfig.svg", $( "<div/>" ).html( roominfo.room ).find( "svg" ) );
+      vm.attr( "isvgConfig.height", roominfo.depth );
+      vm.attr( "isvgConfig.width", roominfo.width );
+      vm.attr( "roomname", roominfo.roomname );
+      vm.attr( "menuAction", "none" );
+    });
+  },
+
+  deleteRoom: function ( roomid, title ) {
+    var email = $( ".room-email" ).val();
+    if ( !email ) {
+      alert( "Please enter your email address to delete this room." );
+      return;
+    }
+    var doit = confirm( "Permanately Delete this room? \n" + title );
+    console.log( doit );
+    //TODO make it
   },
 
   menuActionNone: function () {

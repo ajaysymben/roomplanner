@@ -5,6 +5,28 @@ export const Roomplan = can.Model.extend({
     return data;
   },
 
+  findOne: function ( params, success, error ) {
+    if ( !params.roomid ) {
+      console.log( "bad call to roomplan - findOne" );
+      return null;
+    }
+
+    return $.ajax({
+      url: can.sub( "/rooms?roomid={roomid}", params, true ),
+      type: 'GET',
+      dataType: 'json',
+      cache: false
+    }).then(function ( roominfo ) {
+      if ( roominfo.data ) {
+        if ( roominfo.data.length ) {
+          return roominfo.data[ 0 ];
+        }
+        return roominfo.data;
+      }
+      return roominfo;
+    });
+  },
+
   findAll: function ( params, success, error ) {
     return $.ajax({
       url: can.sub( "/rooms?clientid={clientid}&email={email}", params, true ),

@@ -17,7 +17,7 @@ server({
     app.post( '/addclient', api.doAddClient );
     app.get( '/manage', api.getManage );
     app.post( '/manage', api.doManage );
-    app.get( '/rooms', api.getRooms );
+    app.get( '/rooms', api.roomsGET );
     app.post( '/rooms', api.saveRoom );
     app.get( '/items', api.getItems );
     app.post( '/email', api.sendEmail );

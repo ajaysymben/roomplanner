@@ -10,7 +10,8 @@ export const ViewModel = Map.extend({
 			value: 'This is the main-nav component'
 		}
 	},
-	clientLogo: "/src/flinn-logo.svg",
+	//clientLogo: "/src/flinn-logo.svg",
+	clientLogo: "/src/ScienceRoomPlanner-LogoV1.jpg",
 
 	setAction: function ( newState ) {
 		//console.log(newState)

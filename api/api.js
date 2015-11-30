@@ -398,7 +398,7 @@ exports.doManage = function ( req, res ) {
   );
 };
 
-exports.getRooms = function ( req, res ) {
+var getRoomsFull = function ( req, res ) {
   var validParams = true;
   validParams = parseInt( req.query.clientid ) && validParams;
   validParams = req.query.email && req.query.email.length > 4 && validParams;
@@ -420,6 +420,64 @@ exports.getRooms = function ( req, res ) {
       connection.destroy();
     }
   );
+};
+
+var getRooms = function ( req, res ) {
+  var validParams = true;
+  validParams = parseInt( req.query.clientid ) && validParams;
+  validParams = req.query.email && req.query.email.length > 4 && validParams;
+
+  if ( !validParams ) {
+    return res.send({ success: false, params: req.query });
+  }
+
+  var connection = getConnection();
+
+  connection.query(
+    'SELECT r.id, r.roomname, r.width, r.depth, r.updated FROM rooms r WHERE r.clientid = ? AND r.email = ?',
+    [ parseInt( req.query.clientid || 0 ), req.query.email ],
+    function ( err, rows, fields ) {
+      if (err) throw err;
+     
+      res.send( { success: true, data: rows } );
+
+      connection.destroy();
+    }
+  );
+};
+
+var getOneRoom = function ( req, res ) {
+  var validParams = true;
+  validParams = parseInt( req.query.roomid ) && validParams;
+
+  if ( !validParams ) {
+    return res.send({ success: false, params: req.query });
+  }
+
+  var connection = getConnection();
+  connection.query(
+    'SELECT r.id, r.roomname, r.width, r.depth, r.updated, r.room FROM rooms r WHERE r.id = ?',
+    [ parseInt( req.query.roomid || 0 ) ],
+    function ( err, rows, fields ) {
+      if (err) throw err;
+     
+      res.send( { success: true, data: rows } );
+
+      connection.destroy();
+    }
+  );
+};
+
+exports.roomsGET = function ( req, res ) {
+  if ( parseInt( req.query.roomid || 0 ) ) {
+    return getOneRoom( req, res );
+  }
+
+  if ( ( req.query.email || "" ) === "preplanned" ) {
+    return getRoomsFull( req, res );
+  }
+  
+  return getRooms( req, res );
 };
 
 exports.saveRoom = function ( req, res ) {

@@ -912,6 +912,7 @@ export default Component.extend({
 						info.pxCenterY / scalarUnitsToPx - curUnitsY,
 						curUnitsX - info.pxCenterX / scalarUnitsToPx
 					) * 180 / Math.PI + 90;
+					angle = Math.round( angle / 5 ) * 5;
 					vm.rotatePartAboutCenterTo( selectedParts, -1 * angle, info );
 					vm.attr( "infoForPartControls", info );
 					break;
