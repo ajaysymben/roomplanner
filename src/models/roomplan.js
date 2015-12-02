@@ -41,6 +41,22 @@ export const Roomplan = can.Model.extend({
     });
   },
 
+  create: function ( params, success, error ) {
+    var jqXHR = $.ajax({
+      url: "/rooms",
+      data: JSON.stringify( params ),
+      type: 'POST',
+      contentType: 'application/json',
+      dataType: 'json',
+      cache: false
+    });
+
+    if ( success ) jqXHR.then( success );
+    if ( error ) jqXHR.fail( error );
+
+    return jqXHR;
+  },
+
   //TODO: fix urls and use these in app
   update: function ( params, success, error ) {
     return $.ajax({

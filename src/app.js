@@ -14,6 +14,14 @@ const AppViewModel = AppMap.extend({
       value: true,
       serialize: false
     },
+    message: {
+      value: "",
+      serialize: false
+    },
+    showReturnButtonOnMessage: {
+      value: true,
+      serialize: false
+    },
     partsByCategory: {
       serialize: false
     },
@@ -174,7 +182,7 @@ const AppViewModel = AppMap.extend({
   },
 
   saveRoom: function () {
-    //TODO move ajax stuff into roomplan model
+    var vm = this;
     var postData = {
       clientid: 2, //TODO: use app's client info
       room: $( "<div/>" ).append( $( ".planning-area interactive-svg svg" ).clone() ).html(),
@@ -184,16 +192,24 @@ const AppViewModel = AppMap.extend({
       email: $( ".room-email" ).val()
     };
 
-    return $.ajax({
-      url: "/rooms",
-      data: JSON.stringify( postData ),
-      type: 'POST',
-      contentType: 'application/json',
-      dataType: 'json',
-      cache: false
-    }).then( function ( resp ) {
-      return resp;
-    });
+    vm.attr( "showReturnButtonOnMessage", false );
+    vm.attr( "message", "Saving..." );
+    vm.attr( "menuAction", "message" );
+
+    return Roomplan.create(
+      postData,
+      function ( data ) {
+        vm.attr( "showReturnButtonOnMessage", true );
+        vm.attr( "message", "Save Successful!" );
+        vm.attr( "menuAction", "message" );
+      },
+      function ( data ) {
+        vm.attr( "showReturnButtonOnMessage", true );
+        vm.attr( "message", "Save Failed.<br>Please try again in a moment." );
+        vm.attr( "menuAction", "message" );
+        console.log( data );
+      }
+    );
   },
 
   savedRoomsList: [],

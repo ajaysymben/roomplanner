@@ -108,10 +108,14 @@
         </div>
         {{#savedRoomsList}}
           <div class="open-saved-room">
-            <div ($click)="loadRoomFromID( ./id )">
-              {{./title}}
-            </div>
-            <i class="icon-trash-can" ($click)="deleteRoom( ./id, ./title )"></i>
+            {{^if ./id}}
+              <div>{{./title}}</div>
+            {{else}}
+              <div ($click)="loadRoomFromID( ./id )">
+                {{./title}}
+              </div>
+              <i class="icon-trash-can" ($click)="deleteRoom( ./id, ./title )"></i>
+            {{/if}}
           </div>
         {{/savedRoomsList}}
         <div class="button secondary" ($click)="menuActionNone()">
@@ -269,6 +273,28 @@
           </div>
         </div>
         <br><br>
+      </div>
+    {{/is}}
+    {{#is menuAction "message"}}
+      <div class="menu-action-top"></div>
+      <div class="menu-action-left">
+        {{#if showReturnButtonOnMessage}}
+          <div class="button" ($click)="menuActionNone()">
+            Return To Planner
+          </div>
+        {{/if}}
+      </div>
+      <div class="menu-action-right">
+        <div class="menu-action-message">
+          {{{message}}}
+          <br>
+          <br>
+          {{#if showReturnButtonOnMessage}}
+            <div class="button" ($click)="menuActionNone()">
+              Return To Planner
+            </div>
+          {{/if}}
+        </div>
       </div>
     {{/is}}
 
