@@ -14,6 +14,9 @@ const AppViewModel = AppMap.extend({
       value: true,
       serialize: false
     },
+    partsByCategory: {
+      serialize: false
+    },
     itemSummary: {
       //TODO: Use DB ID instead of itemname
       get: (function(){
@@ -80,11 +83,63 @@ const AppViewModel = AppMap.extend({
 
           return itemSummary;
         };
-      })()
+      })(),
+      serialize: false
+    },
+    menuAction: {
+      value: "gettingstarted",
+      set: function ( newValue ) {
+        if ( newValue === "print" ) {
+          $( "html, body" ).css({ "overflow-y": "auto" });
+        } else {
+          $( "html, body" ).css({ "overflow-y": "hidden" });
+        }
+        return newValue;
+      },
+      serialize: false
+    },
+
+    isvgConfig: {
+      value: {
+        isRunningInBrowser: !( typeof process === "object" && {}.toString.call(process) === "[object process]" ),
+
+        layers: 5,
+
+        //SVG's viewBox points ( sort of like pixels ) per 1 unit ( inch or whatever )
+        scalarUnitsToViewBoxPoints: 10,
+
+        //grid lines every x units
+        gridLinesEvery: 12,
+
+        //dimensions in inches
+        //width: 40 * 12,
+        height: 30 * 12,
+
+        //specify what element parts in the svg can be interacted with
+        iQueryString: "> g > g"
+      },
+      serialize: false
+    },
+
+    itemSummaryTotal: {
+      value: 0,
+      serialize: false
+    },
+
+    isRunningInBrowser: {
+      value: !( typeof process === "object" && {}.toString.call(process) === "[object process]" ),
+      serialize: false
     }
+    //isRunningInNode: typeof process === "object" && {}.toString.call(process) === "[object process]",
+    //isRunningInNode2: typeof module !== 'undefined' && module.exports,
   },
 
-  itemSummaryTotal: 0,
+  init: function () {
+    can.route( "" );
+    //can.route( "dashboard/:dashboardId" );
+    //can.route.bind( 'change', function ( ev, attr, how, newVal, oldVal ) {
+    can.route.ready();
+  },
 
   loadItemSummary: function () {
     this.attr( "itemSummary", null );
@@ -94,31 +149,6 @@ const AppViewModel = AppMap.extend({
 
   extendedPrice: function ( qty, price ) {
     return ( qty * price ).toFixed( 2 );
-  }, 
-
-  menuAction: "gettingstarted",
-
-  isRunningInBrowser: !( typeof process === "object" && {}.toString.call(process) === "[object process]" ),
-  //isRunningInNode: typeof process === "object" && {}.toString.call(process) === "[object process]",
-  //isRunningInNode2: typeof module !== 'undefined' && module.exports,
-
-  isvgConfig: {
-    isRunningInBrowser: !( typeof process === "object" && {}.toString.call(process) === "[object process]" ),
-
-    layers: 5,
-
-    //SVG's viewBox points ( sort of like pixels ) per 1 unit ( inch or whatever )
-    scalarUnitsToViewBoxPoints: 10,
-
-    //grid lines every x units
-    gridLinesEvery: 12,
-
-    //dimensions in inches
-    //width: 40 * 12,
-    height: 30 * 12,
-
-    //specify what element parts in the svg can be interacted with
-    iQueryString: "> g > g"
   },
 
   roomname: "",

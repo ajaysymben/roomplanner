@@ -168,10 +168,10 @@ exports.createDatabaseTables = function ( req, res ) {
   }).go( function ( next ) {
     connection.query( 'SELECT 1 AS solution', function ( err, rows, fields ) {
       if (err) throw err;
-     
-      res.send({ success: true });
 
       connection.destroy();
+     
+      res.send({ success: true });
     });
   });
 };
@@ -242,10 +242,10 @@ exports.dropDatabaseTables = function ( req, res ) {
   }).go( function ( next ) {
     connection.query( 'SELECT 1 AS solution', function ( err, rows, fields ) {
       if (err) throw err;
-     
-      res.send({ success: true });
 
       connection.destroy();
+     
+      res.send({ success: true });
     });
   });
 };
@@ -255,6 +255,8 @@ exports.addClient = function ( req, res ) {
 
   connection.query( 'SELECT * FROM clients', function ( err, rows, fields ) {
     if (err) throw err;
+
+    connection.destroy();
    
     res.send(
       fcs(function(){/*!
@@ -275,8 +277,6 @@ exports.addClient = function ( req, res ) {
         <pre>
       */}) + JSON.stringify( rows, null, 2 ) + "</pre>"
     );
-
-    connection.destroy();
   });
 
 };
@@ -293,9 +293,9 @@ exports.doAddClient = function ( req, res ) {
     function ( err, result ) {
       if (err) throw err;
 
-      res.send({ success: true, newClientId: result.insertId });
-
       connection.destroy();
+
+      res.send({ success: true, newClientId: result.insertId });
     }
   );
 };
@@ -366,9 +366,9 @@ exports.getManage = function ( req, res ) {
     }
     resp = resp.replace( "@roomlist@", "" );
 
-    res.send( resp );
-
     connection.destroy();
+
+    res.send( resp );
   });
 };
 
@@ -391,9 +391,9 @@ exports.doManage = function ( req, res ) {
     function ( err, result ) {
       if (err) throw err;
 
-      res.send({ success: true, msg: result.affectedRows + " rooms deleted." });
-
       connection.destroy();
+
+      res.send({ success: true, msg: result.affectedRows + " rooms deleted." });
     }
   );
 };
@@ -414,10 +414,10 @@ var getRoomsFull = function ( req, res ) {
     [ parseInt( req.query.clientid || 0 ), req.query.email ],
     function ( err, rows, fields ) {
       if (err) throw err;
-     
-      res.send( { success: true, data: rows } );
-
+      
       connection.destroy();
+      
+      res.send( { success: true, data: rows } );
     }
   );
 };
@@ -438,10 +438,10 @@ var getRooms = function ( req, res ) {
     [ parseInt( req.query.clientid || 0 ), req.query.email ],
     function ( err, rows, fields ) {
       if (err) throw err;
-     
-      res.send( { success: true, data: rows } );
 
       connection.destroy();
+     
+      res.send( { success: true, data: rows } );
     }
   );
 };
@@ -460,10 +460,10 @@ var getOneRoom = function ( req, res ) {
     [ parseInt( req.query.roomid || 0 ) ],
     function ( err, rows, fields ) {
       if (err) throw err;
-     
-      res.send( { success: true, data: rows } );
 
       connection.destroy();
+     
+      res.send( { success: true, data: rows } );
     }
   );
 };
@@ -512,9 +512,9 @@ exports.saveRoom = function ( req, res ) {
     function ( err, result ) {
       if (err) throw err;
 
-      res.send({ success: true, newRoomId: result.insertId });
-
       connection.destroy();
+
+      res.send({ success: true, newRoomId: result.insertId });
     }
   );
 };
@@ -524,6 +524,8 @@ exports.getItems = function ( req, res ) {
 
   connection.query( 'SELECT * FROM items', function ( err, rows, fields ) {
     if (err) throw err;
+
+    connection.destroy();
    
     res.send([
       {name:'Hello'},
@@ -533,8 +535,6 @@ exports.getItems = function ( req, res ) {
       rows,
       fields
     ]);
-
-    connection.destroy();
   });
 };
 
