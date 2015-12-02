@@ -10,7 +10,7 @@
 	<li ($click)="setAction( 'open' )">Open</li>
 	<li ($click)="setAction( 'save' )">Save</li>
 	<li ($click)="setAction( 'summary' )">Item Summary</li>
-	<li>Print</li>
+	<li ($click)="setAction( 'print' )">Print</li>
 </ul>
 
 <ul class="right-nav">

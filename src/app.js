@@ -238,6 +238,10 @@ const AppViewModel = AppMap.extend({
 
   menuActionNone: function () {
     this.attr( "menuAction", "none" );
+  },
+
+  cloneRoomSVGTo: function ( el ) {
+    $( el ).append( $( ".planning-area interactive-svg svg" ).clone() );
   }
 
 });

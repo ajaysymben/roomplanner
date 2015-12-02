@@ -234,6 +234,43 @@
         </div>
       </div>
     {{/is}}
+    {{#is menuAction "print"}}
+      <div class="menu-action-print">
+        <div class="print-svg-container" ($inserted)="cloneRoomSVGTo( %element )"></div><br>
+        <div ($inserted)="loadItemSummary()">
+          <b>Item Summary</b><br>
+          <br>
+          <table>
+            <tr>
+              <th width="20%">Item Number</th>
+              <th width="40%">Description</th>
+              <th width="10%">Quantity</th>
+              <th width="12%">Price (Each)</th>
+              <th width="18%">Extended Price</th>
+            </tr>
+            {{#each itemSummary}}
+              <tr>
+                <td>{{./itemnumber}}</td>
+                <td>{{./itemname}}</td>
+                <td>{{./qty}}</td>
+                <td>${{extendedPrice( 1, ./unitprice )}}</td>
+                <td>${{extendedPrice( ./qty, ./unitprice )}}</td>
+              </tr>
+            {{/each}}
+          </table>
+          <div class="summary-totals">
+            {{#itemSummaryTotal}}
+              <b>Total:&nbsp;&nbsp;&nbsp;${{itemSummaryTotal}}&nbsp;&nbsp;&nbsp;</b><br>
+            {{/itemSummaryTotal}}
+            <br>
+            <div class="button secondary" ($click)="menuActionNone()">
+              Return To Planner
+            </div>
+          </div>
+        </div>
+        <br><br>
+      </div>
+    {{/is}}
 
     {{asset "inline-cache"}}
 
