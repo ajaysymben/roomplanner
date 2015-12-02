@@ -48,4 +48,4 @@
 {{/measurmentState}}
 <div class="floor-x">{{getValueString( width )}}</div>
 <div class="floor-y">{{getValueString( height )}}</div>
-<i class="icon-ruler {{#if measurmentState}}measurement-state-on{{/if}}"></i>
+<i class="icon-tape-measure {{#if measurmentState}}measurement-state-on{{/if}}"></i>

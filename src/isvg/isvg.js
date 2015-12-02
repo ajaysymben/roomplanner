@@ -796,7 +796,7 @@ export default Component.extend({
 			if ( $target.is( ".measurment-field" ) ) {
 				/****** INTERACTION SET ******/
 				vm.attr( "currentInteractionOn", "measure" );
-			} else if ( $target.is( ".icon-ruler" ) ) {
+			} else if ( $target.is( ".icon-tape-measure" ) ) {
 				/****** INTERACTION SET ******/
 				vm.attr( "currentInteractionOn", "measureStart" );
 			} else if ( controlsShowing && $target.is( ".resizehandle" ) ) {
@@ -970,7 +970,7 @@ export default Component.extend({
 					}
 					break;
 				case "measureStart":
-					if ( $( ev.target ).is( ".icon-ruler" ) ) {
+					if ( $( ev.target ).is( ".icon-tape-measure" ) ) {
 						vm.attr( "infoForPartControls", null );
 						vm.attr( "selectedParts", null );
 						vm.attr( "measurmentState", !vm.attr( "measurmentState" ) );

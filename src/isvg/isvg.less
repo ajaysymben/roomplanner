@@ -52,16 +52,24 @@ interactive-svg {
 		white-space: nowrap;
 	}
 
-	.icon-ruler {
+	.icon-tape-measure {
 		position: absolute;
-		top: -32px;
+		top: -37px;
 		right: -32px;
-		font-size: 23px;
+		font-size: 56px;
 		cursor: pointer;
 		border-radius: 20px;
-		width: 32px;
-		height: 32px;
+		width: 56px;
+		height: 34px;
 		vertical-align: middle;
+		overflow: hidden;
+
+		&:before {
+			position: absolute;
+			top: -12px;
+			left: -12px;
+		}
+		
 		&.measurement-state-on {
 			color: #666600;
 			text-shadow: 0 0 5px #CCCC00, 0 0 5px #CCCC00, 0 0 5px #CCCC00, 0 0 5px #CCCC00;
