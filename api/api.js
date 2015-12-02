@@ -9,6 +9,12 @@ var getConnection = function () {
   });
 };
 
+/*
+var destroyConnection = function ( connection ) {
+  connection.query( "KILL CONNECTION_ID()", function () { connection.destroy(); } );
+};
+*/
+
 var fcs = function ( fn ) { //functionalCommentString
   /*!Function By James Atherton - http://geckocodes.org/?hacker=James0x57 */
   /*!You are free to copy and alter however you'd like so long as you leave the credit intact! =)*/
@@ -414,7 +420,7 @@ var getRoomsFull = function ( req, res ) {
     [ parseInt( req.query.clientid || 0 ), req.query.email ],
     function ( err, rows, fields ) {
       if (err) throw err;
-      
+
       connection.destroy();
       
       res.send( { success: true, data: rows } );

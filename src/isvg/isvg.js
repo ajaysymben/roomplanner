@@ -507,6 +507,12 @@ export const ViewModel = Map.extend({
 		line.setAttribute( "x2", toUnitsPos.unitsX * sUtVBP );
 		line.setAttribute( "y2", toUnitsPos.unitsY * sUtVBP );
 
+		if ( fromUnitsPos.unitsX.toFixed( 2 ) === toUnitsPos.unitsX.toFixed( 2 ) || fromUnitsPos.unitsY.toFixed( 2 ) === toUnitsPos.unitsY.toFixed( 2 ) ) {
+			line.setAttribute( "style", "stroke:#00CC00;stroke-width:8;" );
+		} else {
+			line.setAttribute( "style", "stroke:#CCCC00;stroke-width:8;" );
+		}
+
 		var xDiff = ( toUnitsPos.unitsX - fromUnitsPos.unitsX );
 		var yDiff = ( toUnitsPos.unitsY - fromUnitsPos.unitsY );
 		var unitsDistance = Math.sqrt( xDiff * xDiff + yDiff * yDiff );
