@@ -31,6 +31,13 @@ html, body {
 			overflow: visible;
 			border: 1px solid #000000;
 		}
+		.icon-tape-measure {
+			text-shadow: 0.5px 0px 0px #000000, -0.5px 0px 0px #000000, 0px 0.5px 0px #000000, 0px -0.5px 0px #000000;
+		}
+		.icon-tape-measure.measurement-state-on {
+			text-shadow: 0.5px 0px 0px #000000, -0.5px 0px 0px #000000, 0px 0.5px 0px #000000, 0px -0.5px 0px #000000,
+							0 0 5px #CCCC00, 0 0 5px #CCCC00, 0 0 5px #CCCC00, 0 0 5px #CCCC00;
+		}
 	}
 }
 
@@ -282,6 +289,12 @@ furniture-nav {
 	.print-svg-container {
 		max-height: 950px;
 		border: 1px solid black;
+	}
+
+	.button {
+		@media print {
+			display: none;
+		}
 	}
 }
 

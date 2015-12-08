@@ -327,6 +327,7 @@ export const ViewModel = Map.extend({
 		$( svgParts ).each(function () {
 			var info = vm.getPartInfo( this );
 			if( info === lastInfo || this === lastThis ) {
+				//TODO: What is this doing
 				console.log( info, this );
 			}
 			lastThis = this;

@@ -14,6 +14,10 @@ const AppViewModel = AppMap.extend({
       value: true,
       serialize: false
     },
+    savedRoomsList: {
+      value: [],
+      serialize: false
+    },
     message: {
       value: "",
       serialize: false
@@ -23,6 +27,13 @@ const AppViewModel = AppMap.extend({
       serialize: false
     },
     partsByCategory: {
+      serialize: false
+    },
+    clientInfo: {
+      serialize: false
+    },
+    roomname: {
+      value: "",
       serialize: false
     },
     itemSummary: {
@@ -99,6 +110,7 @@ const AppViewModel = AppMap.extend({
       set: function ( newValue ) {
         if ( newValue === "print" ) {
           $( "html, body" ).css({ "overflow-y": "auto" });
+          setTimeout(function () { window.print(); }, 250);
         } else {
           $( "html, body" ).css({ "overflow-y": "hidden" });
         }
@@ -143,10 +155,35 @@ const AppViewModel = AppMap.extend({
   },
 
   init: function () {
-    can.route( "" );
-    //can.route( "dashboard/:dashboardId" );
+    var vm = this;
+    can.route( ":clientid" );
     //can.route.bind( 'change', function ( ev, attr, how, newVal, oldVal ) {
     can.route.ready();
+
+    var clientid = parseInt( can.route.attr( "clientid" ) ) || 2;
+    can.route.attr( "clientid", clientid );
+
+    can.route.ready();
+
+    if ( !vm.attr( "isRunningInBrowser" ) ) {
+      return;
+    }
+
+    var jqXHR = $.ajax({
+      url: "/clients?clientid=" + clientid,
+      type: 'GET',
+      contentType: 'application/json',
+      dataType: 'json',
+      cache: false
+    });
+
+    jqXHR.then( function ( client ) {
+      if ( !client || !client.data || !client.data.length ) {
+        console.log( "Could not load client info." );
+        return;
+      }
+      vm.attr( "clientInfo", client.data[ 0 ] );
+    });
   },
 
   loadItemSummary: function () {
@@ -158,8 +195,6 @@ const AppViewModel = AppMap.extend({
   extendedPrice: function ( qty, price ) {
     return ( qty * price ).toFixed( 2 );
   },
-
-  roomname: "",
 
   createRoom: function () {
     var roomname = $( ".room-name" ).val();
@@ -182,9 +217,14 @@ const AppViewModel = AppMap.extend({
   },
 
   saveRoom: function () {
+    var clientid = this.attr( "clientInfo.id" );
+    if ( !clientid ) {
+      console.log( "No client info loaded" );
+      return;
+    }
     var vm = this;
     var postData = {
-      clientid: 2, //TODO: use app's client info
+      clientid: clientid,
       room: $( "<div/>" ).append( $( ".planning-area interactive-svg svg" ).clone() ).html(),
       width: this.attr( "isvgConfig.width" ),
       depth: this.attr( "isvgConfig.height" ),
@@ -212,19 +252,22 @@ const AppViewModel = AppMap.extend({
     );
   },
 
-  savedRoomsList: [],
-
   searchRooms: function () {
     var email = $( ".room-email" ).val();
     if ( !email ) {
       return;
     }
 
+    var clientid = this.attr( "clientInfo.id" );
+    if ( !clientid ) {
+      console.log( "No client info loaded" );
+      return;
+    }
+
     var vm = this;
 
-    //TODO use app's clientid
     return Roomplan.findAll({
-      clientid: 2,
+      clientid: clientid,
       email: email
     }).then(function ( rooms ) {
       var i, room, updated, title, hours, minutes, ampm;

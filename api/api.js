@@ -1,12 +1,30 @@
 var mysql = require( "mysql" );
 
 var getConnection = function () {
-  return mysql.createConnection({
+  var connection = mysql.createConnection({
     host     : process.env.DBHOST,
     user     : process.env.DBUSER,
     password : process.env.DBPASS,
     database : process.env.DBNAME
   });
+
+  connection.query(
+    fcs(function(){/*!
+      SELECT concat('KILL ', id, ';') AS kills
+      FROM information_schema.processlist
+      WHERE Command = 'Sleep'
+        AND Time >= 10
+    */}),
+    function ( err, rows, fields ) {
+      if (err) throw err;
+
+      for ( var i = 0; i < rows.length; i++ ) {
+        connection.query( rows[ i ].kills, function () {} );
+      }
+    }
+  );
+
+  return connection;
 };
 
 /*
@@ -40,9 +58,29 @@ Queue.prototype.go = function ( fn ) {
   return this;
 };
 
+
+exports.oneoffquery = function ( req, res ) {
+  var connection = getConnection();
+
+  connection.query(
+    fcs(function(){/*!
+      UPDATE clients
+      SET logo = '/src/logos/flinn-logo.svg'
+      WHERE id = 2
+    */}),
+    function ( err, result ) {
+      if (err) throw err;
+
+      connection.destroy();
+
+      res.send({ success: true, newRoomId: result.insertId });
+    }
+  );
+};
+
 /*
   ### database tables ###
-    clients -> id, logo, name, itemsscaleable
+    clients -> id, logo, name, itemsscaleable, contactemail
     itemCategory -> id, clientid, category, created, updated
     itemSubcategory -> id, catid, subcategory, created, updated
     verticalplacement -> id, clientid, alias, zindex
@@ -57,9 +95,10 @@ exports.createDatabaseTables = function ( req, res ) {
       fcs(function(){/*!
         CREATE TABLE clients (
           id MEDIUMINT NOT NULL AUTO_INCREMENT,
-          logo MEDIUMTEXT NOT NULL,
+          logo VARCHAR(255) NOT NULL,
           name VARCHAR(255) NOT NULL,
           itemsscaleable TINYINT(1) DEFAULT 1,
+          contactemail VARCHAR(255) NOT NULL,
           PRIMARY KEY (id)
         )
       */}),
@@ -182,6 +221,66 @@ exports.createDatabaseTables = function ( req, res ) {
   });
 };
 
+exports.createDatabaseTables2 = function ( req, res ) {
+  var connection = getConnection();
+
+  new Queue( function ( next ) {
+    connection.query( 
+      fcs(function(){/*!
+        CREATE TABLE saveformfields (
+          id MEDIUMINT NOT NULL AUTO_INCREMENT,
+          label VARCHAR(255) NOT NULL,
+          PRIMARY KEY (id)
+        )
+      */}),
+      function ( err, rows, fields ) {
+        if (err) throw err;
+        next();
+      }
+    );
+  }).then( function ( next ) {
+    connection.query( 
+      fcs(function(){/*!
+        CREATE TABLE clientsxsavefields (
+          clientid MEDIUMINT NOT NULL,
+          savefieldid MEDIUMINT NOT NULL,
+          required TINYINT(1) DEFAULT 0,
+          FOREIGN KEY (clientid) REFERENCES clients(id),
+          FOREIGN KEY (savefieldid) REFERENCES saveformfields(id)
+        )
+      */}),
+      function ( err, rows, fields ) {
+        if (err) throw err;
+        next();
+      }
+    );
+  }).then( function ( next ) {
+    connection.query( 
+      fcs(function(){/*!
+        CREATE TABLE saveformdata (
+          roomid MEDIUMINT NOT NULL AUTO_INCREMENT,
+          savefieldid MEDIUMINT NOT NULL,
+          value MEDIUMTEXT NOT NULL,
+          FOREIGN KEY (roomid) REFERENCES rooms(id),
+          FOREIGN KEY (savefieldid) REFERENCES saveformfields(id)
+        )
+      */}),
+      function ( err, rows, fields ) {
+        if (err) throw err;
+        next();
+      }
+    );
+  }).go( function ( next ) {
+    connection.query( 'SELECT 1 AS solution', function ( err, rows, fields ) {
+      if (err) throw err;
+
+      connection.destroy();
+     
+      res.send({ success: true });
+    });
+  });
+};
+
 exports.dropDatabaseTables = function ( req, res ) {
   var connection = getConnection();
 
@@ -267,8 +366,8 @@ exports.addClient = function ( req, res ) {
     res.send(
       fcs(function(){/*!
         <form action="/addclient" method="POST">
-          SVG Logo sourcecode:<br>
-          <textarea name="logo"></textarea><br>
+          Path to logo file (svg, jpg, png, etc..):<br>
+          <input type="text" name="logo" value="/src/logos/"><br>
           <br>
           Client Name:<br>
           <input type="text" name="name"><br>
@@ -521,6 +620,32 @@ exports.saveRoom = function ( req, res ) {
       connection.destroy();
 
       res.send({ success: true, newRoomId: result.insertId });
+    }
+  );
+};
+
+exports.getClient = function ( req, res ) {
+  var clientid = parseInt( req.query.clientid || 0 );
+
+  if ( !clientid ) {
+    return res.send({ success: false, params: req.query });
+  }
+
+  var connection = getConnection();
+
+  connection.query(
+    fcs(function(){/*!
+      SELECT id, logo, name, itemsscaleable, contactemail
+      FROM clients
+      WHERE id = ?
+    */}),
+    [ clientid ],
+    function ( err, rows, fields ) {
+      if (err) throw err;
+
+      connection.destroy();
+     
+      res.send( { success: true, data: rows } );
     }
   );
 };

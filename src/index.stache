@@ -10,7 +10,7 @@
     <can-import from="svg-roomplanner/app" export-as="viewModel" />
 
     <can-import from="svg-roomplanner/main-nav/" />
-    <main-nav {(parts-menu-expanded)}="partsMenuExpanded" {(menu-action)}="menuAction"></main-nav>
+    <main-nav {(parts-menu-expanded)}="partsMenuExpanded" {(menu-action)}="menuAction" {client-info}="clientInfo"></main-nav>
 
     <can-import from="svg-roomplanner/furniture-nav/" />
     <furniture-nav {(roomname)}="roomname" class="{{#if partsMenuExpanded}}expanded{{/if}}" {(parts-menu-expanded)}="partsMenuExpanded" {^parts-by-category}="partsByCategory"></furniture-nav>
@@ -58,7 +58,9 @@
       </div>
       <div class="menu-action-right">
         <can-import from="svg-roomplanner/pre-saved-rooms/" />
-        <pre-saved-rooms {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
+        {{#if clientInfo}}
+          <pre-saved-rooms {client-info}="clientInfo" {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
+        {{/if}}
       </div>
     {{/is}}
     {{#is menuAction "new"}}
@@ -90,7 +92,7 @@
       </div>
       <div class="menu-action-right">
         <can-import from="svg-roomplanner/pre-saved-rooms/" />
-        <pre-saved-rooms {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
+        <pre-saved-rooms {client-info}="clientInfo" {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
       </div>
     {{/is}}
     {{#is menuAction "open"}}
@@ -123,6 +125,8 @@
         </div>
       </div>
       <div class="menu-action-right">
+        <can-import from="svg-roomplanner/pre-saved-rooms/" />
+        <pre-saved-rooms {client-info}="clientInfo" {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
       </div>
     {{/is}}
     {{#is menuAction "save"}}
@@ -240,6 +244,9 @@
     {{/is}}
     {{#is menuAction "print"}}
       <div class="menu-action-print">
+        <div class="button" ($click)="menuActionNone()">
+          Return To Planner
+        </div>
         <div class="print-svg-container" ($inserted)="cloneRoomSVGTo( %element )"></div><br>
         <div ($inserted)="loadItemSummary()">
           <b>Item Summary</b><br>

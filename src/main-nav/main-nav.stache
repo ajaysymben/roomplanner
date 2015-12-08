@@ -16,8 +16,8 @@
 <ul class="right-nav">
 	<!-- <li>Reset</li> -->
 	<li ($click)="setAction( 'gettingstarted' )">Help</li>
-	{{#if clientLogo}}
-		<li class="clientLogo"><img src="{{clientLogo}}" alt="[client logo]"></li>
+	{{#if clientInfo.logo}}
+		<li class="clientLogo"><img src="{{clientInfo.logo}}" alt="[client logo]"></li>
 	{{/if}}
 </ul>
 

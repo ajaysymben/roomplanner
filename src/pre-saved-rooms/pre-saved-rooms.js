@@ -50,9 +50,16 @@ export default Component.extend({
   events: {
     "inserted": function ( $el, ev ) {
       var vm = this.viewModel;
-      //TODO use app's clientid
+      if ( !vm ) return;
+
+      if ( !vm.attr( "isvgConfig.isRunningInBrowser" ) ) {
+        return;
+      }
+
+      //console.log( "pre-saved-rooms.js", vm.attr( "clientInfo.id" ) );
+
       Roomplan.findAll({
-        clientid: 2,
+        clientid: vm.attr( "clientInfo.id" ),
         email: "preplanned"
       }).then(function ( rooms ) {
         vm.attr( "rooms", rooms );

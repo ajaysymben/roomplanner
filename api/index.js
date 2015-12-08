@@ -12,9 +12,12 @@ server({
     app.use( bodyParser.json({limit: '5mb'}) );
 
     // app.get( '/initdbtables', api.createDatabaseTables );
+    // app.get( '/initdbtables2', api.createDatabaseTables2 );
     // app.get( '/destroydatabase', api.dropDatabaseTables );
+    // app.get( '/oneoffquery', api.oneoffquery );
     app.get( '/addclient', api.addClient );
     app.post( '/addclient', api.doAddClient );
+    app.get( '/clients', api.getClient );
     app.get( '/manage', api.getManage );
     app.post( '/manage', api.doManage );
     app.get( '/rooms', api.roomsGET );
