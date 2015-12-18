@@ -64,9 +64,11 @@ exports.oneoffquery = function ( req, res ) {
 
   connection.query(
     fcs(function(){/*!
-      UPDATE clients
-      SET contactemail = 'james@bitovi.com'
-      WHERE id = 2
+      INSERT INTO rooms ( clientid, email, roomname, room, width, depth, created )
+      SELECT 12, email, roomname, room, width, depth, created
+      FROM rooms
+      WHERE clientid = 2
+        AND email = 'preplanned'
     */}),
     function ( err, result ) {
       if (err) throw err;
@@ -80,7 +82,7 @@ exports.oneoffquery = function ( req, res ) {
 
 /*
   ### database tables ###
-    clients -> id, logo, name, contactemail
+    clients -> id, logo, name, contactemail, address
     itemCategory -> id, clientid, category, created, updated
     itemSubcategory -> id, catid, subcategory, created, updated
     verticalplacement -> id, clientid, alias, zindex
@@ -98,6 +100,7 @@ exports.createDatabaseTables = function ( req, res ) {
           logo VARCHAR(255) NOT NULL,
           name VARCHAR(255) NOT NULL,
           contactemail VARCHAR(255) NOT NULL,
+          address TEXT NULL,
           PRIMARY KEY (id)
         )
       */}),
@@ -837,9 +840,9 @@ exports.manageItemsGET = function ( req, res ) {
           });
 
           $( "#submititems" ).on( "click", function () {
-            var clientid = $( "#clientdropdown" ).val();
+            var clientid = parseInt( $( "#clientdropdown" ).val() || 0 );
 
-            if ( !parseInt( clientid || 0 ) ) {
+            if ( !clientid ) {
               alert( "Select a client first." );
               return;
             }
