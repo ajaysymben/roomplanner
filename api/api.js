@@ -13,7 +13,7 @@ var getConnection = function () {
       SELECT concat('KILL ', id, ';') AS kills
       FROM information_schema.processlist
       WHERE Command = 'Sleep'
-        AND Time >= 10
+        AND Time >= 5
     */}),
     function ( err, rows, fields ) {
       if (err) throw err;
@@ -65,7 +65,7 @@ exports.oneoffquery = function ( req, res ) {
   connection.query(
     fcs(function(){/*!
       UPDATE clients
-      SET logo = '/src/logos/flinn-logo.svg'
+      SET contactemail = 'james@bitovi.com'
       WHERE id = 2
     */}),
     function ( err, result ) {
@@ -80,7 +80,7 @@ exports.oneoffquery = function ( req, res ) {
 
 /*
   ### database tables ###
-    clients -> id, logo, name, itemsscaleable, contactemail
+    clients -> id, logo, name, contactemail
     itemCategory -> id, clientid, category, created, updated
     itemSubcategory -> id, catid, subcategory, created, updated
     verticalplacement -> id, clientid, alias, zindex
@@ -97,7 +97,6 @@ exports.createDatabaseTables = function ( req, res ) {
           id MEDIUMINT NOT NULL AUTO_INCREMENT,
           logo VARCHAR(255) NOT NULL,
           name VARCHAR(255) NOT NULL,
-          itemsscaleable TINYINT(1) DEFAULT 1,
           contactemail VARCHAR(255) NOT NULL,
           PRIMARY KEY (id)
         )
@@ -169,10 +168,11 @@ exports.createDatabaseTables = function ( req, res ) {
           catid MEDIUMINT NOT NULL,
           subcatid MEDIUMINT NULL,
           itemname VARCHAR(255) NOT NULL,
-          item MEDIUMTEXT NOT NULL,
+          item VARCHAR(255) NOT NULL,
           width SMALLINT UNSIGNED,
           depth SMALLINT UNSIGNED,
           vertid SMALLINT NOT NULL,
+          itemnumber VARCHAR(255) NULL,
           unitprice DECIMAL(10,2) NOT NULL DEFAULT 0.00,
           created DATETIME DEFAULT NULL,
           updated TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
@@ -355,6 +355,85 @@ exports.dropDatabaseTables = function ( req, res ) {
   });
 };
 
+
+
+
+var adminHeader = fcs(function(){/*!
+  <style type="text/css">
+    * {
+      font-family: sans-serif;
+      -ms-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      border: none;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    body {
+      background-color: #C2C2C2;
+    }
+
+    .header-bar {
+      display: block;
+      padding: 5px;
+      height: 50px;
+      line-height: 40px;
+      vertical-align: middle;
+      background-color: #4E4E4E;
+      color: #FFFFFF;
+      position: relative;
+    }
+
+    .header-bar ul {
+      list-style: none;
+      display: inline-block;
+    }
+
+    .header-bar .right-nav {
+      position: absolute;
+      right: 0;
+    }
+
+    .header-bar li {
+      padding-left: 15px;
+      padding-right: 15px;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .header-bar li:hover {
+      color: rgb( 134, 171, 199 );
+    }
+
+    .main-body {
+      padding: 40px;
+    }
+
+    .page-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+  </style>
+  <div class="header-bar">
+    <ul>
+      <li onclick="window.location='/manage';">Manage Rooms</li>
+      <li onclick="window.location='/addclient';">Manage Clients</li>
+      <li onclick="window.location='/manageitems';">Manage Items and Categories</li>
+    </ul>
+  </div>
+  <div class="main-body">
+*/});
+
+var adminFooter = fcs(function(){/*!
+  </div>
+*/});
+
+
+
+
 exports.addClient = function ( req, res ) {
   var connection = getConnection();
 
@@ -364,7 +443,34 @@ exports.addClient = function ( req, res ) {
     connection.destroy();
    
     res.send(
+      adminHeader +
       fcs(function(){/*!
+        <style type="text/css">
+          input[type='text'] {
+            padding: 10px;
+            font-size: 13px;
+            width: 300px;
+          }
+
+          textarea {
+            padding: 10px;
+            font-size: 13px;
+            width: 300px;
+            height: 120px;
+          }
+
+          .create-button {
+            background-color: #00AA00;
+            margin: 10px;
+            padding: 10px;
+            cursor: pointer;
+            border: 1px outset #007700;
+            color: #FFFFFF;
+            font-size: 16px;
+            border-radius: 3px;
+          }
+        </style>
+        <div class="page-title">Create a new Client</div>
         <form action="/addclient" method="POST">
           Path to logo file (svg, jpg, png, etc..):<br>
           <input type="text" name="logo" value="/src/logos/"><br>
@@ -372,15 +478,18 @@ exports.addClient = function ( req, res ) {
           Client Name:<br>
           <input type="text" name="name"><br>
           <br>
-          Can client's items be scaled? (check if yes, uncheck if no)<br>
-          <input type="checkbox" name="itemsscaleable" value="1"><br>
+          Client contact email:<br>
+          <input type="text" name="contactemail"><br>
           <br>
-          <input type="submit" value="Create client"><br>
+          Address for the footer of the print page:<br>
+          <textarea name="address"></textarea><br>
+          <br>
+          <input class="create-button" type="submit" value="Create client"><br>
         </form><br>
         <br>
         Current clients:<br>
         <pre>
-      */}) + JSON.stringify( rows, null, 2 ) + "</pre>"
+      */}) + JSON.stringify( rows, null, 2 ) + "</pre>" + adminFooter
     );
   });
 
@@ -391,10 +500,10 @@ exports.doAddClient = function ( req, res ) {
 
   connection.query(
     fcs(function(){/*!
-      INSERT INTO clients ( logo, name, itemsscaleable )
+      INSERT INTO clients ( logo, name, contactemail )
       VALUES ( ?, ?, ? )
     */}),
-    [ req.body.logo || "", req.body.name || "ERR NO NAME", !!( req.body.itemsscaleable || 0 ) + 0 ],
+    [ req.body.logo || "", req.body.name || "ERR NO NAME", req.body.contactemail || "ERR NO EMAIL" ],
     function ( err, result ) {
       if (err) throw err;
 
@@ -410,14 +519,13 @@ exports.getManage = function ( req, res ) {
 
   var getRowHTML = function ( row ) {
     var html = "<div class='row'>";
-    html += "<div>" + row.id + " <input name='roomid' type='checkbox' value='" + row.id + "'></div>";
-    html += "<div>" + row.clientid + "</div>";
+    html += "<div class='small'><input name='roomid' type='checkbox' value='" + row.id + "'> " + row.id + "</div>";
+    html += "<div class='small'>" + row.clientid + "</div>";
     html += "<div>" + row.clientname + "</div>";
     html += "<div>" + row.email + "</div>";
     html += "<div>" + row.roomname + "</div>";
-    html += "<div>" + row.width + "</div>";
-    html += "<div>" + row.length + "</div>";
-    html += "<div>" + row.created + "</div>";
+    html += "<div class='small'>" + row.width + "</div>";
+    html += "<div class='small'>" + row.length + "</div>";
     html += "<div>" + row.updated + "</div>";
     return html + "</div>";
   };
@@ -433,38 +541,51 @@ exports.getManage = function ( req, res ) {
     if (err) throw err;
 
     var resp = fcs(function(){/*!
+      <div class="page-title">Manage Rooms</div>
       <style type="text/css">
         .row {
           display: block;
           word-wrap: no-wrap;
           border-bottom: 1px solid #777;
+          font-size: 0px;
         }
         .row > * {
           display: inline-block;
           width: 200px;
           padding: 2px;
+          font-size: 13px;
+          vertical-align: middle;
+        }
+        .row > .small {
+          width: 75px;
+        }
+        .delete-button {
+          background-color: #AA0000;
+          margin: 10px;
+          padding: 10px;
+          cursor: pointer;
+          border: 1px outset #770000;
+          color: white;
+          font-size: 16px;
+          border-radius: 3px;
         }
       </style>
-      <a href="/addclient">Add client</a><br>
       <form action="/manage" method="POST">
 
         <div class='row'>
-          <div>id</div>
-          <div>clientid</div>
+          <div class="small">id</div>
+          <div class="small">clientid</div>
           <div>clientname</div>
           <div>email</div>
           <div>roomname</div>
-          <div>width</div>
-          <div>length</div>
-          <div>created</div>
+          <div class="small">width</div>
+          <div class="small">length</div>
           <div>updated</div>
         </div>
         @roomlist@
-        <input type="submit" value="Delete selected rooms"><br>
+        <input class="delete-button" type="submit" value="Delete selected rooms"><br>
       </form><br>
       <br>
-      Current clients:<br>
-      <pre>
     */});
     for ( var i = 0; i < rows.length; i++ ) {
       resp = resp.replace( "@roomlist@", getRowHTML( rows[ i ] ) + "@roomlist@" );
@@ -473,7 +594,7 @@ exports.getManage = function ( req, res ) {
 
     connection.destroy();
 
-    res.send( resp );
+    res.send( adminHeader + resp + adminFooter );
   });
 };
 
@@ -502,6 +623,541 @@ exports.doManage = function ( req, res ) {
     }
   );
 };
+
+exports.manageItemsGET = function ( req, res ) {
+  var connection = getConnection();
+
+  connection.query( 'SELECT id, name FROM clients', function ( err, rows, fields ) {
+    if (err) throw err;
+
+    connection.destroy();
+
+    var clientDD = "";
+    for ( var i = 0; i < rows.length; i++ ) {
+      clientDD += '<option value="' + rows[ i ].id + '">' + rows[ i ].name + '</option>';
+    }
+   
+    res.send(
+      adminHeader +
+      fcs(function(){/*!
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <style type="text/css">
+          input[type='text'],
+          select {
+            padding: 10px;
+            font-size: 13px;
+            width: 300px;
+          }
+
+          textarea {
+            padding: 10px;
+            font-size: 13px;
+            width: 300px;
+            height: 120px;
+          }
+
+          .create-button {
+            display: inline-block;
+            background-color: #00AA00;
+            margin: 10px;
+            padding: 10px;
+            cursor: pointer;
+            border: 1px outset #007700;
+            color: #FFFFFF;
+            font-size: 16px;
+            border-radius: 3px;
+          }
+
+          tr, td {
+            vertical-align: top;
+          }
+        </style>
+        <div class="page-title">Manage Items and Categories</div>
+        <form action="/manageitems" method="POST">
+          Select a client to get started:<br>
+          <select id="clientdropdown" name="clientid">
+            <option value="0" disabled selected>Select a client</option>
+            @clientDD@
+          </select><br>
+          <br>
+          <hr style="border-bottom: 4px outset #CCCCCC;">
+          <br>
+          <table width="100%">
+          <tr>
+            <td width="50%">
+              verticalplacement / layers:<br>
+              <div id="verticalOutput"></div>
+            </td>
+            <td width="50%">
+              Add a new vertical placement layer:<br>
+              Alias: <input type="text" name="vertalias"><br>
+              zindex ( 0 based ): <input type="text" name="vertzindex"><br>
+              <input class="create-button" type="submit" value="Create vertical placement layer"><br>
+            </td>
+          </tr>
+          </table><br>
+          <br>
+          <hr style="border-bottom: 4px outset #CCCCCC;">
+          <br>
+          <table width="100%">
+          <tr>
+            <td width="50%">
+              Select a category:<br>
+              <div id="categoryOutput">
+                <select name="category">
+                  <option value="0" disabled selected>Select a category</option>
+                </select>
+              </div>
+            </td>
+            <td width="50%">
+              OR add a new category:<br>
+              <input type="text" name="categoryname"><br>
+              <input class="create-button" type="submit" value="Create category"><br>
+            </td>
+          </tr>
+          </table><br>
+          <br>
+          <hr style="border-bottom: 4px outset #CCCCCC;">
+          <br>
+          <table width="100%">
+          <tr>
+            <td width="50%">
+              Subcategories:<br>
+              <div id="subcategoryOutput">TODO: List of selected cat's subcats here</div>
+            </td>
+            <td width="50%">
+              Add a new subcategory:<br>
+              <input type="text" name="subcategoryname"><br>
+              TODO: <input class="create-button" type="submit" value="Create subcategory"><br>
+            </td>
+          </tr>
+          </table><br>
+          <br>
+          <hr style="border-bottom: 4px outset #CCCCCC;">
+          <br>
+          Copy the text from a spreadsheet and paste it here:<br>
+          <textarea id="spreadsheetdata" name="spreadsheetdata"></textarea><br>
+          <br>
+          <div id="parsedatabutton" class="create-button">Parse Spreadsheet Data</div><br>
+
+          <table id="datatable" width="100%"></table>
+
+          <div id="submititems" class="create-button">Replace ALL Items for this client with this list.</div><br>
+        </form><br>
+
+        <script type="text/javascript">
+          var categoriesSubcategories = [];
+          var verticalplacements = [];
+          var sSObj = [];
+
+          $( "#submititems" ).hide();
+
+          function getCatId( category ) {
+            for ( var i = 0; i < categoriesSubcategories.length; i++ ) {
+              if ( categoriesSubcategories[ i ].category === category ) {
+                return categoriesSubcategories[ i ].catid;
+              }
+            }
+            return null;
+          }
+
+          function getVertId( layer ) {
+            for ( var i = 0; i < verticalplacements.length; i++ ) {
+              if ( verticalplacements[ i ].zindex === layer ) {
+                return verticalplacements[ i ].id;
+              }
+            }
+            return verticalplacements[ 0 ].id;
+          }
+
+          function populateCategoryDD() {
+            var categoryOutput = '<select name="category"><option value="0" disabled selected>Select a category</option>';
+            var lastCat = 0;
+
+            for ( var i = 0; i < categoriesSubcategories.length; i++ ) {
+              var cat = categoriesSubcategories[ i ];
+              if ( cat.catid === lastCat ) {
+                continue;
+              }
+              categoryOutput += '<option value="' + cat.catid + '">' + cat.category + '</option>';
+            }
+
+            $( "#categoryOutput" ).html( categoryOutput + "</select>" );
+            //TODO: onchange, load subcats and allow adding to those
+          }
+
+          function populateVerticalList() {
+            var output = "(id) alias [layer]<br>";
+            for ( var i = 0; i < verticalplacements.length; i++ ) {
+              output += "(" + verticalplacements[ i ].id + ") " + verticalplacements[ i ].alias;
+              output += " [" + verticalplacements[ i ].zindex + "]<br>";
+            }
+            $( "#verticalOutput" ).html( output );
+          }
+
+          $( "#clientdropdown" ).on( "change", function () {
+            var clientid = $(this).val();
+            categoriesSubcategories = [];
+            verticalplacements = [];
+
+            var jqXHR = $.ajax({
+              url: "/catsubcat?clientid=" + clientid,
+              type: 'GET',
+              contentType: 'application/json',
+              dataType: 'json',
+              cache: false
+            });
+
+            jqXHR.then( function ( catsubcats ) {
+              if ( !catsubcats || !catsubcats.data || !catsubcats.data.length ) {
+                console.log( "Could not load catsubcats info, or it is empty." );
+                return;
+              }
+              categoriesSubcategories = catsubcats.data;
+              populateCategoryDD();
+            });
+
+            var jqXHR2 = $.ajax({
+              url: "/verticalplacement?clientid=" + clientid,
+              type: 'GET',
+              contentType: 'application/json',
+              dataType: 'json',
+              cache: false
+            });
+
+            jqXHR2.then( function ( vertplacements ) {
+              if ( !vertplacements || !vertplacements.data || !vertplacements.data.length ) {
+                console.log( "Could not load vertplacements info, or it is empty." );
+                return;
+              }
+              verticalplacements = vertplacements.data;
+              populateVerticalList();
+            });
+
+          });
+
+          $( "#submititems" ).on( "click", function () {
+            var clientid = $( "#clientdropdown" ).val();
+
+            if ( !parseInt( clientid || 0 ) ) {
+              alert( "Select a client first." );
+              return;
+            }
+
+            if ( !categoriesSubcategories.length ) {
+              alert( "no categories exist" );
+              return;
+            }
+            
+            if ( !verticalplacements.length ) {
+              alert( "no vertical placements / layers exist" );
+              return;
+            }
+
+            $( "#submititems" ).hide();
+
+            var jqXHR = $.ajax({
+              url: "/manageitems",
+              type: 'POST',
+              data: JSON.stringify( { clientid: clientid, items: sSObj } ),
+              contentType: 'application/json',
+              dataType: 'json',
+              cache: false
+            });
+
+            jqXHR.then(function ( resp ) {
+              if ( resp && resp.success ) {
+                alert( "Items updated!" );
+              } else {
+                alert( "Items not updated, something went wrong. See console." );
+                console.log( resp );
+              }
+            });
+          });
+
+          var entityMap = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': '&quot;',
+            "'": '&#39;',
+            "/": '&#x2F;'
+          };
+
+          function escapeHtml(string) {
+            return String(string).replace(/[&<>"'\/]/g, function (s) {
+              return entityMap[s];
+            });
+          }
+
+          $( "#parsedatabutton" ).on( "click", function () {
+            var clientid = $( "#clientdropdown" ).val();
+            if ( !clientid ) {
+              alert( "Select a client first" );
+              return;
+            }
+            var sSData = $( "#spreadsheetdata" ).val();
+            
+            sSData = sSData.replace(
+              /^([^\t]*)\t([^\t]*)\t([^\t]*)\t([^\t]*)\t([^\t]*)\t([^\t]*)\t\$?([^\t]*)\t([^\t]*)\t([^\t]*)$/gim,
+              '{ url: "/src/svgs/$1", itemname: "$2", category: "$3", subcategory: "$4", forceWidth: $5, forceHeight: $6, unitprice: $7, itemnumber: "$8", layer: $9 - 1 },'
+            );
+
+            sSData = sSData.replace( /^.*(forceWidth|forceHeight|layer): (- 1)?,.*$\n/gim, "" );
+
+            sSData = sSData.replace( /(url: "\/src\/svgs\/)([^"]*)(", itemname: )("",)/gim, '$1$2$3"$2",' );
+
+            sSData = sSData.replace( /unitprice: ,/gim, "unitprice: 0," );
+
+            sSData = sSData.replace( /(unitprice: \d*),(\d+)/gim, "$1$2" );
+
+            sSData = sSData.replace( /\s+,/gim, "," );
+
+            sSData = sSData.replace( /(: "[^"]*)"([^,]+)/gim, '$1\\"$2' );
+
+            sSData = sSData.replace( / category: ""/gim, ' category: "[ERR NO CATEGORY]"' );
+
+            sSData = "[" + sSData + "]";
+
+            //console.log( sSData );
+            
+            sSObj = eval( sSData );
+
+            var tableOutputSkel = '<tr style="@style@"><td></td><td></td>';
+            tableOutputSkel += '<td>@filename@</td><td>@itemname@</td><td>@category@ (@catid@)</td><td>@subcategory@</td>';
+            tableOutputSkel += '<td>@width@</td><td>@depth@</td><td>@unitprice@</td><td>@Item#@</td><td>@Layer@ (@vertid@)</td>';
+            tableOutputSkel += '</tr>';
+
+            var tableOutput = tableOutputSkel.replace( /@/g, "" );
+
+            $( "#submititems" ).show();
+            var i, row, rowOut, catid, style;
+            for ( i = 0; i < sSObj.length; i++ ) {
+              row = sSObj[ i ];
+              style = "";
+              rowOut = tableOutputSkel;
+              rowOut = rowOut.replace( /@filename@/gi, escapeHtml(row.url) );
+              rowOut = rowOut.replace( /@itemname@/gi, escapeHtml(row.itemname) );
+
+              rowOut = rowOut.replace( /@category@/gi, escapeHtml(row.category) );
+              rowOut = rowOut.replace( /@subcategory@/gi, escapeHtml(row.subcategory) );
+
+              row.catid = getCatId( row.category );
+              if ( !row.catid ) {
+                style += "background-color:red;";
+                $( "#submititems" ).hide();
+              }
+              rowOut = rowOut.replace( /@catid@/gi, row.catid );
+              //TODO: also update the row to have subcatid assigend to it at this point
+
+              rowOut = rowOut.replace( /@width@/gi, row.forceWidth );
+              rowOut = rowOut.replace( /@depth@/gi, row.forceHeight );
+
+              rowOut = rowOut.replace( /@unitprice@/gi, row.unitprice );
+              rowOut = rowOut.replace( /@Item#@/gi, row.itemnumber );
+
+              if ( row.layer < 0 ) row.layer = 0;
+              rowOut = rowOut.replace( /@Layer@/gi, row.layer );
+              row.vertid = getVertId( row.layer );
+              rowOut = rowOut.replace( /@vertid@/gi, row.vertid );
+
+              rowOut = rowOut.replace( /@style@/gi, style );
+              tableOutput += rowOut;
+            }
+
+            $( "#datatable" ).html( tableOutput );
+          });
+        </script>
+        <br>
+      */}).replace(
+        /@clientDD@/g, clientDD
+      ) + adminFooter
+    );
+  });
+
+};
+
+var doAddCategory = function ( req, res ) {
+  var connection = getConnection();
+
+  var clientid = parseInt( req.body.clientid );
+  var category = req.body.categoryname;
+
+  connection.query(
+    fcs(function(){/*!
+      INSERT INTO itemCategory ( clientid, category )
+      VALUES ( ?, ? )
+    */}),
+    [ clientid, category ],
+    function ( err, result ) {
+      if (err) throw err;
+
+      connection.destroy();
+
+      res.send({ success: true, newCategoryId: result.insertId });
+    }
+  );
+};
+
+var replaceClientItems = function ( req, res ) {
+  var clientid = parseInt( req.body.clientid );
+  var items = req.body.items;
+
+  if ( !( clientid && items && items.length ) ) {
+    return res.send({ success: false, params: req.body });
+  }
+
+  var connection = getConnection();
+
+  connection.query(
+    fcs(function(){/*!
+      DELETE FROM items
+      WHERE clientid = ?
+    */}),
+    [ clientid ],
+    function ( err, result ) {
+      if (err) throw err;
+
+      var qry = fcs(function(){/*!
+        INSERT INTO items
+          ( clientid, catid, subcatid, itemname, item, width, depth, vertid, unitprice )
+        VALUES
+      */});
+
+      for ( var i = 0; i < items.length; i++ ) {
+        var item = items[ i ];
+        var insertvals = [
+          clientid,
+          item.catid,
+          item.subcatid || null,
+          item.itemname,
+          item.url,
+          item.forceWidth,
+          item.forceHeight,
+          item.vertid,
+          item.unitprice || 0
+        ];
+
+        qry += "\n( " + connection.escape( insertvals ) + " ),";
+      }
+
+      //turn last row , into ; to signify end of inserts
+      qry = qry.replace( /,$/, ";" );
+
+      connection.query(
+        qry,
+        function ( err, result ) {
+          connection.destroy();
+
+          res.send({ success: true, newCategoryId: result.insertId });
+        }
+      );
+    }
+  );
+};
+
+exports.manageItemsPOST = function ( req, res ) {
+  if ( req.body.categoryname && parseInt( req.body.clientid ) ) {
+    return doAddCategory( req, res );
+  }
+
+  if ( parseInt( req.body.clientid ) && parseInt( req.body.vertzindex ) > -1 && req.body.vertalias ) {
+    return exports.addVerticalPlacements( req, res );
+  }
+
+  if ( parseInt( req.body.clientid ) && req.body.items && req.body.items.length ) {
+    return replaceClientItems( req, res );
+  }
+
+  res.send({ success: false, params: req.body });
+};
+
+
+
+
+
+exports.getCategorySubcategory = function ( req, res ) {
+  var validParams = true;
+  validParams = parseInt( req.query.clientid ) && validParams;
+
+  if ( !validParams ) {
+    return res.send({ success: false, params: req.query });
+  }
+
+  var connection = getConnection();
+
+  connection.query(
+    fcs(function(){/*!
+      SELECT c.id AS catid, c.category, s.id AS subcatid, s.subcategory
+      FROM itemCategory c
+        LEFT JOIN itemSubcategory s ON c.id = s.catid
+      WHERE c.clientid = ?
+    */}),
+    [ parseInt( req.query.clientid || 0 ) ],
+    function ( err, rows, fields ) {
+      if (err) throw err;
+
+      connection.destroy();
+     
+      res.send( { success: true, data: rows } );
+    }
+  );
+};
+
+exports.getVerticalPlacements = function ( req, res ) {
+  var validParams = true;
+  validParams = parseInt( req.query.clientid ) && validParams;
+
+  if ( !validParams ) {
+    return res.send({ success: false, params: req.query });
+  }
+
+  var connection = getConnection();
+
+  connection.query(
+    fcs(function(){/*!
+      SELECT v.id, v.alias, v.zindex
+      FROM verticalplacement v
+      WHERE v.clientid = ?
+    */}),
+    [ parseInt( req.query.clientid || 0 ) ],
+    function ( err, rows, fields ) {
+      if (err) throw err;
+
+      connection.destroy();
+     
+      res.send( { success: true, data: rows } );
+    }
+  );
+};
+
+exports.addVerticalPlacements = function ( req, res ) {
+  var clientid = parseInt( req.body.clientid );
+  var alias = req.body.vertalias;
+  var zindex = parseInt( req.body.vertzindex );
+
+  if ( !( clientid && alias && zindex >= 0 ) ) {
+    return res.send({ success: false, params: req.body });
+  }
+
+  var connection = getConnection();
+
+  connection.query(
+    fcs(function(){/*!
+      INSERT INTO verticalplacement ( clientid, alias, zindex )
+      VALUES ( ?, ?, ? )
+    */}),
+    [ clientid, alias, zindex ],
+    function ( err, result ) {
+      if (err) throw err;
+
+      connection.destroy();
+
+      res.send({ success: true, newVertId: result.insertId });
+    }
+  );
+};
+
 
 var getRoomsFull = function ( req, res ) {
   var validParams = true;
@@ -612,7 +1268,7 @@ exports.saveRoom = function ( req, res ) {
       req.body.room,
       parseInt( req.body.width ),
       parseInt( req.body.depth ),
-      Date.now()
+      Date.now() //TODO: this should probably be 'new Date()' so mysql plugin escapes correctly
     ],
     function ( err, result ) {
       if (err) throw err;
@@ -635,7 +1291,7 @@ exports.getClient = function ( req, res ) {
 
   connection.query(
     fcs(function(){/*!
-      SELECT id, logo, name, itemsscaleable, contactemail
+      SELECT id, logo, name, contactemail
       FROM clients
       WHERE id = ?
     */}),
@@ -651,22 +1307,40 @@ exports.getClient = function ( req, res ) {
 };
 
 exports.getItems = function ( req, res ) {
+  var clientid = parseInt( req.query.clientid || 0 );
+
+  if ( !clientid ) {
+    return res.send({ success: false, params: req.query });
+  }
+
   var connection = getConnection();
+  // CONCAT( '/src/svgs/', i.item ) AS url
+  connection.query(
+    fcs(function(){/*!
+      SELECT i.id, i.catid, i.subcatid, i.itemname
+        , i.item AS url
+        , c.category
+        , COALESCE( s.subcategory, '' ) AS subcategory
+        , i.width AS forceWidth
+        , i.depth AS forceHeight
+        , i.unitprice
+        , COALESCE( i.itemnumber, '' ) AS itemnumber
+        , v.zindex AS layer
+      FROM items i
+        INNER JOIN verticalplacement v ON v.id = i.vertid AND v.clientid = i.clientid
+        INNER JOIN itemCategory c ON c.id = i.catid AND c.clientid = i.clientid
+        LEFT JOIN itemSubcategory s ON s.id = i.subcatid AND s.catid = i.catid
+      WHERE i.clientid = ?
+    */}),
+    [ clientid ],
+    function ( err, rows, fields ) {
+      if (err) throw err;
 
-  connection.query( 'SELECT * FROM items', function ( err, rows, fields ) {
-    if (err) throw err;
-
-    connection.destroy();
-   
-    res.send([
-      {name:'Hello'},
-      {name:'World'},
-      //{name: rows[0].solution },
-      err,
-      rows,
-      fields
-    ]);
-  });
+      connection.destroy();
+       
+      res.send( { success: true, data: rows } );
+    }
+  );
 };
 
 exports.sendEmail = function ( req, res ) {

@@ -14,12 +14,19 @@ server({
     // app.get( '/initdbtables', api.createDatabaseTables );
     // app.get( '/initdbtables2', api.createDatabaseTables2 );
     // app.get( '/destroydatabase', api.dropDatabaseTables );
-    // app.get( '/oneoffquery', api.oneoffquery );
+    app.get( '/oneoffquery', api.oneoffquery );
     app.get( '/addclient', api.addClient );
     app.post( '/addclient', api.doAddClient );
-    app.get( '/clients', api.getClient );
     app.get( '/manage', api.getManage );
     app.post( '/manage', api.doManage );
+    app.get( '/manageitems', api.manageItemsGET );
+    app.post( '/manageitems', api.manageItemsPOST );
+
+    app.get( '/catsubcat', api.getCategorySubcategory );
+    app.get( '/verticalplacement', api.getVerticalPlacements );
+    app.post( '/verticalplacement', api.addVerticalPlacements );
+
+    app.get( '/clients', api.getClient );
     app.get( '/rooms', api.roomsGET );
     app.post( '/rooms', api.saveRoom );
     app.get( '/items', api.getItems );

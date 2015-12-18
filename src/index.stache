@@ -12,8 +12,10 @@
     <can-import from="svg-roomplanner/main-nav/" />
     <main-nav {(parts-menu-expanded)}="partsMenuExpanded" {(menu-action)}="menuAction" {client-info}="clientInfo"></main-nav>
 
-    <can-import from="svg-roomplanner/furniture-nav/" />
-    <furniture-nav {(roomname)}="roomname" class="{{#if partsMenuExpanded}}expanded{{/if}}" {(parts-menu-expanded)}="partsMenuExpanded" {^parts-by-category}="partsByCategory"></furniture-nav>
+    {{#if clientInfo}}
+      <can-import from="svg-roomplanner/furniture-nav/" />
+      <furniture-nav {(roomname)}="roomname" class="{{#if partsMenuExpanded}}expanded{{/if}}" {(parts-menu-expanded)}="partsMenuExpanded" {^parts-by-category}="partsByCategory" {client-info}="clientInfo"></furniture-nav>
+    {{/if}}
 
     <div class="planning-area">
       <can-import from="svg-roomplanner/isvg/" />
@@ -145,7 +147,7 @@
         </div>
         <div>
           <span>Email:</span>
-          <input class="room-email" type="text" value="preplanned">
+          <input class="room-email" type="text">
         </div>
         <div>
           <span>Phone Number:</span>
