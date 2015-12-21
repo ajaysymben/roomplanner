@@ -45,6 +45,10 @@
           <br>
           - Click or tap any of the furniture icons in the plan to open the planning tools.<br>
           <br>
+          - Click or touch the circular rotate icon to rotate any object.<br>
+          <br>
+          - Click or touch any of the four square resize icons to resize  any object.<br>
+          <br>
           - Use "Help" for an overview of the planning tools available.<br>
           <br>
           - Click on "Item Summary" to view a list of items placed.<br>
@@ -63,6 +67,81 @@
         {{#if clientInfo}}
           <pre-saved-rooms {client-info}="clientInfo" {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
         {{/if}}
+      </div>
+    {{/is}}
+    {{#is menuAction "help"}}
+      <div class="menu-action-top">
+        Welcome to the Room Planner
+      </div>
+      <div class="menu-action-left">
+        <div class="button secondary" ($click)="menuActionNone()">
+          Return To Planner
+        </div>
+      </div>
+      <div class="menu-action-right">
+        <div class="backdrop">
+          <span>&nbsp;</span><br>
+          <b>ROOM PLANNER - HELP</b><br>
+          <br>
+          Welcome to the Room Planner.<br>
+          Whether planning a new or remodeled room, creating, sharing and improving a room plan is simple using these easy-to-follow steps!<br>
+          <br>
+          <br>
+          <b>NEW PLAN</b><br>
+          - To create a plan with your room dimensions select NEW. Add your room name and dimensions in the left panel of the planner. Select the "Create Room" button to begin adding furniture to your room.<br>
+          <br>
+          <br>
+          <b>USING PRE-PLANNED ROOMS</b><br>
+          - To create a plan with a template room, select a room from the planning area to the right.<br>
+          <img src="/src/img/FlinnSciLogo V1.2.jpg" alt=""><br>
+          <br>
+          <br>
+          <b>ADDING FURNITURE ITEMS</b><br>
+          - Choose a furniture category from the left pull down menu.<br>
+          <img src="/src/img/FlinnSciPlanner3.0.jpg" alt=""><br>
+          <br>
+          - Create your room plan using furniture from the furniture library.<br>
+          - Click or touch and drag furniture icons into the room.<br>
+          <img src="/src/img/FlinnSciPlanner5.0.jpg" alt=""><br>
+          <br>
+          <br>
+          <b>TOOLS – ROTATE, CONE AND RESIZE ITEMS</b><br>
+          - Click or tap any of the furniture icons in the plan to open the planning tools.<br>
+          - Click or touch the circular rotate icon to rotate any object.<br>
+          <img src="/src/img/FlinnSciPlanner6.2.jpg" alt=""><br>
+          <br>
+          - Click or touch any of the double overlapping square icons in the tool box to clone any object.<br>
+          <img src="/src/img/FlinnSciPlanner6.1.jpg" alt=""><br>
+          <br>
+          - Click or touch any of the four square icons next to the furniture icon to resize any object.<br>
+          <img src="/src/img/FlinnSciPlanner6.3.jpg" alt=""><br>
+          <br>
+          - Click or touch the tape ruler icon to measure the distance between items placed in your plan. This opens the measure tool. You can then click or touch and drag from anywhere on the plan to another spot on the plan to view the distance. The line will change color when you have aligned the measure tool to create a straight line.<br>
+          <img src="/src/img/FlinnSciPlanner10.0.jpg" alt=""><br>
+          <br>
+          <br>
+          <b>VIEW LIST OF ITEMS AND COST (If included in your version)</b><br>
+          - Click on "Item Summary" to view a list of items placed in your plan.<br>
+          <img src="/src/img/FlinnSciPlanner7.0.jpg" alt=""><br>
+          <br>
+          <br>
+          <b>SAVE OR PRINT YOUR PROJECT</b><br>
+          - Save your project using your email for future review.<br>
+          <img src="/src/img/FlinnSciPlanner8.1.jpg" alt=""><br>
+          <br>
+          - Print your project. An image of your planned room along with the list of items will be included in your print file.<br>
+          <img src="/src/img/FlinnSciPlanner8.0.jpg" alt=""><br>
+          <br>
+          - Return to the planner and enter your email address to retrieve all previously saved plans<br>
+          <img src="/src/img/FlinnSciPlanner9.0.jpg" alt=""><br>
+          <br>
+          <br>
+          <b>ADD NOTES TO YOUR PROJECT FILE</b><br>
+          - Request a safety review &amp; estimate of your project.<br>
+          <br>
+          Thank you for using the Science Room Planner.<br>
+          <br>
+        </div>
       </div>
     {{/is}}
     {{#is menuAction "new"}}
@@ -133,7 +212,7 @@
     {{/is}}
     {{#is menuAction "save"}}
       <div class="menu-action-top">
-        Save your roomplan!
+        Save your roomplan! You will be given the option to print once it has been saved.
       </div>
       <div class="menu-action-left">
         <div>
@@ -210,6 +289,16 @@
             <option value="West Virginia">West Virginia</option>
             <option value="Wisconsin">Wisconsin</option>
             <option value="Wyoming">Wyoming</option>
+            <option value="Alberta">Alberta</option>
+            <option value="British Columbia">British Columbia</option>
+            <option value="Manitoba">Manitoba</option>
+            <option value="New Brunswick">New Brunswick</option>
+            <option value="Newfoundland and Labrador">Newfoundland and Labrador</option>
+            <option value="Nova Scotia">Nova Scotia</option>
+            <option value="Ontario">Ontario</option>
+            <option value="Prince Edward Island">Prince Edward Island</option>
+            <option value="Quebec">Quebec</option>
+            <option value="Saskatchewan">Saskatchewan</option>
           </select>
         </div>
         <div>
@@ -338,6 +427,11 @@
     {{#is menuAction "message"}}
       <div class="menu-action-top"></div>
       <div class="menu-action-left">
+        {{#if showPrintButtonOnMessage}}
+          <div class="button" ($click)="menuActionPrint()">
+            Print Plan
+          </div>
+        {{/if}}
         {{#if showReturnButtonOnMessage}}
           <div class="button" ($click)="menuActionNone()">
             Return To Planner
@@ -349,6 +443,11 @@
           {{{message}}}
           <br>
           <br>
+          {{#if showPrintButtonOnMessage}}
+            <div class="button" ($click)="menuActionPrint()">
+              Print Plan
+            </div>
+          {{/if}}
           {{#if showReturnButtonOnMessage}}
             <div class="button" ($click)="menuActionNone()">
               Return To Planner

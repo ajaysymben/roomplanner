@@ -10,12 +10,12 @@
 	<li ($click)="setAction( 'open' )">Open</li>
 	<li ($click)="setAction( 'save' )">Save</li>
 	<li ($click)="setAction( 'summary' )">Item Summary</li>
-	<li ($click)="setAction( 'print' )">Print</li>
+	<li ($click)="setAction( 'save' )">Print</li>
 </ul>
 
 <ul class="right-nav">
 	<!-- <li>Reset</li> -->
-	<li ($click)="setAction( 'gettingstarted' )">Help</li>
+	<li ($click)="setAction( 'help' )">Help</li>
 	{{#if clientInfo.logo}}
 		<li class="clientLogo"><img src="{{clientInfo.logo}}" alt="[client logo]"></li>
 	{{/if}}

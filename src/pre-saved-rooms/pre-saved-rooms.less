@@ -1,5 +1,7 @@
 pre-saved-rooms {
 	display: block;
+	height: 100%;
+	position: relative;
 
 	> .title {
 		font-weight: bold;
@@ -8,6 +10,11 @@ pre-saved-rooms {
 	}
 
 	.pre-planned-room-grid {
+		overflow-y: auto;
+		position: absolute;
+		bottom: 0px;
+		top: 50px;
+
 		> div {
 			display: inline-block;
 			margin-left: 20px;

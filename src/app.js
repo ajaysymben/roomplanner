@@ -161,6 +161,12 @@ const AppViewModel = AppMap.extend({
     can.route.ready();
 
     var clientid = parseInt( can.route.attr( "clientid" ) ) || 2;
+
+    //overwrite url specified clientid and default with domain specific client
+    if ( window.location.href.indexOf( "flinnsci" ) !== -1 ) {
+      clientid = 12;
+    }
+
     can.route.attr( "clientid", clientid );
 
     can.route.ready();
@@ -232,6 +238,7 @@ const AppViewModel = AppMap.extend({
       email: $( ".room-email" ).val()
     };
 
+    vm.attr( "showPrintButtonOnMessage", false );
     vm.attr( "showReturnButtonOnMessage", false );
     vm.attr( "message", "Saving..." );
     vm.attr( "menuAction", "message" );
@@ -239,11 +246,13 @@ const AppViewModel = AppMap.extend({
     return Roomplan.create(
       postData,
       function ( data ) {
+        vm.attr( "showPrintButtonOnMessage", true );
         vm.attr( "showReturnButtonOnMessage", true );
         vm.attr( "message", "Save Successful!" );
         vm.attr( "menuAction", "message" );
       },
       function ( data ) {
+        vm.attr( "showPrintButtonOnMessage", false );
         vm.attr( "showReturnButtonOnMessage", true );
         vm.attr( "message", "Save Failed.<br>Please try again in a moment." );
         vm.attr( "menuAction", "message" );
@@ -327,6 +336,10 @@ const AppViewModel = AppMap.extend({
 
   menuActionNone: function () {
     this.attr( "menuAction", "none" );
+  },
+
+  menuActionPrint: function () {
+    this.attr( "menuAction", "print" );
   },
 
   cloneRoomSVGTo: function ( el ) {

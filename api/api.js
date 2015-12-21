@@ -484,6 +484,9 @@ exports.addClient = function ( req, res ) {
           Client contact email:<br>
           <input type="text" name="contactemail"><br>
           <br>
+          Custom highlight color:<br>
+          <input type="text" name="highlightcolor" value="29597E"><br>
+          <br>
           Address for the footer of the print page:<br>
           <textarea name="address"></textarea><br>
           <br>
