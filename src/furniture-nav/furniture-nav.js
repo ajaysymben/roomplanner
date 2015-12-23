@@ -100,7 +100,8 @@ export const ViewModel = Map.extend({
 					categoryObj = {
 						category: part.category,
 						subcategories: [],
-						parts: []
+						parts: [],
+						resizeable: part.resizeable
 					};
 					partsByCategory.push( categoryObj );
 				}

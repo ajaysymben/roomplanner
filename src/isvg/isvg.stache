@@ -2,7 +2,7 @@
 	{{#if blurShield}}
 		<div class="blur-shield"></div>
 	{{/if}}
-	<div class="part-controls" {{#infoForPartControls}}style="
+	<div class="part-controls {{#allowResize}}resizeable{{/allowResize}}" {{#infoForPartControls}}style="
 		width: {{infoForPartControls.pxWidth}}px;
 		height: {{infoForPartControls.pxHeight}}px;
 		left: {{infoForPartControls.pxLeftTopX}}px;
@@ -23,8 +23,13 @@
 		">
 			<div class="part-title">{{infoForPartControls.partTitle}}<div>
 			<div class="part-dimensions">
-				<input class="width" type="text" value="{{round2DecimalPlaces( infoForPartControls.unitsWidth )}}">" x
-				<input class="height" type="text" value="{{round2DecimalPlaces( infoForPartControls.unitsHeight )}}">"
+				{{#allowResize}}
+					<input class="width" type="text" value="{{round2DecimalPlaces( infoForPartControls.unitsWidth )}}">" x
+					<input class="height" type="text" value="{{round2DecimalPlaces( infoForPartControls.unitsHeight )}}">"
+				{{else}}
+					{{round2DecimalPlaces( infoForPartControls.unitsWidth )}}" x
+					{{round2DecimalPlaces( infoForPartControls.unitsHeight )}}"
+				{{/allowResize}}
 			</div>
 			<div class="part-menu">
 				<i class="icon-lock-open"></i>

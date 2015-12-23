@@ -21,8 +21,11 @@ server({
     app.post( '/manage', api.doManage );
     app.get( '/manageitems', api.manageItemsGET );
     app.post( '/manageitems', api.manageItemsPOST );
+    app.get( '/managesaveformfields', api.manageFieldsGET );
+    app.post( '/managesaveformfields', api.manageFieldsPOST );
 
     app.get( '/catsubcat', api.getCategorySubcategory );
+    app.post( '/catresizeable', api.setCatResizeable );
     app.get( '/verticalplacement', api.getVerticalPlacements );
     app.post( '/verticalplacement', api.addVerticalPlacements );
 
@@ -30,7 +33,7 @@ server({
     app.get( '/rooms', api.roomsGET );
     app.post( '/rooms', api.saveRoom );
     app.get( '/items', api.getItems );
-    app.post( '/email', api.sendEmail );
+    app.get( '/saveformfields', api.getSFFields );
 
     if ( process.argv.indexOf( "--develop" ) !== -1 ) {
       //is dev mode so do live reload

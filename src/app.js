@@ -32,6 +32,9 @@ const AppViewModel = AppMap.extend({
     clientInfo: {
       serialize: false
     },
+    saveFields: {
+      serialize: false
+    },
     roomname: {
       value: "",
       serialize: false
@@ -189,6 +192,16 @@ const AppViewModel = AppMap.extend({
         return;
       }
       vm.attr( "clientInfo", client.data[ 0 ] );
+
+      $.ajax({
+        url: "/saveformfields?clientid=" + clientid,
+        type: 'GET',
+        contentType: 'application/json',
+        dataType: 'json',
+        cache: false
+      }).then( function ( fields ) {
+        vm.attr( "saveFields", fields.data );
+      });
     });
   },
 
@@ -234,9 +247,62 @@ const AppViewModel = AppMap.extend({
       room: $( "<div/>" ).append( $( ".planning-area interactive-svg svg" ).clone() ).html(),
       width: this.attr( "isvgConfig.width" ),
       depth: this.attr( "isvgConfig.height" ),
-      roomname: $( ".room-name" ).val(),
-      email: $( ".room-email" ).val()
+      roomname: $( ".room-name" ).val() || $( ".room-firstandlastname" ).val(),
+      email: $( ".room-email" ).val(),
+      formdata: []
     };
+
+    var fields = vm.attr( "saveFields" );
+    var value = "";
+    if ( fields && fields.length ) {
+      for ( var i = 0; i < fields.length; i++ ) {
+        if ( !fields[ i ].included ) continue;
+        value = "";
+
+        switch ( fields[ i ].id ) {
+          case 2:
+            value = $( ".room-name" ).val();
+          break;
+          case 12:
+            value = $( ".room-firstandlastname" ).val();
+          break;
+          case 22:
+            value = $( ".room-email" ).val();
+          break;
+          case 32:
+            value = $( ".room-phone" ).val();
+          break;
+          case 42:
+            value = $( ".room-school" ).val();
+          break;
+          case 52:
+            value = $( ".room-state" ).val();
+          break;
+          case 62:
+            value = $( ".room-zip" ).val();
+          break;
+          case 72:
+            value = $( ".room-timeframe:checked" ).val();
+          break;
+          case 82:
+            value = $( ".room-comments" ).val();
+          break;
+        }
+
+        if ( fields[ i ].required && !value ) {
+          alert( fields[ i ].label + " is required." );
+          return null;
+        }
+
+        //todo: prompt for pw if email is "preplanned"
+
+        postData.formdata.push({
+          fieldid: fields[ i ].id,
+          label: fields[ i ].label,
+          value: value
+        });
+      }
+    }
 
     vm.attr( "showPrintButtonOnMessage", false );
     vm.attr( "showReturnButtonOnMessage", false );

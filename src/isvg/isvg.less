@@ -121,6 +121,7 @@ interactive-svg {
 
 	.part-controls {
 		position: absolute;
+		outline: 1px dashed #777777;
 
 		.resizehandle {
 			position: absolute;
@@ -130,6 +131,14 @@ interactive-svg {
 			cursor: pointer;
 			background-color: #FFFFFF;
 			box-shadow: 0 0 4px #FFFFFF;
+			display: none;
+		}
+		&.resizeable {
+			outline: none;
+			
+			.resizehandle {
+				display: block;
+			}
 		}
 		.top {
 			top: -20px;

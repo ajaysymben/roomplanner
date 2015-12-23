@@ -437,6 +437,9 @@ export const ViewModel = Map.extend({
 
 		//TODO: make this more generic
 		g.setAttribute( "data-part-title", options.itemname || "[no title]" );
+		if ( options.resizeable ) {
+			g.setAttribute( "data-resizeable", 1 );
+		}
 
 		this.cloneInnerElements( g, newSVGEl );
 
@@ -602,6 +605,7 @@ export const ViewModel = Map.extend({
 	//	stopEvent from other without moveEvent ( no further action )
 	currentInteractionOn: null,
 	selectedParts: null,
+	allowResize: false,
 	mouseMoveInitialPos: {
 		unitsX: -1,
 		unitsY: -1
@@ -851,12 +855,22 @@ export default Component.extend({
 
 						prevSelected.splice( indexOfAlreadySelected, 1 );
 						prevSelected.unshift( curPart );
+						if ( prevSelected[ 0 ].getAttribute( "data-resizeable" ) ) {
+							vm.attr( "allowResize", true );
+						} else {
+							vm.attr( "allowResize", false );
+						}
 					} else {
 						/****** INTERACTION SET ******/
 						vm.attr( "currentInteractionOn", "newSelectedPart" );
 
 						vm.attr( "selectedParts", [ curPart ] );
 						//vm.debugDrawOutline( vm.getPartInfo( curPart ).geo );
+						if ( curPart.getAttribute( "data-resizeable" ) ) {
+							vm.attr( "allowResize", true );
+						} else {
+							vm.attr( "allowResize", false );
+						}
 					}
 					vm.attr( "infoForPartControls", null );
 				} else if ( $target.is( "svg" ) ) {

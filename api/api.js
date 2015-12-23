@@ -58,24 +58,50 @@ Queue.prototype.go = function ( fn ) {
   return this;
 };
 
+/*!
+      INSERT INTO saveformfields ( label )
+      VALUES ( 'Room Name' )
+        , ( 'Your First and Last Name' ) #
+        , ( 'Email' ) #
+        , ( 'Phone Number' )
+        , ( 'School Name' )
+        , ( 'State/Province' ) #
+        , ( 'Zip/Postal Code' )
+        , ( 'When will your project start construction?' )
+        , ( 'Comments or Questions' )
+    */
 
 exports.oneoffquery = function ( req, res ) {
   var connection = getConnection();
 
   connection.query(
     fcs(function(){/*!
-      INSERT INTO rooms ( clientid, email, roomname, room, width, depth, created )
-      SELECT 12, email, roomname, room, width, depth, created
-      FROM rooms
-      WHERE clientid = 2
-        AND email = 'preplanned'
+      INSERT INTO clientsxsavefields ( clientid, savefieldid, required, sortorder )
+      VALUES ( 2, 2, 0, 2 )
+        , ( 2, 12, 1, 12 )
+        , ( 2, 22, 1, 22 )
+        , ( 2, 32, 0, 32 )
+        , ( 2, 42, 0, 42 )
+        , ( 2, 52, 1, 52 )
+        , ( 2, 62, 0, 62 )
+        , ( 2, 72, 0, 72 )
+        , ( 2, 82, 0, 82 )
+        , ( 12, 2, 0, 2 )
+        , ( 12, 12, 1, 12 )
+        , ( 12, 22, 1, 22 )
+        , ( 12, 32, 0, 32 )
+        , ( 12, 42, 0, 42 )
+        , ( 12, 52, 1, 52 )
+        , ( 12, 62, 0, 62 )
+        , ( 12, 72, 0, 72 )
+        , ( 12, 82, 0, 82 )
     */}),
     function ( err, result ) {
       if (err) throw err;
 
       connection.destroy();
 
-      res.send({ success: true, newRoomId: result.insertId });
+      res.send({ success: true, result: result });
     }
   );
 };
@@ -83,7 +109,7 @@ exports.oneoffquery = function ( req, res ) {
 /*
   ### database tables ###
     clients -> id, logo, name, contactemail, address
-    itemCategory -> id, clientid, category, created, updated
+    itemCategory -> id, clientid, category, created, updated, resizeable
     itemSubcategory -> id, catid, subcategory, created, updated
     verticalplacement -> id, clientid, alias, zindex
     items -> id, clientid, catid, subcatid, itemname, item, width, depth, vertid, unitprice, created, updated
@@ -116,6 +142,7 @@ exports.createDatabaseTables = function ( req, res ) {
           id MEDIUMINT NOT NULL AUTO_INCREMENT,
           clientid MEDIUMINT NOT NULL,
           category VARCHAR(255) NOT NULL,
+          resizeable TINYINT(1) DEFAULT 0 NOT NULL,
           created DATETIME DEFAULT NULL,
           updated TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
           PRIMARY KEY (id),
@@ -248,6 +275,7 @@ exports.createDatabaseTables2 = function ( req, res ) {
           clientid MEDIUMINT NOT NULL,
           savefieldid MEDIUMINT NOT NULL,
           required TINYINT(1) DEFAULT 0,
+          sortorder MEDIUMINT DEFAULT 0 NOT NULL,
           FOREIGN KEY (clientid) REFERENCES clients(id),
           FOREIGN KEY (savefieldid) REFERENCES saveformfields(id)
         )
@@ -425,6 +453,7 @@ var adminHeader = fcs(function(){/*!
       <li onclick="window.location='/manage';">Manage Rooms</li>
       <li onclick="window.location='/addclient';">Manage Clients</li>
       <li onclick="window.location='/manageitems';">Manage Items and Categories</li>
+      <li onclick="window.location='/managesaveformfields';">Save Form Fields</li>
     </ul>
   </div>
   <div class="main-body">
@@ -714,6 +743,8 @@ exports.manageItemsGET = function ( req, res ) {
                   <option value="0" disabled selected>Select a category</option>
                 </select>
               </div>
+              Can items in the selected category be updated? ( check if yes )<br>
+              <input type="checkbox" id="catresizeable" style="display:none;" onclick="updateResizeable( this )">
             </td>
             <td width="50%">
               OR add a new category:<br>
@@ -777,7 +808,7 @@ exports.manageItemsGET = function ( req, res ) {
           }
 
           function populateCategoryDD() {
-            var categoryOutput = '<select name="category"><option value="0" disabled selected>Select a category</option>';
+            var categoryOutput = '<select name="category" onchange="catchanged( this )"><option value="0" disabled selected>Select a category</option>';
             var lastCat = 0;
 
             for ( var i = 0; i < categoriesSubcategories.length; i++ ) {
@@ -790,6 +821,62 @@ exports.manageItemsGET = function ( req, res ) {
 
             $( "#categoryOutput" ).html( categoryOutput + "</select>" );
             //TODO: onchange, load subcats and allow adding to those
+          }
+
+          function getCatById ( id ) {
+            var cs = categoriesSubcategories;
+
+            for ( var i = 0; i < cs.length; i++ ) {
+              if ( cs[ i ].catid == id ) {
+                return cs[ i ];
+              }
+            }
+
+            return null;
+          }
+
+          function catchanged( dd ) {
+            var catid = $( dd ).val();
+            var cb = $( "#catresizeable" );
+
+            if ( !catid ) {
+              cb.hide();
+              return;
+            } else {
+              cb.show();
+            }
+
+            var cat = getCatById( catid );
+            if ( cat.resizeable ) {
+              cb[ 0 ].checked = true;
+            } else {
+              cb[ 0 ].checked = false;
+            }
+          }
+
+          function updateResizeable( cb ) {
+            var catid = $( "#categoryOutput select" ).val();
+            if ( !catid ) {
+              console.log( "no catid" );
+              return;
+            }
+            var resizeable = cb.checked + 0;
+            cb = $( cb );
+
+            cb.hide();
+
+            var jqXHR = $.ajax({
+              url: "/catresizeable",
+              type: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify( { catid: catid, resizeable: resizeable } ),
+              dataType: 'json',
+              cache: false
+            }).then( function ( rtrn ) {
+              var cat = getCatById( catid );
+              cat.resizeable = resizeable;
+              alert( "category updated!" );
+            });
           }
 
           function populateVerticalList() {
@@ -1078,7 +1165,268 @@ exports.manageItemsPOST = function ( req, res ) {
   res.send({ success: false, params: req.body });
 };
 
+exports.manageFieldsPOST = function ( req, res ) {
+  if ( req.body.fields && parseInt( req.body.clientid ) ) {
 
+    var clientid = parseInt( req.body.clientid );
+    var fields = req.body.fields;
+
+    var connection = getConnection();
+
+    connection.query(
+      fcs(function(){/*!
+        DELETE FROM clientsxsavefields
+        WHERE clientid = ?
+      */}),
+      [ clientid ],
+      function ( err, result ) {
+        if (err) throw err;
+
+        var qry = fcs(function(){/*!
+          INSERT INTO clientsxsavefields
+            ( clientid, savefieldid, required, sortorder )
+          VALUES
+        */});
+
+        for ( var i = 0; i < fields.length; i++ ) {
+          var field = fields[ i ];
+          var insertvals = [
+            clientid,
+            parseInt( field.fieldid ),
+            field.required ? 1 : 0,
+            parseInt( field.sortorder ) || 999
+          ];
+
+          qry += "\n( " + connection.escape( insertvals ) + " ),";
+        }
+
+        //turn last row , into ; to signify end of inserts
+        qry = qry.replace( /,$/, ";" );
+
+        connection.query(
+          qry,
+          function ( err, result ) {
+            connection.destroy();
+
+            if (err) {
+              console.log( qry );
+              throw err;
+            }
+
+            res.send({ success: true, qry: qry });
+          }
+        );
+      }
+    );
+
+  } else {
+    res.send({ success: false, params: req.body });
+  }
+};
+
+exports.manageFieldsGET = function ( req, res ) {
+  var connection = getConnection();
+
+  connection.query( 'SELECT id, name FROM clients', function ( err, rows, fields ) {
+    if (err) throw err;
+
+    connection.destroy();
+
+    var clientDD = "";
+    for ( var i = 0; i < rows.length; i++ ) {
+      clientDD += '<option value="' + rows[ i ].id + '">' + rows[ i ].name + '</option>';
+    }
+   
+    res.send(
+      adminHeader +
+      fcs(function(){/*!
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <style type="text/css">
+          input[type='number'],
+          select {
+            padding: 10px;
+            font-size: 13px;
+            width: 300px;
+          }
+
+          textarea {
+            padding: 10px;
+            font-size: 13px;
+            width: 300px;
+            height: 120px;
+          }
+
+          .create-button {
+            display: inline-block;
+            background-color: #00AA00;
+            margin: 10px;
+            padding: 10px;
+            cursor: pointer;
+            border: 1px outset #007700;
+            color: #FFFFFF;
+            font-size: 16px;
+            border-radius: 3px;
+          }
+
+          tr, td {
+            vertical-align: top;
+            border-bottom: 1px solid #cccccc;
+            padding: 2px;
+          }
+        </style>
+        <div class="page-title">Manage Save Form Fields</div>
+        Select a client to get started:<br>
+        <select id="clientdropdown" name="clientid">
+          <option value="0" disabled selected>Select a client</option>
+          @clientDD@
+        </select><br>
+        <br>
+        <hr style="border-bottom: 4px outset #CCCCCC;">
+        <br>
+        <table id="formtable" width="100%" border="1" style="border-collapse: collapse;">
+        </table><br>
+        <br>
+        <hr style="border-bottom: 4px outset #CCCCCC;">
+        <br>
+        <div id="submititems" class="create-button">Update save form fields.</div><br>
+
+        <script type="text/javascript">
+          var fields = [];
+
+          $( "#submititems" ).hide();
+
+          $( "#clientdropdown" ).on( "change", function () {
+            var clientid = $(this).val();
+            fields = [];
+
+            var jqXHR = $.ajax({
+              url: "/saveformfields?clientid=" + clientid,
+              type: 'GET',
+              contentType: 'application/json',
+              dataType: 'json',
+              cache: false
+            });
+
+            jqXHR.then( function ( sff ) {
+              if ( !sff || !sff.data || !sff.data.length ) {
+                console.log( "Could not load sff info." );
+                return;
+              }
+              fields = sff.data;
+              buildForm();
+            });
+          });
+
+          function buildForm () {
+            var clientid = parseInt( $( "#clientdropdown" ).val() );
+            var tableOutput = '<tr><td>Include on form</td><td>[id] label</td><td>required</td><td>sort order</td></tr>';
+
+            var i, field;
+            for ( i = 0; i < fields.length; i++ ) {
+              field = fields[ i ];
+              tableOutput += '<tr><td>';
+              if ( field.included ) {
+                tableOutput += '<input class="included" type="checkbox" value="' + field.id + '" checked>';
+              } else {
+                tableOutput += '<input class="included" type="checkbox" value="' + field.id + '">';
+              }
+              tableOutput += '</td><td>[' + field.id + '] ' + field.label + '</td><td>';
+              if ( field.required ) {
+                tableOutput += '<input class="required" type="checkbox" value="1" checked>';
+              } else {
+                tableOutput += '<input class="required" type="checkbox" value="1">';
+              }
+              tableOutput += '</td><td>';
+              tableOutput += '<input class="fieldid' + field.id + ' sortorder" type="number" value="' + field.sortorder + '">';
+              tableOutput += '</td></tr>';
+            }
+
+            $( "#formtable" ).html( tableOutput );
+            $( "#submititems" ).show();
+          }
+
+          $( "#submititems" ).on( "click", function () {
+            var clientid = parseInt( $( "#clientdropdown" ).val() || 0 );
+
+            if ( !clientid ) {
+              alert( "Select a client first." );
+              return;
+            }
+
+            $( "#submititems" ).hide();
+
+            var fields = [];
+            var temp, fieldid;
+            $( "#formtable tr" ).each(function () {
+              temp = $( this ).find( "input.included" );
+              if ( temp && temp.length && temp[0].checked ) {
+                fieldid = parseInt( temp.val() );
+                //console.log( fieldid );
+                temp = {
+                  fieldid: fieldid,
+                  required: $( this ).find( "input.required" )[ 0 ].checked ? 1 : 0,
+                  sortorder: parseInt( $( this ).find( "input.sortorder" ).val() )
+                };
+                fields.push( temp );
+              }
+            });
+
+            var jqXHR = $.ajax({
+              url: "/managesaveformfields",
+              type: 'POST',
+              data: JSON.stringify( { clientid: clientid, fields: fields } ),
+              contentType: 'application/json',
+              dataType: 'json',
+              cache: false
+            });
+
+            jqXHR.then(function ( resp ) {
+              if ( resp && resp.success ) {
+                alert( "Save Form Fields updated!" );
+              } else {
+                alert( "Save Form Fields not updated, something went wrong. See console." );
+                console.log( resp );
+              }
+            });
+          });
+        </script>
+        <br>
+      */}).replace(
+        /@clientDD@/g, clientDD
+      ) + adminFooter
+    );
+  });
+};
+
+exports.setCatResizeable = function ( req, res ) {
+  var catid = parseInt( req.body.catid );
+  var resizeable = parseInt( req.body.resizeable );
+  if ( resizeable ) resizeable = 1;
+  else resizeable = 0;
+
+  if ( catid && resizeable >= 0 ) {
+    var connection = getConnection();
+
+    connection.query(
+      fcs(function(){/*!
+        UPDATE itemCategory
+        SET resizeable = ?
+        WHERE id = ?
+      */}),
+      [ resizeable, catid ],
+      function ( err, result ) {
+        if (err) throw err;
+
+        connection.destroy();
+
+        res.send({ success: true, catid: catid, resizeable: resizeable });
+      }
+    );
+    return;
+  }
+
+  res.send({ success: false, params: req.body });
+};
 
 
 
@@ -1094,7 +1442,7 @@ exports.getCategorySubcategory = function ( req, res ) {
 
   connection.query(
     fcs(function(){/*!
-      SELECT c.id AS catid, c.category, s.id AS subcatid, s.subcategory
+      SELECT c.id AS catid, c.category, s.id AS subcatid, s.subcategory, c.resizeable
       FROM itemCategory c
         LEFT JOIN itemSubcategory s ON c.id = s.catid
       WHERE c.clientid = ?
@@ -1247,6 +1595,86 @@ exports.roomsGET = function ( req, res ) {
   return getRooms( req, res );
 };
 
+var saveFormData = function ( req, res, roomid, connection ) {
+  if ( !roomid ) {
+    connection.destroy();
+    return res.send({ success: false, roomid: roomid, params: req.body });
+  }
+
+  var qry = fcs(function(){/*!
+    INSERT INTO saveformdata
+      ( roomid, savefieldid, value )
+    VALUES
+  */});
+
+  var fields = req.body.formdata;
+  var emailbody = "";
+
+  for ( var i = 0; i < fields.length; i++ ) {
+    var field = fields[ i ];
+    var insertvals = [
+      roomid,
+      parseInt( field.fieldid ),
+      field.value || ""
+    ];
+
+    emailbody += "<b>" + field.label + "</b><br><i>" + field.value + "</i><br><br>";
+
+    qry += "\n( " + connection.escape( insertvals ) + " ),";
+  }
+
+  //turn last row , into ; to signify end of inserts
+  qry = qry.replace( /,$/, ";" );
+
+  connection.query(
+    qry,
+    function ( err, result ) {
+      if (err) {
+        console.log( qry );
+        throw err;
+      }
+
+      connection.query(
+        "SELECT contactemail FROM clients WHERE id = ?",
+        [ parseInt( req.body.clientid || 0 ) ],
+        function ( err, rows, fields ) {
+          connection.destroy();
+
+          if (err) {
+            console.log( qry );
+            throw err;
+          }
+
+          var nodemailer = require('nodemailer');
+          // https://github.com/andris9/Nodemailer
+          // http://nodemailer.com/
+
+          var transporter = nodemailer.createTransport();
+          //var transporter = nodemailer.createTransport({
+          //  service: 'gmail',
+          //  auth: {
+          //      user: '*****',
+          //      pass: '*****'
+          //  }
+          //});
+          transporter.sendMail({
+              from: 'stevetryba@4gig.com',
+              to: rows[ 0 ].contactemail,
+              subject: 'hello world!',
+              text: emailbody
+          }, function ( error, info ) {
+            if ( error ) {
+              res.send( { success: false, info: info, error: error } );
+              return;
+            }
+            res.send( { success: true, newRoomId: roomid, info: info } );
+          });
+        }
+      );
+    }
+  );
+};
+
 exports.saveRoom = function ( req, res ) {
   var validParams = true;
   validParams = parseInt( req.body.clientid ) && validParams;
@@ -1279,9 +1707,15 @@ exports.saveRoom = function ( req, res ) {
     function ( err, result ) {
       if (err) throw err;
 
-      connection.destroy();
+      if ( req.body.formdata && req.body.formdata.length ) {
 
-      res.send({ success: true, newRoomId: result.insertId });
+        return saveFormData( req, res, result.insertId, connection );
+
+      } else {
+        connection.destroy();
+
+        res.send({ success: true, newRoomId: result.insertId });
+      }
     }
   );
 };
@@ -1312,6 +1746,37 @@ exports.getClient = function ( req, res ) {
   );
 };
 
+exports.getSFFields = function ( req, res ) {
+  var clientid = parseInt( req.query.clientid || 0 );
+
+  if ( !clientid ) {
+    return res.send({ success: false, params: req.query });
+  }
+
+  var connection = getConnection();
+  // CONCAT( '/src/svgs/', i.item ) AS url
+  connection.query(
+    fcs(function(){/*!
+      SELECT f.id
+        , f.label
+        , CASE WHEN x.savefieldid IS NULL THEN 0 ELSE 1 END AS included
+        , COALESCE( x.required, 0 ) AS required
+        , COALESCE( x.sortorder, 999 ) AS sortorder
+      FROM saveformfields f
+        LEFT JOIN clientsxsavefields x ON f.id = x.savefieldid AND x.clientid = ?
+      ORDER BY COALESCE( x.sortorder, 999 ), f.id
+    */}),
+    [ clientid ],
+    function ( err, rows, fields ) {
+      if (err) throw err;
+
+      connection.destroy();
+       
+      res.send( { success: true, data: rows } );
+    }
+  );
+};
+
 exports.getItems = function ( req, res ) {
   var clientid = parseInt( req.query.clientid || 0 );
 
@@ -1326,6 +1791,7 @@ exports.getItems = function ( req, res ) {
       SELECT i.id, i.catid, i.subcatid, i.itemname
         , i.item AS url
         , c.category
+        , c.resizeable
         , COALESCE( s.subcategory, '' ) AS subcategory
         , i.width AS forceWidth
         , i.depth AS forceHeight
@@ -1348,30 +1814,3 @@ exports.getItems = function ( req, res ) {
     }
   );
 };
-
-exports.sendEmail = function ( req, res ) {
-  var nodemailer = require('nodemailer');
-  // https://github.com/andris9/Nodemailer
-  // http://nodemailer.com/
-
-  var transporter = nodemailer.createTransport();
-  //var transporter = nodemailer.createTransport({
-  //  service: 'gmail',
-  //  auth: {
-  //      user: '*****',
-  //      pass: '*****'
-  //  }
-  //});
-  transporter.sendMail({
-      from: 'stevetryba@4gig.com',
-      to: 'james@bitovi.com',
-      subject: 'hello',
-      text: 'hello world!'
-  }, function ( error, info ) {
-    if ( error ) {
-      res.send( { success: false, info: info, error: error } );
-      return;
-    }
-    res.send( { success: true, info: info } );
-  });
-}
