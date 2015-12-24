@@ -389,6 +389,7 @@
         <div class="button" ($click)="menuActionNone()">
           Return To Planner
         </div>
+        <b style="display:block;">{{roomname}}</b><br>
         <div class="print-svg-container" ($inserted)="cloneRoomSVGTo( %element )"></div><br>
         <div ($inserted)="loadItemSummary()">
           <b>Item Summary</b><br>
@@ -416,6 +417,16 @@
               <b>Total:&nbsp;&nbsp;&nbsp;${{itemSummaryTotal}}&nbsp;&nbsp;&nbsp;</b><br>
             {{/itemSummaryTotal}}
             <br>
+            <div>
+              <div style="display: inline-block; width: 32%; vertical-align: middle; text-align: center;">
+                {{#if clientInfo.logo}}
+                  <img src="{{clientInfo.logo}}" alt="[client logo]" width="100%">
+                {{/if}}
+              </div>
+              <div style="display: inline-block; width: 66%; vertical-align: middle; text-align: center;">
+                <pre>{{clientInfo.address}}</pre>
+              </div>
+            </div>
             <div class="button secondary" ($click)="menuActionNone()">
               Return To Planner
             </div>

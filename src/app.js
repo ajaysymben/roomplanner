@@ -159,18 +159,24 @@ const AppViewModel = AppMap.extend({
 
   init: function () {
     var vm = this;
-    can.route( ":clientid" );
+    can.route( ":clientid/:roomid" );
     //can.route.bind( 'change', function ( ev, attr, how, newVal, oldVal ) {
     can.route.ready();
 
     var clientid = parseInt( can.route.attr( "clientid" ) ) || 2;
+    var roomid = parseInt( can.route.attr( "roomid" ) ) || 0;
 
     //overwrite url specified clientid and default with domain specific client
+    //TODO: make subdomain lookup dynamic -- send it to the server and fetch with client query
     if ( window.location.href.indexOf( "flinnsci" ) !== -1 ) {
       clientid = 12;
     }
 
     can.route.attr( "clientid", clientid );
+
+    if ( roomid ) {
+      can.route.attr( "roomid", roomid );
+    }
 
     can.route.ready();
 
@@ -203,6 +209,12 @@ const AppViewModel = AppMap.extend({
         vm.attr( "saveFields", fields.data );
       });
     });
+
+    if ( roomid ) {
+      jqXHR.then( function () {
+        vm.loadRoomFromID( roomid );
+      });
+    }
   },
 
   loadItemSummary: function () {

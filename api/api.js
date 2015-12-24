@@ -8,21 +8,23 @@ var getConnection = function () {
     database : process.env.DBNAME
   });
 
-  connection.query(
-    fcs(function(){/*!
-      SELECT concat('KILL ', id, ';') AS kills
-      FROM information_schema.processlist
-      WHERE Command = 'Sleep'
-        AND Time >= 5
-    */}),
-    function ( err, rows, fields ) {
-      if (err) throw err;
-
-      for ( var i = 0; i < rows.length; i++ ) {
-        connection.query( rows[ i ].kills, function () {} );
-      }
-    }
-  );
+  //connection.query(
+  //  fcs(function(){/*!
+  //    SELECT concat('KILL ', ID, ';') AS kills
+  //    FROM information_schema.processlist
+  //    WHERE COMMAND = 'Sleep'
+  //      AND STATE = ''
+  //      AND INFO IS NULL
+  //      AND TIME >= 3
+  //  */}),
+  //  function ( err, rows, fields ) {
+  //    if (err) throw err;
+  //
+  //    for ( var i = 0; i < rows.length; i++ ) {
+  //      connection.query( rows[ i ].kills, function () {} );
+  //    }
+  //  }
+  //);
 
   return connection;
 };
@@ -71,30 +73,27 @@ Queue.prototype.go = function ( fn ) {
         , ( 'Comments or Questions' )
     */
 
+
+
+/*!
+      SELECT *
+      FROM information_schema.processlist
+      WHERE Command = 'Sleep'
+    */
+
+
+
+
 exports.oneoffquery = function ( req, res ) {
   var connection = getConnection();
 
   connection.query(
     fcs(function(){/*!
-      INSERT INTO clientsxsavefields ( clientid, savefieldid, required, sortorder )
-      VALUES ( 2, 2, 0, 2 )
-        , ( 2, 12, 1, 12 )
-        , ( 2, 22, 1, 22 )
-        , ( 2, 32, 0, 32 )
-        , ( 2, 42, 0, 42 )
-        , ( 2, 52, 1, 52 )
-        , ( 2, 62, 0, 62 )
-        , ( 2, 72, 0, 72 )
-        , ( 2, 82, 0, 82 )
-        , ( 12, 2, 0, 2 )
-        , ( 12, 12, 1, 12 )
-        , ( 12, 22, 1, 22 )
-        , ( 12, 32, 0, 32 )
-        , ( 12, 42, 0, 42 )
-        , ( 12, 52, 1, 52 )
-        , ( 12, 62, 0, 62 )
-        , ( 12, 72, 0, 72 )
-        , ( 12, 82, 0, 82 )
+      UPDATE clients
+      SET address = 'P.O. Box 219, Batavia, IL 60510 
+1-800-452-1261 • Fax: (866) 452-1436 
+E-mail: flinn@flinnsci.com • Website: www.flinnsci.com'
+      WHERE id = 12
     */}),
     function ( err, result ) {
       if (err) throw err;
@@ -126,7 +125,8 @@ exports.createDatabaseTables = function ( req, res ) {
           logo VARCHAR(255) NOT NULL,
           name VARCHAR(255) NOT NULL,
           contactemail VARCHAR(255) NOT NULL,
-          address TEXT NULL,
+          color VARCHAR(6) DEFAULT '29597E' NOT NULL,
+          address  TEXT DEFAULT '' NOT NULL,
           PRIMARY KEY (id)
         )
       */}),
@@ -743,7 +743,7 @@ exports.manageItemsGET = function ( req, res ) {
                   <option value="0" disabled selected>Select a category</option>
                 </select>
               </div>
-              Can items in the selected category be updated? ( check if yes )<br>
+              Can items in the selected category be resized? ( check if yes )<br>
               <input type="checkbox" id="catresizeable" style="display:none;" onclick="updateResizeable( this )">
             </td>
             <td width="50%">
@@ -1595,6 +1595,11 @@ exports.roomsGET = function ( req, res ) {
   return getRooms( req, res );
 };
 
+var validateEmail = function ( email ) {
+  var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test( email );
+};
+
 var saveFormData = function ( req, res, roomid, connection ) {
   if ( !roomid ) {
     connection.destroy();
@@ -1608,7 +1613,8 @@ var saveFormData = function ( req, res, roomid, connection ) {
   */});
 
   var fields = req.body.formdata;
-  var emailbody = "";
+  var emailbody = "Hello, a floor plan has just been saved to the room planner.<br><br>";
+  var userEmail = "";
 
   for ( var i = 0; i < fields.length; i++ ) {
     var field = fields[ i ];
@@ -1618,10 +1624,27 @@ var saveFormData = function ( req, res, roomid, connection ) {
       field.value || ""
     ];
 
+    if ( parseInt( field.fieldid ) === 22 ) {
+      //email field on form
+      userEmail = field.value || "";
+    }
+
+    if ( userEmail === "preplanned" ) {
+      //TODO: check password field
+      userEmail = "";
+    }
+
+    if ( !validateEmail( userEmail ) ) {
+      userEmail = "";
+    }
+
     emailbody += "<b>" + field.label + "</b><br><i>" + field.value + "</i><br><br>";
 
     qry += "\n( " + connection.escape( insertvals ) + " ),";
   }
+
+  emailbody += "To view their floorplan, follow this url:<br>";
+  emailbody += "TODO: URL STRAIGHT TO PLAN";
 
   //turn last row , into ; to signify end of inserts
   qry = qry.replace( /,$/, ";" );
@@ -1659,9 +1682,9 @@ var saveFormData = function ( req, res, roomid, connection ) {
           //});
           transporter.sendMail({
               from: 'stevetryba@4gig.com',
-              to: rows[ 0 ].contactemail,
-              subject: 'hello world!',
-              text: emailbody
+              bcc: rows[ 0 ].contactemail + ( userEmail.length ? "," + userEmail : "" ),
+              subject: 'Room Planner Saved Plan',
+              html: emailbody
           }, function ( error, info ) {
             if ( error ) {
               res.send( { success: false, info: info, error: error } );
@@ -1731,7 +1754,7 @@ exports.getClient = function ( req, res ) {
 
   connection.query(
     fcs(function(){/*!
-      SELECT id, logo, name, contactemail
+      SELECT id, logo, name, contactemail, color, address
       FROM clients
       WHERE id = ?
     */}),
