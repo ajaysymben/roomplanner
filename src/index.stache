@@ -390,7 +390,7 @@
           Return To Planner
         </div>
         <b style="display:block;">{{roomname}}</b><br>
-        <div class="print-svg-container" ($inserted)="cloneRoomSVGTo( %element )"></div><br>
+        <div class="print-svg-container print-break-page-after" ($inserted)="cloneRoomSVGTo( %element )"></div><br>
         <div ($inserted)="loadItemSummary()">
           <b>Item Summary</b><br>
           <br>

@@ -112,10 +112,10 @@ const AppViewModel = AppMap.extend({
       value: "gettingstarted",
       set: function ( newValue ) {
         if ( newValue === "print" ) {
-          $( "html, body" ).css({ "overflow-y": "auto" });
+          $( "html, body" ).addClass( "printing" );
           setTimeout(function () { window.print(); }, 250);
         } else {
-          $( "html, body" ).css({ "overflow-y": "hidden" });
+          $( "html, body" ).removeClass( "printing" );
         }
         return newValue;
       },
@@ -159,6 +159,7 @@ const AppViewModel = AppMap.extend({
 
   init: function () {
     var vm = this;
+    can.route( ":clientid" );
     can.route( ":clientid/:roomid" );
     //can.route.bind( 'change', function ( ev, attr, how, newVal, oldVal ) {
     can.route.ready();

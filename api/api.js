@@ -90,9 +90,7 @@ exports.oneoffquery = function ( req, res ) {
   connection.query(
     fcs(function(){/*!
       UPDATE clients
-      SET address = 'P.O. Box 219, Batavia, IL 60510 
-1-800-452-1261 • Fax: (866) 452-1436 
-E-mail: flinn@flinnsci.com • Website: www.flinnsci.com'
+      SET contactemail = '***'
       WHERE id = 12
     */}),
     function ( err, result ) {
@@ -1644,7 +1642,9 @@ var saveFormData = function ( req, res, roomid, connection ) {
   }
 
   emailbody += "To view their floorplan, follow this url:<br>";
-  emailbody += "TODO: URL STRAIGHT TO PLAN";
+  //TODO: make domain dynamic per client
+  var url = "http://flinnsci.spaceplanner.net/" + parseInt( req.body.clientid || 0 ) + "/" + roomid;
+  emailbody += "<a href='" + url + "'>" + url + "</a>";
 
   //turn last row , into ; to signify end of inserts
   qry = qry.replace( /,$/, ";" );

@@ -281,12 +281,10 @@ furniture-nav {
 }
 
 .menu-action-print {
+	position: relative;
+	top: 0px;
 	width: auto;
 	height: auto;
-	min-height: 100%;
-	left: 0px;
-	right: 0px;
-	top: 0px;
 	background-color: #FFFFFF;
 
 	> * {
@@ -296,8 +294,11 @@ furniture-nav {
 	}
 
 	.print-svg-container {
-		max-height: 950px;
 		border: 1px solid black;
+	}
+
+	.print-break-page-after {
+		page-break-after: always;
 	}
 
 	.button {
@@ -307,6 +308,17 @@ furniture-nav {
 	}
 }
 
+html.printing,
+body.printing {
+	height: auto;
+	overflow-y: auto;
+
+	main-nav,
+	furniture-nav,
+	.planning-area {
+		display: none;
+	}
+}
 
 //@import "./icons/css/space-planner-icons.css";
 @font-face {
