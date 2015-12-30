@@ -4,9 +4,9 @@
     {{asset "css"}}
     {{asset "html5shiv"}}
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <script type="text/javascript" src="/three-js/build/three.min.js"></script>
-    <script type="text/javascript" src="/three-js/examples/js/renderers/CanvasRenderer.js"></script>
-    <script type="text/javascript" src="/three-js/examples/js/renderers/Projector.js"></script>
+    <script type="text/javascript" src="/three-js/three.min.js"></script>
+    <script type="text/javascript" src="/three-js/renderers/CanvasRenderer.js"></script>
+    <script type="text/javascript" src="/three-js/renderers/Projector.js"></script>
   </head>
   <body>
     <can-import from="svg-roomplanner/styles.less!" />
