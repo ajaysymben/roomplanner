@@ -10,7 +10,7 @@ export const ViewModel = Roomplan.extend({}, {
       value: 'This is the pre-saved-rooms component'
     }
   },
-  rooms: [],
+  //rooms: [],
   loadRoom: function ( el, roominfo ) {
     //TODO: save if dirty first
     this.attr( "isvgConfig.width", 0 );
@@ -57,7 +57,9 @@ export default Component.extend({
       }
 
       //console.log( "pre-saved-rooms.js", vm.attr( "clientInfo.id" ) );
-
+      if ( vm.attr( "rooms" ) && vm.attr( "rooms" ).length ) {
+        return;
+      }
       Roomplan.findAll({
         clientid: vm.attr( "clientInfo.id" ),
         email: "preplanned"

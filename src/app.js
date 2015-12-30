@@ -35,8 +35,26 @@ const AppViewModel = AppMap.extend({
     saveFields: {
       serialize: false
     },
+    show3DButton: {
+      serialize: false,
+      get: function () {
+        var loc = window.location.href;
+        var showIt = false;
+        if ( loc.indexOf( "localhost" ) !== -1 ) {
+          showIt = true;
+        }
+        if ( loc.indexOf( "3D" ) !== -1 ) {
+          showIt = true;
+        }
+        return showIt;
+      }
+    },
     roomname: {
       value: "",
+      serialize: false
+    },
+    preSavedRooms: {
+      value: [],
       serialize: false
     },
     itemSummary: {
@@ -419,6 +437,14 @@ const AppViewModel = AppMap.extend({
 
   menuActionPrint: function () {
     this.attr( "menuAction", "print" );
+  },
+
+  menuActionToggle3D: function () {
+    if ( this.attr( "menuAction" ) === "none" ) {
+      this.attr( "menuAction", "3d" );
+    } else {
+      this.attr( "menuAction", "none" );
+    }
   },
 
   cloneRoomSVGTo: function ( el ) {

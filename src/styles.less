@@ -41,6 +41,46 @@ html, body {
 	}
 }
 
+.view-3d-toggler {
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+	padding: 10px;
+	display: inline-block;
+	cursor: pointer;
+	z-index: 250;
+	color: #FFFFFF;
+	font-size: 15px;
+	font-weight: bold;
+	text-shadow: rgb(204, 204, 204) 0px 1px 0px,
+				rgb(201, 201, 201) 0px 2px 0px,
+				rgb(187, 187, 187) 0px 3px 0px,
+				rgb(185, 185, 185) 0px 4px 0px,
+				rgb(170, 170, 170) 0px 5px 0px,
+				rgba(0, 0, 0, 0.0980392) 0px 6px 1px,
+				rgba(0, 0, 0, 0.0980392) 0px 0px 5px,
+				rgba(0, 0, 0, 0.298039) 0px 1px 3px,
+				rgba(0, 0, 0, 0.14902) 0px 3px 5px,
+				rgba(0, 0, 0, 0.2) 0px 5px 10px,
+				rgba(0, 0, 0, 0.2) 0px 10px 10px,
+				rgba(0, 0, 0, 0.0980392) 0px 20px 20px;
+
+	&.returntoplanner {
+		color: #000000;
+		text-shadow: none;
+	}
+}
+
+.view-3d-container {
+	background-color: #C8C8C8;
+	position: absolute;
+	top: 50px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	z-index: 222;
+}
+
 furniture-nav {
 	z-index: 2;
 	background-color: #FFFFFF;

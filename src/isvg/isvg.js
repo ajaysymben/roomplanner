@@ -126,6 +126,7 @@ export const ViewModel = Map.extend({
 
 	setGeometryInfo: function ( info ) {
 		var scalarPxToViewBoxPoints = this.attr( "scalarPxToViewBoxPoints" );
+		var scalarUnitsToPx = this.attr( "scalarUnitsToPx" );
 		var lx = info.translateX + info.viewBoxPointsOffsetX;
 		var rx = lx + info.viewBoxPointsWidth;
 		var ty = info.translateY + info.viewBoxPointsOffsetY;
@@ -148,6 +149,8 @@ export const ViewModel = Map.extend({
 		info.pxLeftTopY = ty / scalarPxToViewBoxPoints;
 		info.pxCenterX = cx / scalarPxToViewBoxPoints;
 		info.pxCenterY = cy / scalarPxToViewBoxPoints;
+		info.unitsCenterX = info.pxCenterX / scalarUnitsToPx;
+		info.unitsCenterY = info.pxCenterY / scalarUnitsToPx;
 
 		info.pxOptionsX = Math.min( info.geo.A.x, info.geo.B.x, info.geo.C.x, info.geo.D.x ) / scalarPxToViewBoxPoints;
 		if ( info.pxOptionsX < 10 ) {
@@ -239,9 +242,11 @@ export const ViewModel = Map.extend({
 		var $parts = $svg.find( iQueryString );
 
 		var vm = this;
+		var allinfo = [];
 		$parts.each(function () {
-			vm.getPartInfo( this );
+			allinfo.push( vm.getPartInfo( this ) );
 		});
+		return allinfo;
 	},
 
 	setTransform: function ( svgPart, info ) {

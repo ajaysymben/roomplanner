@@ -4,6 +4,9 @@
     {{asset "css"}}
     {{asset "html5shiv"}}
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <script type="text/javascript" src="/three-js/build/three.min.js"></script>
+    <script type="text/javascript" src="/three-js/examples/js/renderers/CanvasRenderer.js"></script>
+    <script type="text/javascript" src="/three-js/examples/js/renderers/Projector.js"></script>
   </head>
   <body>
     <can-import from="svg-roomplanner/styles.less!" />
@@ -23,6 +26,19 @@
         <interactive-svg {config}="isvgConfig"></interactive-svg>
       {{/if}}
     </div>
+
+    {{#if show3DButton}}
+      <div class="view-3d-toggler {{#is menuAction '3d'}}returntoplanner{{/is}}" ($click)="menuActionToggle3D()">
+        {{#if isvgConfig.width}}
+          {{#is menuAction "none"}}
+            3D VIEW
+          {{/is}}
+          {{#is menuAction "3d"}}
+            Return To Planner
+          {{/is}}
+        {{/if}}
+      </div>
+    {{/if}}
 
     {{#is menuAction "gettingstarted"}}
       <div class="menu-action-top">
@@ -65,7 +81,7 @@
       <div class="menu-action-right">
         <can-import from="svg-roomplanner/pre-saved-rooms/" />
         {{#if clientInfo}}
-          <pre-saved-rooms {client-info}="clientInfo" {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
+          <pre-saved-rooms {client-info}="clientInfo" {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction" {(rooms)}="preSavedRooms"></pre-saved-rooms>
         {{/if}}
       </div>
     {{/is}}
@@ -173,7 +189,13 @@
       </div>
       <div class="menu-action-right">
         <can-import from="svg-roomplanner/pre-saved-rooms/" />
-        <pre-saved-rooms {client-info}="clientInfo" {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
+        <pre-saved-rooms {client-info}="clientInfo" {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction" {(rooms)}="preSavedRooms"></pre-saved-rooms>
+      </div>
+    {{/is}}
+    {{#is menuAction "3d"}}
+      <div class="view-3d-container">
+        <can-import from="svg-roomplanner/view-3d/" />
+        <view-3d></view-3d>
       </div>
     {{/is}}
     {{#is menuAction "open"}}
@@ -207,7 +229,7 @@
       </div>
       <div class="menu-action-right">
         <can-import from="svg-roomplanner/pre-saved-rooms/" />
-        <pre-saved-rooms {client-info}="clientInfo" {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction"></pre-saved-rooms>
+        <pre-saved-rooms {client-info}="clientInfo" {^roomname}="roomname" {(isvg-config)}="isvgConfig" {(menu-action)}="menuAction" {(rooms)}="preSavedRooms"></pre-saved-rooms>
       </div>
     {{/is}}
     {{#is menuAction "save"}}
