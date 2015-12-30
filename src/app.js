@@ -38,12 +38,12 @@ const AppViewModel = AppMap.extend({
     show3DButton: {
       serialize: false,
       get: function () {
-        var loc = window.location.href;
+        var loc = window.location.href.toLowerCase();
         var showIt = false;
         if ( loc.indexOf( "localhost" ) !== -1 ) {
           showIt = true;
         }
-        if ( loc.indexOf( "3D" ) !== -1 ) {
+        if ( loc.indexOf( "3d" ) !== -1 ) {
           showIt = true;
         }
         return showIt;
