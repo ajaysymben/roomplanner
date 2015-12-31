@@ -449,6 +449,19 @@ const AppViewModel = AppMap.extend({
 
   cloneRoomSVGTo: function ( el ) {
     $( el ).append( $( ".planning-area interactive-svg svg" ).clone() );
+
+    var unitWidth = this.attr( "isvgConfig.width" );
+    var unitHeight = this.attr( "isvgConfig.height" );
+
+    var printWidth = 7;
+    var printHeight = printWidth * unitHeight / unitWidth;
+
+    if ( printHeight > 9 ) {
+      printHeight = 9;
+      printWidth = printHeight * unitWidth / unitHeight;
+    }
+
+    $( el ).css({ height: printHeight + "in", width: printWidth + "in" });
   }
 
 });
