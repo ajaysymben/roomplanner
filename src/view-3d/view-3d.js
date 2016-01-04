@@ -131,11 +131,19 @@ export const ViewModel = Map.extend({
     var depth = this.attr( "floorDepth" );
     var width = this.attr( "floorWidth" );
 
+    //var floor = new THREE.Mesh(
+    //  new THREE.BoxGeometry( width, 6, depth ),
+    //  new THREE.MeshBasicMaterial({ color: 0xFFFFFF })
+    //);
+    //floor.translateX( width / 2 );
+    //floor.translateY( -6 );
+    //floor.translateZ( -depth / 2 );
+    //this.attr( "scene" ).add( floor );
+
     var geometry = new THREE.Geometry();
     var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
 
     var color = new THREE.Color( 0x000000 );
-    var white = new THREE.Color( 0xFFFFFF );
 
     var lefttop = this.convertSVGPointFor3DCoordSystem( 0, 0 );
     var righttop = this.convertSVGPointFor3DCoordSystem( width, 0 );
@@ -149,8 +157,8 @@ export const ViewModel = Map.extend({
       new THREE.Vector3( rightbottom.x, 0, rightbottom.z ), new THREE.Vector3( righttop.x, 0, righttop.z )
     );
     geometry.colors.push(
-      color, white,
-      white, color,
+      color, color,
+      color, color,
       color, color,
       color, color
     );
@@ -202,6 +210,21 @@ export const ViewModel = Map.extend({
     x = ~~( Math.random() * 6 ) * 0x33;
     color += x.toString( 16 );
     return color;
+  },
+
+  insertDAE: function ( filepath, scene, xPos, yPos, zPos, rotationDeg ) {
+    var loader = new THREE.ColladaLoader();
+    var dae;
+    loader.options.convertUpAxis = true;
+
+    loader.load( filepath, function ( collada ) {
+      //TODO: turn loader into a promise, map filename to this promise so future requests use the same data via dae.clone()
+      dae = collada.scene;
+      dae.scale.x = dae.scale.y = dae.scale.z = 1.0;
+      dae.position.set( xPos, yPos, zPos );
+      dae.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), rotationDeg * -0.0174533 );
+      scene.add( dae );
+    });
   },
 
   get3DData: function ( partTitle ) {
@@ -261,6 +284,10 @@ export const ViewModel = Map.extend({
       data3D.color = parseInt( "FEE8B2", 16 );
     }
 
+    if ( false && partTitle === '48"l wall cabinet' ) {
+      data3D.dae = "/src/daes/shelf.dae";
+    }
+
     return data3D;
   },
 
@@ -289,20 +316,32 @@ export const ViewModel = Map.extend({
       data3D = this.get3DData( info.partTitle );
       if ( data3D.color ) color = data3D.color;
 
-      geometry = new THREE.BoxGeometry( info.unitsWidth, data3D.height, info.unitsHeight );
-      material = new THREE.MeshBasicMaterial({
-        color: color,
-        //wireframe: true
-      });
-
-      mesh = new THREE.Mesh( geometry, material );
-      scene.add( mesh );
       temp = this.convertSVGPointFor3DCoordSystem( info.unitsCenterX, info.unitsCenterY );
-      mesh.translateX( temp.x );
-      mesh.translateY( data3D.yPos );
-      mesh.translateZ( temp.z );
-      mesh.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), info.rotation * -0.0174533 );
+
+      if ( data3D.dae ) {
+        vm.insertDAE( data3D.dae, scene, temp.x, data3D.yPos, temp.z, info.rotation );
+      } else {
+        geometry = new THREE.BoxGeometry( info.unitsWidth, data3D.height, info.unitsHeight );
+        material = new THREE.MeshBasicMaterial({
+          color: color,
+          //wireframe: true
+        });
+
+        mesh = new THREE.Mesh( geometry, material );
+        scene.add( mesh );
+        mesh.translateX( temp.x );
+        mesh.translateY( data3D.yPos );
+        mesh.translateZ( temp.z );
+        mesh.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), info.rotation * -0.0174533 );
+      }
     }
+
+    //var light = new THREE.AmbientLight( 0xffffff );
+    //scene.add( light );
+
+    //var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+    //directionalLight.position.set( 0, 1, 0 );
+    //scene.add( directionalLight );
 
     renderer = new THREE.CanvasRenderer();
     renderer.setSize( $el.width(), $el.height() );
