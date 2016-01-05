@@ -96,8 +96,8 @@ exports.oneoffquery = function ( req, res ) {
     function ( err, result ) {
       if (err) throw err;
 
-      connection.destroy();
-
+      //connection.destroy();
+      connection.end(function ( err ) { });
       res.send({ success: true, result: result });
     }
   );
@@ -242,8 +242,8 @@ exports.createDatabaseTables = function ( req, res ) {
     connection.query( 'SELECT 1 AS solution', function ( err, rows, fields ) {
       if (err) throw err;
 
-      connection.destroy();
-     
+      //connection.destroy();
+      connection.end(function ( err ) { });
       res.send({ success: true });
     });
   });
@@ -303,7 +303,8 @@ exports.createDatabaseTables2 = function ( req, res ) {
     connection.query( 'SELECT 1 AS solution', function ( err, rows, fields ) {
       if (err) throw err;
 
-      connection.destroy();
+      //connection.destroy();
+      connection.end(function ( err ) { });
      
       res.send({ success: true });
     });
@@ -377,7 +378,8 @@ exports.dropDatabaseTables = function ( req, res ) {
     connection.query( 'SELECT 1 AS solution', function ( err, rows, fields ) {
       if (err) throw err;
 
-      connection.destroy();
+      //connection.destroy();
+      connection.end(function ( err ) { });
      
       res.send({ success: true });
     });
@@ -470,8 +472,9 @@ exports.addClient = function ( req, res ) {
   connection.query( 'SELECT * FROM clients', function ( err, rows, fields ) {
     if (err) throw err;
 
-    connection.destroy();
-   
+    //connection.destroy();
+    connection.end(function ( err ) { });
+
     res.send(
       adminHeader +
       fcs(function(){/*!
@@ -540,7 +543,8 @@ exports.doAddClient = function ( req, res ) {
     function ( err, result ) {
       if (err) throw err;
 
-      connection.destroy();
+      //connection.destroy();
+      connection.end(function ( err ) { });
 
       res.send({ success: true, newClientId: result.insertId });
     }
@@ -625,8 +629,9 @@ exports.getManage = function ( req, res ) {
     }
     resp = resp.replace( "@roomlist@", "" );
 
-    connection.destroy();
-
+    //connection.destroy();
+    connection.end(function ( err ) { });
+    
     res.send( adminHeader + resp + adminFooter );
   });
 };
@@ -650,7 +655,8 @@ exports.doManage = function ( req, res ) {
     function ( err, result ) {
       if (err) throw err;
 
-      connection.destroy();
+      //connection.destroy();
+      connection.end(function ( err ) { });
 
       res.send({ success: true, msg: result.affectedRows + " rooms deleted." });
     }
@@ -663,7 +669,8 @@ exports.manageItemsGET = function ( req, res ) {
   connection.query( 'SELECT id, name FROM clients', function ( err, rows, fields ) {
     if (err) throw err;
 
-    connection.destroy();
+    //connection.destroy();
+    connection.end(function ( err ) { });
 
     var clientDD = "";
     for ( var i = 0; i < rows.length; i++ ) {
@@ -1065,7 +1072,6 @@ exports.manageItemsGET = function ( req, res ) {
       ) + adminFooter
     );
   });
-
 };
 
 var doAddCategory = function ( req, res ) {
@@ -1083,7 +1089,8 @@ var doAddCategory = function ( req, res ) {
     function ( err, result ) {
       if (err) throw err;
 
-      connection.destroy();
+      //connection.destroy();
+      connection.end(function ( err ) { });
 
       res.send({ success: true, newCategoryId: result.insertId });
     }
@@ -1138,8 +1145,9 @@ var replaceClientItems = function ( req, res ) {
       connection.query(
         qry,
         function ( err, result ) {
-          connection.destroy();
-
+          //connection.destroy();
+          connection.end(function ( err ) { });
+          
           res.send({ success: true, newCategoryId: result.insertId });
         }
       );
@@ -1204,13 +1212,13 @@ exports.manageFieldsPOST = function ( req, res ) {
         connection.query(
           qry,
           function ( err, result ) {
-            connection.destroy();
-
             if (err) {
               console.log( qry );
               throw err;
             }
-
+            //connection.destroy();
+            connection.end(function ( err ) { });
+            
             res.send({ success: true, qry: qry });
           }
         );
@@ -1228,7 +1236,8 @@ exports.manageFieldsGET = function ( req, res ) {
   connection.query( 'SELECT id, name FROM clients', function ( err, rows, fields ) {
     if (err) throw err;
 
-    connection.destroy();
+    //connection.destroy();
+    connection.end(function ( err ) { });
 
     var clientDD = "";
     for ( var i = 0; i < rows.length; i++ ) {
@@ -1415,7 +1424,8 @@ exports.setCatResizeable = function ( req, res ) {
       function ( err, result ) {
         if (err) throw err;
 
-        connection.destroy();
+        //connection.destroy();
+        connection.end(function ( err ) { });
 
         res.send({ success: true, catid: catid, resizeable: resizeable });
       }
@@ -1449,8 +1459,9 @@ exports.getCategorySubcategory = function ( req, res ) {
     function ( err, rows, fields ) {
       if (err) throw err;
 
-      connection.destroy();
-     
+      //connection.destroy();
+      connection.end(function ( err ) { });
+
       res.send( { success: true, data: rows } );
     }
   );
@@ -1476,8 +1487,9 @@ exports.getVerticalPlacements = function ( req, res ) {
     function ( err, rows, fields ) {
       if (err) throw err;
 
-      connection.destroy();
-     
+      //connection.destroy();
+      connection.end(function ( err ) { });
+      
       res.send( { success: true, data: rows } );
     }
   );
@@ -1503,8 +1515,9 @@ exports.addVerticalPlacements = function ( req, res ) {
     function ( err, result ) {
       if (err) throw err;
 
-      connection.destroy();
-
+      //connection.destroy();
+      connection.end(function ( err ) { });
+      
       res.send({ success: true, newVertId: result.insertId });
     }
   );
@@ -1528,9 +1541,10 @@ var getRoomsFull = function ( req, res ) {
     function ( err, rows, fields ) {
       if (err) throw err;
 
-      connection.destroy();
+      //connection.destroy();
+      connection.end(function ( err ) { });
       
-      res.send( { success: true, data: rows } );
+      res.send({ success: true, data: rows });
     }
   );
 };
@@ -1552,8 +1566,9 @@ var getRooms = function ( req, res ) {
     function ( err, rows, fields ) {
       if (err) throw err;
 
-      connection.destroy();
-     
+      //connection.destroy();
+      connection.end(function ( err ) { });
+      
       res.send( { success: true, data: rows } );
     }
   );
@@ -1574,8 +1589,9 @@ var getOneRoom = function ( req, res ) {
     function ( err, rows, fields ) {
       if (err) throw err;
 
-      connection.destroy();
-     
+      //connection.destroy();
+      connection.end(function ( err ) { });
+      
       res.send( { success: true, data: rows } );
     }
   );
@@ -1600,7 +1616,9 @@ var validateEmail = function ( email ) {
 
 var saveFormData = function ( req, res, roomid, connection ) {
   if ( !roomid ) {
-    connection.destroy();
+    //connection.destroy();
+    connection.end(function ( err ) { });
+    
     return res.send({ success: false, roomid: roomid, params: req.body });
   }
 
@@ -1661,13 +1679,14 @@ var saveFormData = function ( req, res, roomid, connection ) {
         "SELECT contactemail FROM clients WHERE id = ?",
         [ parseInt( req.body.clientid || 0 ) ],
         function ( err, rows, fields ) {
-          connection.destroy();
 
           if (err) {
             console.log( qry );
             throw err;
           }
 
+          //connection.destroy();
+          connection.end(function ( err ) { });
           var nodemailer = require('nodemailer');
           // https://github.com/andris9/Nodemailer
           // http://nodemailer.com/
@@ -1735,8 +1754,9 @@ exports.saveRoom = function ( req, res ) {
         return saveFormData( req, res, result.insertId, connection );
 
       } else {
-        connection.destroy();
-
+        //connection.destroy();
+        connection.end(function ( err ) { });
+        
         res.send({ success: true, newRoomId: result.insertId });
       }
     }
@@ -1762,8 +1782,9 @@ exports.getClient = function ( req, res ) {
     function ( err, rows, fields ) {
       if (err) throw err;
 
-      connection.destroy();
-     
+      //connection.destroy();
+      connection.end(function ( err ) { });
+      
       res.send( { success: true, data: rows } );
     }
   );
@@ -1793,8 +1814,9 @@ exports.getSFFields = function ( req, res ) {
     function ( err, rows, fields ) {
       if (err) throw err;
 
-      connection.destroy();
-       
+      //connection.destroy();
+      connection.end(function ( err ) { });
+      
       res.send( { success: true, data: rows } );
     }
   );
@@ -1831,8 +1853,9 @@ exports.getItems = function ( req, res ) {
     function ( err, rows, fields ) {
       if (err) throw err;
 
-      connection.destroy();
-       
+      //connection.destroy();
+      connection.end(function ( err ) { });
+      
       res.send( { success: true, data: rows } );
     }
   );
