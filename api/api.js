@@ -76,6 +76,12 @@ Queue.prototype.go = function ( fn ) {
 
 
 /*!
+      UPDATE clients
+      SET contactemail = '***'
+      WHERE id = 12
+
+
+
       SELECT *
       FROM information_schema.processlist
       WHERE Command = 'Sleep'
@@ -1118,7 +1124,7 @@ var replaceClientItems = function ( req, res ) {
 
       var qry = fcs(function(){/*!
         INSERT INTO items
-          ( clientid, catid, subcatid, itemname, item, width, depth, vertid, unitprice )
+          ( clientid, catid, subcatid, itemname, item, width, depth, vertid, unitprice, itemnumber )
         VALUES
       */});
 
@@ -1133,7 +1139,8 @@ var replaceClientItems = function ( req, res ) {
           item.forceWidth,
           item.forceHeight,
           item.vertid,
-          item.unitprice || 0
+          item.unitprice || 0,
+          item.itemnumber || null
         ];
 
         qry += "\n( " + connection.escape( insertvals ) + " ),";
@@ -1700,7 +1707,7 @@ var saveFormData = function ( req, res, roomid, connection ) {
           //  }
           //});
           transporter.sendMail({
-              from: 'stevetryba@4gig.com',
+              from: rows[ 0 ].contactemail,
               bcc: rows[ 0 ].contactemail + ( userEmail.length ? "," + userEmail : "" ),
               subject: 'Room Planner Saved Plan',
               html: emailbody
