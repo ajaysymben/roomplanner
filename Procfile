@@ -1,1 +1,1 @@
-web: NODE_ENV=production node api/
+web: node api/
